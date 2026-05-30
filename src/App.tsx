@@ -1,5 +1,4 @@
 import { startTransition, useEffect, useMemo } from "react";
-import { BookOpenCheck, Code2, LayoutDashboard } from "lucide-react";
 
 import { AppShell } from "./components/app-shell";
 import { DashboardPanel } from "./components/dashboard-panel";
@@ -8,33 +7,7 @@ import { FrontendPanel } from "./components/frontend-panel";
 import { dsaCompanies } from "./data/dsa";
 import { frontendQuestions, roadmapWeeks } from "./data/frontend";
 import { useLocalStorage } from "./hooks/use-local-storage";
-import type {
-  AppPanel,
-  FrontendQuestionId,
-  PanelDefinition,
-  QuestionId,
-} from "./types/prepdoc";
-
-const panelDefinitions: PanelDefinition[] = [
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    description: "Overview",
-    icon: LayoutDashboard,
-  },
-  {
-    id: "dsa",
-    label: "DSA Practice",
-    description: "Company tracker",
-    icon: Code2,
-  },
-  {
-    id: "frontend",
-    label: "Frontend Prep",
-    description: "Roadmap + bank",
-    icon: BookOpenCheck,
-  },
-];
+import type { AppPanel, FrontendQuestionId, QuestionId } from "./types/prepdoc";
 
 function App() {
   const [activePanel, setActivePanel] = useLocalStorage<AppPanel>(
@@ -65,7 +38,7 @@ function App() {
   >("prepdoc.frontend.roadmap-days", []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   const dsaQuestionCount = useMemo(
@@ -106,7 +79,6 @@ function App() {
 
   return (
     <AppShell
-      panels={panelDefinitions}
       activePanel={activePanel}
       onPanelChange={handlePanelChange}
       theme={theme}
@@ -120,7 +92,6 @@ function App() {
         <DashboardPanel
           dsaProgress={dsaProgress}
           frontendProgress={frontendProgress}
-          roadmapProgress={roadmapProgress}
           overallProgress={overallProgress}
           solvedDsaCount={solvedDsaIds.length}
           totalDsaCount={dsaQuestionCount}

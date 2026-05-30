@@ -1,13 +1,4 @@
-import type { LucideIcon } from "lucide-react";
-
 export type AppPanel = "dashboard" | "dsa" | "frontend";
-
-export interface PanelDefinition {
-  id: AppPanel;
-  label: string;
-  description: string;
-  icon: LucideIcon;
-}
 
 export interface DsaQuestion {
   id: string;

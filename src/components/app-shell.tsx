@@ -1,13 +1,8 @@
 import type { ReactNode } from "react";
-import { Moon, PanelLeftClose, PanelLeftOpen, SunMedium } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { PrepDocLogo } from "@/components/prepdoc-logo";
-import { cn } from "@/lib/utils";
-import type { AppPanel, PanelDefinition } from "@/types/prepdoc";
+import type { AppPanel } from "@/types/prepdoc";
 
 interface AppShellProps {
-  panels: PanelDefinition[];
   activePanel: AppPanel;
   onPanelChange: (panel: AppPanel) => void;
   theme: "light" | "dark";
@@ -19,8 +14,19 @@ interface AppShellProps {
   children: ReactNode;
 }
 
+const navItems = [
+  { id: "dashboard" as AppPanel, label: "Dashboard", emoji: "🏠" },
+  { id: "dsa" as AppPanel, label: "DSA Practice", emoji: "⚡", badge: "LC" },
+  { id: "frontend" as AppPanel, label: "Frontend Prep", emoji: "🎯", badge: "45d" },
+];
+
+const panelLabels: Record<AppPanel, string> = {
+  dashboard: "Dashboard",
+  dsa: "DSA Practice",
+  frontend: "Frontend Prep",
+};
+
 export function AppShell({
-  panels,
   activePanel,
   onPanelChange,
   theme,
@@ -31,199 +37,144 @@ export function AppShell({
   qDoneCount,
   children,
 }: AppShellProps) {
-  const activePanelDefinition =
-    panels.find((panel) => panel.id === activePanel) ?? panels[0];
-
   return (
-    <div className="min-h-screen text-foreground">
-      <div className="mx-auto flex min-h-screen w-full max-w-400">
-        <aside
-          className={cn(
-            "hidden shrink-0 border-r border-[#e5dccd] bg-[rgba(247,241,231,0.88)] backdrop-blur md:flex md:flex-col",
-            isSidebarCollapsed ? "md:w-22" : "md:w-53.5",
-          )}
-        >
-          <div
-            className={cn(
-              "border-b border-[#e5dccd] px-4 py-4",
-              isSidebarCollapsed && "px-3",
-            )}
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", width: "100%" }}>
+      {/* SIDEBAR */}
+      <aside className={`sidebar${isSidebarCollapsed ? " collapsed" : ""}`}>
+        {/* Logo */}
+        <div className="sidebar-logo">
+          <div className="logo-icon">
+            <svg viewBox="0 0 20 20">
+              <path d="M10 1L2 6v8l8 5 8-5V6L10 1zm0 2.3L16 7v6l-6 3.7L4 13V7l6-3.7z" />
+            </svg>
+          </div>
+          <div className="logo-text">
+            Prep<span>Doc</span>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="sidebar-section-label">Navigation</div>
+
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={`nav-item${activePanel === item.id ? " active" : ""}`}
+            onClick={() => onPanelChange(item.id)}
           >
-            <PrepDocLogo collapsed={isSidebarCollapsed} />
-          </div>
+            <div className="nav-icon">{item.emoji}</div>
+            <span className="nav-label">{item.label}</span>
+            {item.badge ? <span className="nav-badge">{item.badge}</span> : null}
+          </button>
+        ))}
 
-          <div className="flex-1 px-3 py-4">
-            <p
-              className={cn(
-                "px-2 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#9a917e]",
-                isSidebarCollapsed && "sr-only",
-              )}
-            >
-              Navigation
-            </p>
-            <div className="mt-4 space-y-2">
-              {panels.map((panel) => {
-                const Icon = panel.icon;
+        {/* Resources */}
+        <div className="sidebar-section-label">Resources</div>
 
-                return (
-                  <button
-                    key={panel.id}
-                    type="button"
-                    onClick={() => onPanelChange(panel.id)}
-                    className={cn(
-                      "flex w-full items-center rounded-[1.15rem] border px-3 py-3 text-left transition",
-                      activePanel === panel.id
-                        ? "border-[#b8d1a8] bg-[#e9f2e2] text-[#1f271f] shadow-[0_12px_26px_-22px_rgba(77,140,73,0.8)]"
-                        : "border-transparent text-[#6f6658] hover:border-[#ddd4c1] hover:bg-white/70 hover:text-[#1f271f]",
-                      isSidebarCollapsed ? "justify-center px-0" : "gap-3",
-                    )}
-                  >
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-[1rem] bg-white/80 text-[#4d8c49] shadow-[0_6px_18px_-16px_rgba(30,41,59,0.6)]">
-                      <Icon className="size-4.5" />
-                    </span>
-                    {!isSidebarCollapsed ? (
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[0.96rem] font-semibold leading-5">
-                          {panel.label}
-                        </span>
-                        <span className="mt-0.5 block text-[0.74rem] text-[#9a917e]">
-                          {panel.description}
-                        </span>
-                      </span>
-                    ) : null}
-                    {!isSidebarCollapsed && panel.id !== "dashboard" ? (
-                      <span className="rounded-full bg-[#e9f2e2] px-2 py-1 text-[0.7rem] font-semibold text-[#6c8a5f]">
-                        {panel.id === "dsa" ? "LC" : "45d"}
-                      </span>
-                    ) : null}
-                  </button>
-                );
-              })}
-            </div>
+        <a
+          className="nav-item"
+          href="https://leetcode.com"
+          target="_blank"
+          rel="noreferrer"
+          style={{ opacity: 0.7 }}
+        >
+          <div className="nav-icon">🔗</div>
+          <span className="nav-label">LeetCode</span>
+        </a>
 
-            <p
-              className={cn(
-                "mt-8 px-2 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#9a917e]",
-                isSidebarCollapsed && "sr-only",
-              )}
-            >
-              Resources
-            </p>
-            <div className="mt-4 space-y-2">
-              {[
-                { label: "LeetCode", icon: "⧉" },
-                { label: "MDN Docs", icon: "◫" },
-              ].map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  className={cn(
-                    "flex w-full items-center rounded-[1rem] border border-transparent px-3 py-3 text-left text-[#6f6658] transition hover:border-[#ddd4c1] hover:bg-white/60 hover:text-[#1f271f]",
-                    isSidebarCollapsed ? "justify-center px-0" : "gap-3",
-                  )}
+        <a
+          className="nav-item"
+          href="https://developer.mozilla.org"
+          target="_blank"
+          rel="noreferrer"
+          style={{ opacity: 0.7 }}
+        >
+          <div className="nav-icon">📖</div>
+          <span className="nav-label">MDN Docs</span>
+        </a>
+
+        {/* Bottom Controls */}
+        <div className="sidebar-bottom">
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={onThemeChange}
+            aria-label="Toggle theme"
+          >
+            <div className="theme-toggle-icon">
+              {theme === "light" ? (
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ width: 16, height: 16 }}
                 >
-                  <span className="flex size-9 items-center justify-center rounded-[0.95rem] bg-white/80 text-[0.95rem] shadow-[0_6px_18px_-16px_rgba(30,41,59,0.55)]">
-                    {item.icon}
-                  </span>
-                  {!isSidebarCollapsed ? (
-                    <span className="text-[0.94rem] font-medium">
-                      {item.label}
-                    </span>
-                  ) : null}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-3 border-t border-[#e5dccd] p-3">
-            <Button
-              variant="outline"
-              className="h-12 w-full justify-start rounded-[1rem] border-[#ddd4c1] bg-white/65 px-4 text-[#5f584d] shadow-none hover:bg-white"
-              onClick={onThemeChange}
-            >
-              {theme === "dark" ? (
-                <SunMedium className="size-4" />
+                  <circle cx="10" cy="10" r="3.2" />
+                  <path d="M10 1.8V4.1M10 15.9V18.2M1.8 10H4.1M15.9 10H18.2M4.2 4.2L5.8 5.8M14.2 14.2L15.8 15.8M4.2 15.8L5.8 14.2M14.2 5.8L15.8 4.2" />
+                </svg>
               ) : (
-                <Moon className="size-4" />
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  style={{ width: 16, height: 16 }}
+                >
+                  <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
+                </svg>
               )}
-              {!isSidebarCollapsed ? (
-                <span>{theme === "dark" ? "Light" : "Light"}</span>
-              ) : null}
-            </Button>
-            <Button
-              variant="outline"
-              className="h-12 w-full justify-start rounded-[1rem] border-[#ddd4c1] bg-white/65 px-4 text-[#5f584d] shadow-none hover:bg-white"
-              onClick={onToggleSidebar}
-            >
-              {isSidebarCollapsed ? (
-                <PanelLeftOpen className="size-4" />
-              ) : (
-                <PanelLeftClose className="size-4" />
-              )}
-              {!isSidebarCollapsed ? (
-                <span>{isSidebarCollapsed ? "Expand" : "Collapse"}</span>
-              ) : null}
-            </Button>
-          </div>
-        </aside>
-
-        <main className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 border-b border-[#e5dccd] bg-[rgba(248,244,236,0.9)] backdrop-blur">
-            <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-              <div className="min-w-0">
-                <p className="truncate text-[0.92rem] text-[#aa9f8a]">
-                  PrepDoc <span className="px-1 text-[#c3b69e]">›</span>{" "}
-                  <span className="font-semibold text-[#2f2a23]">
-                    {activePanelDefinition.label}
-                  </span>
-                </p>
-              </div>
-              <div className="flex items-center gap-2 sm:gap-3">
-                <StatPill label="LC solved" value={lcSolvedCount} />
-                <StatPill label="Q done" value={qDoneCount} />
-              </div>
             </div>
+            <span className="theme-mode-text">
+              {theme === "light" ? "Light" : "Dark"}
+            </span>
+          </button>
 
-            <div className="flex gap-2 overflow-x-auto px-4 pb-4 sm:px-6 lg:hidden lg:px-8">
-              {panels.map((panel) => {
-                const Icon = panel.icon;
-
-                return (
-                  <button
-                    key={panel.id}
-                    type="button"
-                    onClick={() => onPanelChange(panel.id)}
-                    className={cn(
-                      "flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm transition",
-                      activePanel === panel.id
-                        ? "border-[#b8d1a8] bg-[#e9f2e2] text-[#223020]"
-                        : "border-[#ddd4c1] bg-white/70 text-[#73695b]",
-                    )}
-                  >
-                    <Icon className="size-4" />
-                    {panel.label}
-                  </button>
-                );
-              })}
+          <button
+            type="button"
+            className="collapse-btn"
+            onClick={onToggleSidebar}
+            aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <div className="collapse-btn-icon">
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                style={{ width: 16, height: 16 }}
+              >
+                <path d="M13 5L8 10L13 15" />
+              </svg>
             </div>
-          </header>
+            <span className="collapse-label">Collapse</span>
+          </button>
+        </div>
+      </aside>
 
-          <div className="flex-1 px-4 py-4 sm:px-6 lg:px-8">
-            <div className="mx-auto w-full max-w-350">{children}</div>
+      {/* MAIN BODY */}
+      <div className="app-body">
+        {/* Top Nav */}
+        <div className="topnav">
+          <div className="breadcrumb">
+            <span className="breadcrumb-home">PrepDoc</span>
+            <span className="breadcrumb-sep">›</span>
+            <span className="breadcrumb-current">{panelLabels[activePanel]}</span>
           </div>
-        </main>
+          <div className="topnav-actions">
+            <div className="topnav-stat">
+              <strong>{lcSolvedCount}</strong> LC solved
+            </div>
+            <div className="topnav-stat">
+              <strong>{qDoneCount}</strong> Q done
+            </div>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="content-area">{children}</div>
       </div>
-    </div>
-  );
-}
-
-function StatPill({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="inline-flex h-10 items-center gap-2 rounded-full border border-[#ddd4c1] bg-[#f7f2e8] px-3 text-[0.84rem] font-medium text-[#534a3f] shadow-[0_8px_18px_-16px_rgba(30,41,59,0.45)]">
-      <span className="text-[0.78rem] font-semibold text-[#2f2a23]">
-        {value}
-      </span>
-      <span>{label}</span>
     </div>
   );
 }
