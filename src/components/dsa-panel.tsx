@@ -117,13 +117,14 @@ export function DsaPanel({
       {/* Company Browser */}
       <section className="company-browser">
         <div className="company-browser-head">
-          <div>
+          <div className="company-browser-copy">
             <div className="company-browser-title">Browse Companies</div>
-            <div className="company-browser-sub">
+            <div className="logo-sub">
               Pick one company to load its most frequent DSA interview questions.
             </div>
           </div>
-          <div className="company-search-wrap">
+          <div className="company-browser-tools">
+            <div className="search-wrap company-search">
             <input
               className="co-search"
               placeholder="Search company..."
@@ -134,6 +135,7 @@ export function DsaPanel({
               }}
               autoComplete="off"
             />
+            </div>
           </div>
         </div>
 
