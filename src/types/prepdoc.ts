@@ -11,6 +11,7 @@ export interface PanelDefinition {
 
 export interface DsaQuestion {
   id: string;
+  number: number;
   title: string;
   difficulty: "Easy" | "Medium" | "Hard";
   frequency: number;

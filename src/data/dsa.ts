@@ -36,6 +36,7 @@ function buildQuestions(
 
   return questions.map((question) => ({
     id: `${companyId}-${question.id}`,
+    number: question.id,
     title: question.t,
     difficulty: question.d,
     frequency: question.freq,
