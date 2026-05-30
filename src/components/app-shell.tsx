@@ -129,6 +129,7 @@ export function AppShell({
             <span className="theme-mode-text">
               {theme === "light" ? "Light" : "Dark"}
             </span>
+            <span className="control-spacer" aria-hidden="true" />
           </button>
 
           <button
@@ -149,6 +150,7 @@ export function AppShell({
               </svg>
             </div>
             <span className="collapse-label">Collapse</span>
+            <span className="control-spacer" aria-hidden="true" />
           </button>
         </div>
       </aside>
