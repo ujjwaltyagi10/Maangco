@@ -273,7 +273,11 @@ export function DsaPanel({
                     />
                   </td>
                   <td className="q-num">{q.number}</td>
-                  <td className="q-title">{q.title}</td>
+                  <td className="q-title">
+                    <a href={q.url} target="_blank" rel="noopener noreferrer">
+                      {q.title}
+                    </a>
+                  </td>
                   <td>
                     <span className={`diff-badge ${q.difficulty}`}>{q.difficulty}</span>
                   </td>

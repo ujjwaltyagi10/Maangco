@@ -21,7 +21,11 @@ type RawQuestion = {
 };
 
 function toQuestionUrl(title: string) {
-  return `https://leetcode.com/problemset/all/?search=${encodeURIComponent(title)}`;
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return `https://leetcode.com/problems/${slug}/`;
 }
 
 function toCompanyId(name: string) {
