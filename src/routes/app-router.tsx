@@ -59,8 +59,13 @@ export function AppRouter(props: AppRouterProps) {
   return (
     <BrowserRouter>
       {props.authStatus === "loading" ? (
-        <div className="auth-page auth-page--loading">
-          <div className="auth-loading-card">Restoring session...</div>
+        <div className="app-loading-screen">
+          <div className="app-loading-logo">
+            <svg viewBox="0 0 20 20" width="28" height="28">
+              <path d="M10 1L2 6v8l8 5 8-5V6L10 1zm0 2.3L16 7v6l-6 3.7L4 13V7l6-3.7z" fill="white" />
+            </svg>
+          </div>
+          <div className="app-loading-text">PrepDoc</div>
         </div>
       ) : props.authSession?.token ? (
         <PrivateRoutes
@@ -105,6 +110,8 @@ export function AppRouter(props: AppRouterProps) {
           authError={props.authError}
           authInfo={props.authInfo}
           isSubmitting={props.authSubmitting}
+          theme={props.theme}
+          onThemeChange={props.onThemeChange}
         />
       )}
     </BrowserRouter>

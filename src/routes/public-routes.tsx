@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { AuthScreen } from "@/components/auth-screen";
+import { LandingPage } from "@/components/landing-page";
 import { getAuthErrorMessage, getGoogleAuthUrl, parseAuthCallbackSearch, type AuthSession } from "@/lib/auth-api";
 import { authModeFromPath, authPathForMode, ROUTES, type AuthMode, type AuthSubmitResult } from "./route-paths";
 
@@ -22,6 +23,8 @@ interface PublicRoutesProps {
   authError: string | null;
   authInfo: string | null;
   isSubmitting: boolean;
+  theme: "light" | "dark";
+  onThemeChange: () => void;
 }
 
 function AuthRoute({
@@ -32,17 +35,16 @@ function AuthRoute({
   authInfo,
   isSubmitting,
   resetTokenHint,
-}: Pick<PublicRoutesProps, "onAuthSubmit" | "onResendVerification" | "authError" | "authInfo" | "isSubmitting"> & {
+  theme,
+  onThemeChange,
+}: Pick<PublicRoutesProps, "onAuthSubmit" | "onResendVerification" | "authError" | "authInfo" | "isSubmitting" | "theme" | "onThemeChange"> & {
   mode: AuthMode;
   resetTokenHint?: string;
 }) {
   const navigate = useNavigate();
 
   const handleSubmit = async (input: AuthSubmitInput) => {
-    const result = await onAuthSubmit({
-      ...input,
-      mode,
-    });
+    const result = await onAuthSubmit({ ...input, mode });
     if (result.nextRoute) {
       navigate(result.nextRoute, { replace: true });
     }
@@ -51,37 +53,25 @@ function AuthRoute({
   return (
     <AuthScreen
       mode={mode}
-      onModeChange={(nextMode) => {
-        navigate(authPathForMode(nextMode, resetTokenHint));
-      }}
+      onModeChange={(nextMode) => navigate(authPathForMode(nextMode, resetTokenHint))}
       onSubmit={handleSubmit}
-      onGoogleLogin={() => {
-        window.location.assign(getGoogleAuthUrl());
-      }}
+      onGoogleLogin={() => window.location.assign(getGoogleAuthUrl())}
       onResendVerification={onResendVerification}
       isLoading={isSubmitting}
       errorMessage={authError}
       infoMessage={authInfo}
       resetTokenHint={resetTokenHint}
+      theme={theme}
+      onThemeChange={onThemeChange}
     />
   );
 }
 
 function ResetPasswordRoute(
-  props: Pick<
-    PublicRoutesProps,
-    "onAuthSubmit" | "onResendVerification" | "authError" | "authInfo" | "isSubmitting"
-  >,
+  props: Pick<PublicRoutesProps, "onAuthSubmit" | "onResendVerification" | "authError" | "authInfo" | "isSubmitting" | "theme" | "onThemeChange">,
 ) {
   const params = useParams();
-
-  return (
-    <AuthRoute
-      {...props}
-      mode="reset"
-      resetTokenHint={params.token}
-    />
-  );
+  return <AuthRoute {...props} mode="reset" resetTokenHint={params.token} />;
 }
 
 function VerifyEmailPage() {
@@ -98,24 +88,14 @@ function VerifyEmailPage() {
         setMessage("Verification token is missing.");
         return;
       }
-
       try {
         const response = await fetch(
           `${import.meta.env.VITE_AUTH_API_BASE_URL?.trim() || "https://lcauth-backend.onrender.com"}/api/verify-email/${encodeURIComponent(token)}`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: { Accept: "application/json" },
-          },
+          { method: "GET", credentials: "include", headers: { Accept: "application/json" } },
         );
         const text = await response.text();
         let payload: unknown = null;
-        try {
-          payload = text ? JSON.parse(text) : null;
-        } catch {
-          payload = text;
-        }
-
+        try { payload = text ? JSON.parse(text) : null; } catch { payload = text; }
         if (!response.ok) {
           const errorMessage =
             typeof payload === "object" && payload && "message" in payload
@@ -123,7 +103,6 @@ function VerifyEmailPage() {
               : "Unable to verify email.";
           throw new Error(errorMessage);
         }
-
         const successMessage =
           typeof payload === "object" && payload && "message" in payload
             ? String((payload as { message?: unknown }).message ?? "Email verified successfully.")
@@ -135,29 +114,24 @@ function VerifyEmailPage() {
         setMessage(getAuthErrorMessage(error));
       }
     }
-
     void run();
   }, [params.token]);
 
   return (
-    <div className="auth-page auth-page--loading">
-      <div className="auth-loading-card">
-        <div className="auth-card-title" style={{ marginTop: 0 }}>
+    <div className="auth-status-page">
+      <div className="auth-status-card">
+        <div className="auth-status-title">
           {status === "success" ? "Email verified" : status === "error" ? "Verification failed" : "Verifying email"}
         </div>
-        <div className="auth-card-copy" style={{ marginTop: 8 }}>
-          {message}
-        </div>
+        <div className="auth-status-copy">{message}</div>
         {status !== "loading" ? (
           <button
             type="button"
-            className="auth-submit"
-            style={{ marginTop: 16 }}
-            onClick={() => {
-              navigate(ROUTES.login, { replace: true });
-            }}
+            className="auth-btn-primary"
+            style={{ marginTop: 20 }}
+            onClick={() => navigate(ROUTES.login, { replace: true })}
           >
-            Go to login
+            Go to Sign In
           </button>
         ) : null}
       </div>
@@ -173,40 +147,27 @@ function GoogleCallbackPage({ onGoogleCallback }: Pick<PublicRoutesProps, "onGoo
 
   useEffect(() => {
     const callback = parseAuthCallbackSearch(location.search);
-
     if (callback.success === "false") {
       setStatus("error");
       setMessage(callback.message || "Google authentication failed.");
       return;
     }
-
     if (!callback.token) {
       setStatus("error");
       setMessage("Google callback did not include an access token.");
       return;
     }
-
     const session: AuthSession = {
       token: callback.token,
       user: {
         ...(callback.user ?? {}),
-        first_name:
-          callback.user?.first_name ||
-          callback.user?.name?.split(" ")?.[0] ||
-          callback.name?.split(" ")?.[0],
-        last_name:
-          callback.user?.last_name ||
-          callback.user?.name?.split(" ").slice(1).join(" ") ||
-          undefined,
-        name:
-          callback.user?.name ||
-          [callback.user?.first_name, callback.user?.last_name].filter(Boolean).join(" ") ||
-          callback.name,
+        first_name: callback.user?.first_name || callback.user?.name?.split(" ")?.[0] || callback.name?.split(" ")?.[0],
+        last_name: callback.user?.last_name || callback.user?.name?.split(" ").slice(1).join(" ") || undefined,
+        name: callback.user?.name || [callback.user?.first_name, callback.user?.last_name].filter(Boolean).join(" ") || callback.name,
         email: callback.user?.email || callback.email,
         provider: callback.user?.provider || "google",
       },
     };
-
     onGoogleCallback(session);
     setStatus("success");
     setMessage("Google authentication successful.");
@@ -214,22 +175,20 @@ function GoogleCallbackPage({ onGoogleCallback }: Pick<PublicRoutesProps, "onGoo
   }, [location.search, navigate, onGoogleCallback]);
 
   return (
-    <div className="auth-page auth-page--loading">
-      <div className="auth-loading-card">
-        <div className="auth-card-title" style={{ marginTop: 0 }}>
+    <div className="auth-status-page">
+      <div className="auth-status-card">
+        <div className="auth-status-title">
           {status === "success" ? "Signed in" : status === "error" ? "Authentication failed" : "Signing in"}
         </div>
-        <div className="auth-card-copy" style={{ marginTop: 8 }}>
-          {message}
-        </div>
+        <div className="auth-status-copy">{message}</div>
         {status === "error" ? (
           <button
             type="button"
-            className="auth-submit"
-            style={{ marginTop: 16 }}
+            className="auth-btn-primary"
+            style={{ marginTop: 20 }}
             onClick={() => navigate(ROUTES.login, { replace: true })}
           >
-            Go to login
+            Go to Sign In
           </button>
         ) : null}
       </div>
@@ -245,8 +204,11 @@ export function PublicRoutes({
   authError,
   authInfo,
   isSubmitting,
+  theme,
+  onThemeChange,
 }: PublicRoutesProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const mode = useMemo(() => authModeFromPath(location.pathname), [location.pathname]);
 
   if (authSession?.token) {
@@ -256,66 +218,53 @@ export function PublicRoutes({
   return (
     <Routes>
       <Route
+        path={ROUTES.landing}
+        element={
+          <LandingPage
+            theme={theme}
+            onThemeChange={onThemeChange}
+            onSignIn={() => navigate(ROUTES.login)}
+            onGetStarted={() => navigate(ROUTES.signup)}
+          />
+        }
+      />
+      <Route
         path={ROUTES.login}
         element={
-          <AuthRoute
-            mode="login"
-            onAuthSubmit={onAuthSubmit}
-            onResendVerification={onResendVerification}
-            authError={authError}
-            authInfo={authInfo}
-            isSubmitting={isSubmitting}
-          />
+          <AuthRoute mode="login" onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification}
+            authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} theme={theme} onThemeChange={onThemeChange} />
         }
       />
       <Route
         path={ROUTES.signup}
         element={
-          <AuthRoute
-            mode="register"
-            onAuthSubmit={onAuthSubmit}
-            onResendVerification={onResendVerification}
-            authError={authError}
-            authInfo={authInfo}
-            isSubmitting={isSubmitting}
-          />
+          <AuthRoute mode="register" onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification}
+            authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} theme={theme} onThemeChange={onThemeChange} />
         }
       />
       <Route
         path={ROUTES.forgotPassword}
         element={
-          <AuthRoute
-            mode="forgot"
-            onAuthSubmit={onAuthSubmit}
-            onResendVerification={onResendVerification}
-            authError={authError}
-            authInfo={authInfo}
-            isSubmitting={isSubmitting}
-          />
+          <AuthRoute mode="forgot" onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification}
+            authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} theme={theme} onThemeChange={onThemeChange} />
         }
       />
       <Route
         path={`${ROUTES.resetPassword}/:token`}
-        element={<ResetPasswordRoute onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification} authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} />}
+        element={
+          <ResetPasswordRoute onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification}
+            authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} theme={theme} onThemeChange={onThemeChange} />
+        }
       />
       <Route
         path={ROUTES.verifyEmail}
         element={
-          <AuthRoute
-            mode="verify"
-            onAuthSubmit={onAuthSubmit}
-            onResendVerification={onResendVerification}
-            authError={authError}
-            authInfo={authInfo}
-            isSubmitting={isSubmitting}
-          />
+          <AuthRoute mode="verify" onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification}
+            authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} theme={theme} onThemeChange={onThemeChange} />
         }
       />
       <Route path={`${ROUTES.verifyEmail}/:token`} element={<VerifyEmailPage />} />
-      <Route
-        path={ROUTES.googleCallback}
-        element={<GoogleCallbackPage onGoogleCallback={onGoogleCallback} />}
-      />
+      <Route path={ROUTES.googleCallback} element={<GoogleCallbackPage onGoogleCallback={onGoogleCallback} />} />
       <Route path="*" element={<Navigate to={mode === "login" ? ROUTES.login : authPathForMode(mode)} replace />} />
     </Routes>
   );

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import type { AppPanel } from "@/types/prepdoc";
 
@@ -43,11 +43,33 @@ export function AppShell({
   onOpenChangePassword,
   children,
 }: AppShellProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
+
+  const userInitials =
+    userLabel
+      .split(" ")
+      .map((w) => w[0] ?? "")
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "U";
+
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden", width: "100%" }}>
       {/* SIDEBAR */}
       <aside className={`sidebar${isSidebarCollapsed ? " collapsed" : ""}`}>
-        {/* Logo */}
         <div className="sidebar-logo">
           <div className="logo-icon">
             <svg viewBox="0 0 20 20">
@@ -59,9 +81,7 @@ export function AppShell({
           </div>
         </div>
 
-        {/* Navigation */}
         <div className="sidebar-section-label">Navigation</div>
-
         {navItems.map((item) => (
           <button
             key={item.id}
@@ -75,69 +95,17 @@ export function AppShell({
           </button>
         ))}
 
-        {/* Resources */}
         <div className="sidebar-section-label">Resources</div>
-
-        <a
-          className="nav-item"
-          href="https://leetcode.com"
-          target="_blank"
-          rel="noreferrer"
-          style={{ opacity: 0.7 }}
-        >
+        <a className="nav-item" href="https://leetcode.com" target="_blank" rel="noreferrer" style={{ opacity: 0.7 }}>
           <div className="nav-icon">🔗</div>
           <span className="nav-label">LeetCode</span>
         </a>
-
-        <a
-          className="nav-item"
-          href="https://developer.mozilla.org"
-          target="_blank"
-          rel="noreferrer"
-          style={{ opacity: 0.7 }}
-        >
+        <a className="nav-item" href="https://developer.mozilla.org" target="_blank" rel="noreferrer" style={{ opacity: 0.7 }}>
           <div className="nav-icon">📖</div>
           <span className="nav-label">MDN Docs</span>
         </a>
 
-        {/* Bottom Controls */}
         <div className="sidebar-bottom">
-          <button
-            type="button"
-            className="theme-toggle"
-            onClick={onThemeChange}
-            aria-label="Toggle theme"
-          >
-            <div className="theme-toggle-icon">
-              {theme === "light" ? (
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ width: 16, height: 16 }}
-                >
-                  <circle cx="10" cy="10" r="3.2" />
-                  <path d="M10 1.8V4.1M10 15.9V18.2M1.8 10H4.1M15.9 10H18.2M4.2 4.2L5.8 5.8M14.2 14.2L15.8 15.8M4.2 15.8L5.8 14.2M14.2 5.8L15.8 4.2" />
-                </svg>
-              ) : (
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  style={{ width: 16, height: 16 }}
-                >
-                  <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
-                </svg>
-              )}
-            </div>
-            <span className="theme-mode-text">
-              {theme === "light" ? "Light" : "Dark"}
-            </span>
-            <span className="control-spacer" aria-hidden="true" />
-          </button>
-
           <button
             type="button"
             className="collapse-btn"
@@ -145,13 +113,7 @@ export function AppShell({
             aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <div className="collapse-btn-icon">
-              <svg
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                style={{ width: 16, height: 16 }}
-              >
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 16, height: 16 }}>
                 <path d="M13 5L8 10L13 15" />
               </svg>
             </div>
@@ -170,6 +132,7 @@ export function AppShell({
             <span className="breadcrumb-sep">›</span>
             <span className="breadcrumb-current">{panelLabels[activePanel]}</span>
           </div>
+
           <div className="topnav-actions">
             <div className="topnav-stat">
               <strong>{lcSolvedCount}</strong> LC solved
@@ -177,22 +140,93 @@ export function AppShell({
             <div className="topnav-stat">
               <strong>{qDoneCount}</strong> Q done
             </div>
-            <div className="topnav-user">
-              <div className="topnav-user-copy">
-                <span className="topnav-user-label">Signed in as</span>
-                <strong>{userLabel}</strong>
-              </div>
-              <button type="button" className="topnav-action" onClick={onOpenChangePassword}>
-                Change password
+
+            {/* Profile dropdown */}
+            <div className="profile-menu-wrap" ref={menuRef}>
+              <button
+                type="button"
+                className={`profile-menu-btn${menuOpen ? " open" : ""}`}
+                onClick={() => setMenuOpen((o) => !o)}
+                aria-label="Open user menu"
+                aria-expanded={menuOpen}
+              >
+                <div className="profile-avatar">{userInitials}</div>
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="profile-chevron"
+                  style={{ width: 12, height: 12 }}
+                >
+                  <path d="M5 8l5 5 5-5H5z" />
+                </svg>
               </button>
-              <button type="button" className="topnav-logout" onClick={onLogout}>
-                Logout
-              </button>
+
+              {menuOpen ? (
+                <div className="profile-dropdown">
+                  <div className="profile-dropdown-header">
+                    <div className="profile-avatar profile-avatar--lg">{userInitials}</div>
+                    <div style={{ minWidth: 0 }}>
+                      <div className="profile-dropdown-name">{userLabel}</div>
+                      <div className="profile-dropdown-sub">Signed in</div>
+                    </div>
+                  </div>
+
+                  <div className="profile-dropdown-divider" />
+
+                  <button
+                    type="button"
+                    className="profile-dropdown-item"
+                    onClick={() => { onThemeChange(); setMenuOpen(false); }}
+                  >
+                    <span className="profile-dropdown-item-icon">
+                      {theme === "light" ? (
+                        <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: 14, height: 14 }}>
+                          <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                          <circle cx="10" cy="10" r="3.2" />
+                          <path d="M10 1.8V4.1M10 15.9V18.2M1.8 10H4.1M15.9 10H18.2M4.2 4.2L5.8 5.8M14.2 14.2L15.8 15.8M4.2 15.8L5.8 14.2M14.2 5.8L15.8 4.2" />
+                        </svg>
+                      )}
+                    </span>
+                    {theme === "light" ? "Dark Mode" : "Light Mode"}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="profile-dropdown-item"
+                    onClick={() => { onOpenChangePassword(); setMenuOpen(false); }}
+                  >
+                    <span className="profile-dropdown-item-icon">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                        <rect x="3" y="9" width="14" height="10" rx="2" />
+                        <path d="M7 9V6a3 3 0 0 1 6 0v3" />
+                      </svg>
+                    </span>
+                    Change Password
+                  </button>
+
+                  <div className="profile-dropdown-divider" />
+
+                  <button
+                    type="button"
+                    className="profile-dropdown-item profile-dropdown-item--danger"
+                    onClick={() => { onLogout(); setMenuOpen(false); }}
+                  >
+                    <span className="profile-dropdown-item-icon">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                        <path d="M7 3H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3M13 14l4-4-4-4M17 10H7" />
+                      </svg>
+                    </span>
+                    Sign Out
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="content-area">{children}</div>
       </div>
     </div>

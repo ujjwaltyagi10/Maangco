@@ -8,6 +8,7 @@ export interface AuthSubmitResult {
 }
 
 export const ROUTES = {
+  landing: "/",
   login: "/login",
   signup: "/signup",
   forgotPassword: "/forgot-password",
