@@ -3,7 +3,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "re
 
 import { AuthScreen } from "@/components/auth-screen";
 import { LandingPage } from "@/components/landing-page";
-import { getAuthErrorMessage, getGoogleAuthUrl, parseAuthCallbackSearch, type AuthSession } from "@/lib/auth-api";
+import { getAuthErrorMessage, getGoogleAuthUrl, parseAuthCallbackSearch, verifyEmail, type AuthSession } from "@/lib/auth-api";
 import { authModeFromPath, authPathForMode, ROUTES, type AuthMode, type AuthSubmitResult } from "./route-paths";
 
 interface AuthSubmitInput {
@@ -89,26 +89,9 @@ function VerifyEmailPage() {
         return;
       }
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_AUTH_API_BASE_URL?.trim() || "https://lcauth-backend.onrender.com"}/api/verify-email/${encodeURIComponent(token)}`,
-          { method: "GET", credentials: "include", headers: { Accept: "application/json" } },
-        );
-        const text = await response.text();
-        let payload: unknown = null;
-        try { payload = text ? JSON.parse(text) : null; } catch { payload = text; }
-        if (!response.ok) {
-          const errorMessage =
-            typeof payload === "object" && payload && "message" in payload
-              ? String((payload as { message?: unknown }).message ?? "Unable to verify email.")
-              : "Unable to verify email.";
-          throw new Error(errorMessage);
-        }
-        const successMessage =
-          typeof payload === "object" && payload && "message" in payload
-            ? String((payload as { message?: unknown }).message ?? "Email verified successfully.")
-            : "Email verified successfully.";
+        await verifyEmail(token);
         setStatus("success");
-        setMessage(successMessage);
+        setMessage("Email verified successfully. You can now sign in.");
       } catch (error) {
         setStatus("error");
         setMessage(getAuthErrorMessage(error));

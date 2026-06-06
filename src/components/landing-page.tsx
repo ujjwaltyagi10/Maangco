@@ -218,7 +218,7 @@ export function LandingPage({ theme, onThemeChange, onSignIn, onGetStarted }: La
             everything you need to land your next software engineering role.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-14">
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
             <button type="button" className="lbtn-primary lbtn-lg" onClick={onGetStarted}>
               Start for free
               <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">

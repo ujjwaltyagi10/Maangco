@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { ChangePasswordModal } from "./components/change-password-modal";
 import { AppRouter } from "./routes/app-router";
-import { getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, isValidEmail, loginUser, logoutUser, registerUser, requestPasswordReset, resetPassword, resendVerificationEmail, type AuthSession, type AuthUser } from "./lib/auth-api";
+import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, isValidEmail, loginUser, logoutUser, registerUser, requestPasswordReset, resetPassword, resendVerificationEmail, type AuthSession, type AuthUser } from "./lib/auth-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
 import { dsaCompanies } from "./data/dsa";
 import { frontendQuestions, roadmapWeeks } from "./data/frontend";
@@ -268,35 +268,7 @@ function App() {
     setChangePasswordInfo(null);
 
     try {
-      await fetch(`${import.meta.env.VITE_AUTH_API_BASE_URL?.trim() || "https://lcauth-backend.onrender.com"}/api/change-password`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authSession.token}`,
-        },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword,
-        }),
-      }).then(async (response) => {
-        const text = await response.text();
-        let payload: unknown = null;
-        try {
-          payload = text ? JSON.parse(text) : null;
-        } catch {
-          payload = text;
-        }
-        if (!response.ok) {
-          const errorMessage =
-            typeof payload === "object" && payload && "message" in payload
-              ? String((payload as { message?: unknown }).message ?? "Unable to change password.")
-              : "Unable to change password.";
-          throw new Error(errorMessage);
-        }
-        return payload;
-      });
+      await changePassword(authSession.token, { currentPassword, newPassword });
       setChangePasswordInfo("Password changed. Please sign in again.");
       await handleLogout();
     } catch (error) {

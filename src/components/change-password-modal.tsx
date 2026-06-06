@@ -50,8 +50,8 @@ export function ChangePasswordModal({
           </button>
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <label className="auth-field">
+        <form className="auth-form-v2" onSubmit={handleSubmit}>
+          <label className="auth-field-v2">
             <span>
               {allowEmptyCurrentPassword ? "Current password (optional)" : "Current password"}
             </span>
@@ -59,29 +59,32 @@ export function ChangePasswordModal({
               type="password"
               value={currentPassword}
               onChange={(event) => setCurrentPassword(event.target.value)}
+              placeholder="••••••••"
               autoComplete="current-password"
               required={!allowEmptyCurrentPassword}
             />
           </label>
 
-          <label className="auth-field">
+          <label className="auth-field-v2">
             <span>New password</span>
             <input
               type="password"
               value={newPassword}
               onChange={(event) => setNewPassword(event.target.value)}
+              placeholder="••••••••"
               autoComplete="new-password"
               minLength={6}
               required
             />
           </label>
 
-          <label className="auth-field">
+          <label className="auth-field-v2">
             <span>Confirm new password</span>
             <input
               type="password"
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
+              placeholder="••••••••"
               autoComplete="new-password"
               minLength={6}
               required
@@ -89,13 +92,13 @@ export function ChangePasswordModal({
           </label>
 
           {newPassword && confirmPassword && newPassword !== confirmPassword ? (
-            <div className="auth-error">Passwords do not match.</div>
+            <div className="auth-error-v2">Passwords do not match.</div>
           ) : null}
 
-          {errorMessage ? <div className="auth-error">{errorMessage}</div> : null}
-          {infoMessage ? <div className="auth-info">{infoMessage}</div> : null}
+          {errorMessage ? <div className="auth-error-v2">{errorMessage}</div> : null}
+          {infoMessage ? <div className="auth-info-v2">{infoMessage}</div> : null}
 
-          <button type="submit" className="auth-submit" disabled={isLoading}>
+          <button type="submit" className="auth-submit-v2" disabled={isLoading}>
             {isLoading ? "Updating..." : "Change password"}
           </button>
         </form>
