@@ -11,6 +11,9 @@ interface AppShellProps {
   onToggleSidebar: () => void;
   lcSolvedCount: number;
   qDoneCount: number;
+  userLabel: string;
+  onLogout: () => void;
+  onOpenChangePassword: () => void;
   children: ReactNode;
 }
 
@@ -35,6 +38,9 @@ export function AppShell({
   onToggleSidebar,
   lcSolvedCount,
   qDoneCount,
+  userLabel,
+  onLogout,
+  onOpenChangePassword,
   children,
 }: AppShellProps) {
   return (
@@ -170,6 +176,18 @@ export function AppShell({
             </div>
             <div className="topnav-stat">
               <strong>{qDoneCount}</strong> Q done
+            </div>
+            <div className="topnav-user">
+              <div className="topnav-user-copy">
+                <span className="topnav-user-label">Signed in as</span>
+                <strong>{userLabel}</strong>
+              </div>
+              <button type="button" className="topnav-action" onClick={onOpenChangePassword}>
+                Change password
+              </button>
+              <button type="button" className="topnav-logout" onClick={onLogout}>
+                Logout
+              </button>
             </div>
           </div>
         </div>
