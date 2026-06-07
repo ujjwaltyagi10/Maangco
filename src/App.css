@@ -1166,6 +1166,297 @@
 }
 
 /* ─────────────────────────────────────────
+   HERO — LIVE BADGE & PULSE DOT
+───────────────────────────────────────── */
+.lhero-badge--live {
+  background: linear-gradient(
+    90deg,
+    rgba(74, 124, 65, 0.12) 0%,
+    rgba(74, 124, 65, 0.06) 100%
+  );
+  border-color: rgba(74, 124, 65, 0.3);
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1);   opacity: 1; }
+  70%  { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.lhero-badge-dot--pulse {
+  position: relative;
+  background: #4a7c41;
+  flex-shrink: 0;
+}
+
+.lhero-badge-dot--pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(74, 124, 65, 0.5);
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+
+/* ─────────────────────────────────────────
+   MOCKUP — LIVE DOT & DAILY BADGE
+───────────────────────────────────────── */
+.mock-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4a7c41;
+  margin-left: auto;
+  flex-shrink: 0;
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+
+.mock-daily-badge {
+  margin-top: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green);
+  background: rgba(74, 124, 65, 0.1);
+  border: 1px solid rgba(74, 124, 65, 0.2);
+  border-radius: 20px;
+  padding: 4px 10px;
+  display: inline-block;
+  letter-spacing: 0.02em;
+}
+
+/* ─────────────────────────────────────────
+   PHILOSOPHY STRIP
+───────────────────────────────────────── */
+.lphil-strip {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 36px 0;
+}
+
+.lphil-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+
+@media (max-width: 768px) {
+  .lphil-grid {
+    grid-template-columns: 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+}
+
+.lphil-card {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-right: 1px solid var(--border);
+}
+
+.lphil-card:last-child {
+  border-right: none;
+}
+
+@media (max-width: 768px) {
+  .lphil-card {
+    border-right: none;
+    background: var(--surface);
+    padding: 22px 24px;
+  }
+}
+
+.lphil-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(74, 124, 65, 0.1);
+  border: 1px solid rgba(74, 124, 65, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.lphil-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text1);
+}
+
+.lphil-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+}
+
+/* ─────────────────────────────────────────
+   PRICING SECTION
+───────────────────────────────────────── */
+.lprice-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .lprice-cards {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+  }
+}
+
+.lprice-card {
+  position: relative;
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 32px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s;
+}
+
+.lprice-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.lprice-card--highlight {
+  border-color: rgba(74, 124, 65, 0.45);
+  background: linear-gradient(
+    160deg,
+    rgba(74, 124, 65, 0.07) 0%,
+    var(--surface) 60%
+  );
+  box-shadow:
+    0 0 0 1px rgba(74, 124, 65, 0.25),
+    var(--shadow-md);
+}
+
+.lprice-popular-badge {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #4a7c41, #6aab61);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.lprice-plan-name {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.lprice-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.lprice-currency {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text1);
+  margin-top: 4px;
+}
+
+.lprice-num {
+  font-size: 52px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: var(--text1);
+  line-height: 1;
+}
+
+.lprice-period {
+  font-size: 15px;
+  color: var(--text3);
+  font-weight: 500;
+  margin-left: 2px;
+}
+
+.lprice-tagline {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: -10px;
+  margin-bottom: 2px;
+}
+
+.lprice-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.lprice-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.lprice-feature svg {
+  color: var(--green);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.lprice-feature--bonus {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.lprice-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.lprice-note {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+/* ─────────────────────────────────────────
+   MAKE lbtn-outline WORK ON <a> TAGS
+───────────────────────────────────────── */
+a.lbtn-outline,
+a.lbtn-lg {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─────────────────────────────────────────
    AUTH PAGE (v2 — thita.ai inspired)
 ───────────────────────────────────────── */
 .auth-page-v2 {
