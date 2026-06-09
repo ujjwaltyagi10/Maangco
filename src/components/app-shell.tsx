@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { BookOpen, Code2, ExternalLink, LayoutDashboard, Layers } from "lucide-react";
 
 import type { AppPanel } from "@/types/prepdoc";
 
@@ -18,9 +19,9 @@ interface AppShellProps {
 }
 
 const navItems = [
-  { id: "dashboard" as AppPanel, label: "Dashboard", emoji: "🏠" },
-  { id: "dsa" as AppPanel, label: "DSA Practice", emoji: "⚡", badge: "LC" },
-  { id: "frontend" as AppPanel, label: "Frontend Prep", emoji: "🎯", badge: "45d" },
+  { id: "dashboard" as AppPanel, label: "Dashboard", icon: LayoutDashboard },
+  { id: "dsa" as AppPanel, label: "DSA Practice", icon: Code2, badge: "LC" },
+  { id: "frontend" as AppPanel, label: "Frontend Prep", icon: Layers, badge: "45d" },
 ];
 
 const panelLabels: Record<AppPanel, string> = {
@@ -89,7 +90,7 @@ export function AppShell({
             className={`nav-item${activePanel === item.id ? " active" : ""}`}
             onClick={() => onPanelChange(item.id)}
           >
-            <div className="nav-icon">{item.emoji}</div>
+            <div className="nav-icon"><item.icon size={16} strokeWidth={1.8} /></div>
             <span className="nav-label">{item.label}</span>
             {item.badge ? <span className="nav-badge">{item.badge}</span> : null}
           </button>
@@ -97,11 +98,11 @@ export function AppShell({
 
         <div className="sidebar-section-label">Resources</div>
         <a className="nav-item" href="https://leetcode.com" target="_blank" rel="noreferrer" style={{ opacity: 0.7 }}>
-          <div className="nav-icon">🔗</div>
+          <div className="nav-icon"><ExternalLink size={16} strokeWidth={1.8} /></div>
           <span className="nav-label">LeetCode</span>
         </a>
         <a className="nav-item" href="https://developer.mozilla.org" target="_blank" rel="noreferrer" style={{ opacity: 0.7 }}>
-          <div className="nav-icon">📖</div>
+          <div className="nav-icon"><BookOpen size={16} strokeWidth={1.8} /></div>
           <span className="nav-label">MDN Docs</span>
         </a>
 

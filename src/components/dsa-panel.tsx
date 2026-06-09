@@ -40,22 +40,32 @@ export function DsaPanel({
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>("all");
   const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false);
   const [showUnsolvedOnly, setShowUnsolvedOnly] = useState(false);
-  const [sortMode, setSortMode] = useState<SortMode>("freq");
+  const [sortMode, setSortMode] = useState<SortMode>(isPremium ? "freq" : "num");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
 
   const deferredCompanySearch = useDeferredValue(companySearch);
 
   const allCompany = useMemo((): DsaCompany => {
-    const allQuestions = companies
+    // Sort by frequency first so the highest-frequency entry wins the dedup
+    const seen = new Map<number, DsaQuestion>();
+    companies
       .flatMap((c) => c.questions)
-      .sort((a, b) => b.frequency - a.frequency);
+      .forEach((q) => {
+        const existing = seen.get(q.number);
+        if (!existing || q.frequency > existing.frequency) {
+          seen.set(q.number, q);
+        }
+      });
+    const uniqueQuestions = Array.from(seen.values()).sort(
+      (a, b) => b.frequency - a.frequency,
+    );
     return {
       id: ALL_ID,
       name: "All",
       logo: "",
       accent: "#6c63ff",
-      questions: allQuestions,
+      questions: uniqueQuestions,
     };
   }, [companies]);
 
@@ -283,12 +293,17 @@ export function DsaPanel({
           <select
             className="sort-select"
             value={sortMode}
-            onChange={(e) => setSortMode(e.target.value as SortMode)}
+            onChange={(e) => {
+              const val = e.target.value as SortMode;
+              if (val === "freq" && !isPremium) { onBuyPremium(); return; }
+              setSortMode(val);
+            }}
           >
-            <option value="freq">Sort: Frequency</option>
+            {isPremium && <option value="freq">Sort: Frequency</option>}
             <option value="num">Sort: #Number</option>
             <option value="diff">Sort: Difficulty</option>
             <option value="title">Sort: Title</option>
+            {!isPremium && <option value="freq" disabled>Sort: Frequency 🔒</option>}
           </select>
           <select
             className="sort-select"
@@ -344,14 +359,25 @@ export function DsaPanel({
                     <span className={`diff-badge ${q.difficulty}`}>{q.difficulty}</span>
                   </td>
                   <td>
-                    <div className="freq-bar">
-                      <div className="freq-dots">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <div key={i} className={`freq-dot${i <= dots ? " on" : ""}`} />
-                        ))}
+                    {isPremium ? (
+                      <div className="freq-bar">
+                        <div className="freq-dots">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <div key={i} className={`freq-dot${i <= dots ? " on" : ""}`} />
+                          ))}
+                        </div>
+                        <span className="freq-num">{q.frequency}%</span>
                       </div>
-                      <span className="freq-num">{q.frequency}%</span>
-                    </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="tag-locked-btn"
+                        onClick={onBuyPremium}
+                        title="Unlock frequency data with Premium"
+                      >
+                        🔒 Premium
+                      </button>
+                    )}
                   </td>
                   <td>
                     {isPremium ? (

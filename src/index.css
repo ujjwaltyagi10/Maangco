@@ -258,6 +258,12 @@ body {
   justify-content: center;
   flex-shrink: 0;
   font-size: 16px;
+  color: var(--sidebar-muted);
+}
+
+.nav-item:hover .nav-icon,
+.nav-item.active .nav-icon {
+  color: var(--sidebar-text);
 }
 
 .sidebar.collapsed .nav-icon {
