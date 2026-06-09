@@ -2051,6 +2051,11 @@ body {
   transform: rotate(-45deg) translateY(-1px);
 }
 
+/* ── BOTTOM NAV (mobile only, hidden by default) ── */
+.bottom-nav {
+  display: none;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 1100px) {
   .company-browser-tools {
@@ -2084,30 +2089,131 @@ body {
 }
 
 @media (max-width: 768px) {
+  /* ── Hide desktop sidebar, show bottom nav ── */
   .sidebar {
+    display: none !important;
+  }
+
+  .bottom-nav {
+    display: flex;
     position: fixed;
-    left: 0;
-    top: 0;
     bottom: 0;
-    z-index: 200;
+    left: 0;
+    right: 0;
+    z-index: 300;
+    background: var(--sidebar-bg);
+    border-top: 1px solid var(--sidebar-border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.1);
   }
 
-  .sidebar:not(.collapsed) {
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px 4px 8px;
+    color: var(--sidebar-muted);
+    transition: color 0.15s;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+    min-width: 0;
   }
 
+  .bottom-nav-item.active {
+    color: var(--green);
+  }
+
+  .bottom-nav-icon {
+    width: 44px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    transition: background 0.15s;
+  }
+
+  .bottom-nav-item.active .bottom-nav-icon {
+    background: var(--green-bg);
+  }
+
+  .bottom-nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
+  /* ── Topnav: essentials only ── */
+  .topnav {
+    padding: 0 1rem;
+  }
+
+  .topnav-stat {
+    display: none;
+  }
+
+  .breadcrumb-home,
+  .breadcrumb-sep {
+    display: none;
+  }
+
+  .breadcrumb-current {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  /* ── Bottom clearance for fixed bottom nav ── */
+  .dashboard {
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px) + 0.5rem);
+  }
+
+  .dsa-panel {
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .frontend-content {
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px) + 0.5rem);
+  }
+
+  /* ── Company grid: 2 columns ── */
+  .company-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* ── Questions layout: single column ── */
   .questions-layout {
     grid-template-columns: 1fr;
   }
 
-  .company-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* ── DSA table: hide Frequency + Tags on mobile ── */
+  .q-table th:nth-child(5),
+  .q-table td:nth-child(5),
+  .q-table th:nth-child(6),
+  .q-table td:nth-child(6) {
+    display: none;
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 480px) {
+  /* Hero */
   .dash-hero-text h1 {
-    font-size: 20px;
+    font-size: 18px;
+  }
+
+  .dash-cards {
+    grid-template-columns: 1fr;
+  }
+
+  /* Company browser */
+  .company-browser {
+    padding: 0.9rem 0.85rem;
   }
 
   .company-browser-head {
@@ -2126,7 +2232,47 @@ body {
   }
 
   .co-item {
-    padding: 0.75rem 0.85rem;
+    padding: 0.75rem 0.75rem;
+  }
+
+  /* Stats row */
+  .stat-chip {
+    padding: 0.4rem 0.75rem;
+  }
+
+  .stat-chip .n {
+    font-size: 15px;
+  }
+
+  /* Table */
+  .q-row td {
+    padding: 0.5rem 0.5rem;
+    font-size: 12px;
+  }
+
+  .q-table th {
+    padding: 0.5rem 0.5rem;
+  }
+
+  /* Also hide bookmark on very small screens */
+  .q-table th:nth-child(7),
+  .q-table td:nth-child(7) {
+    display: none;
+  }
+
+  /* Frontend */
+  .frontend-header {
+    padding: 0.85rem 1rem 0;
+  }
+
+  .frontend-content {
+    padding: 0.85rem 1rem;
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px) + 0.5rem);
+  }
+
+  .frontend-tabs {
+    margin: 0 -1rem;
+    padding: 0 1rem;
   }
 }
 

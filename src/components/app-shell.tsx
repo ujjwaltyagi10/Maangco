@@ -230,6 +230,23 @@ export function AppShell({
 
         <div className="content-area">{children}</div>
       </div>
+
+      {/* BOTTOM NAV — mobile only */}
+      <nav className="bottom-nav" aria-label="Main navigation">
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={`bottom-nav-item${activePanel === item.id ? " active" : ""}`}
+            onClick={() => onPanelChange(item.id)}
+          >
+            <div className="bottom-nav-icon">
+              <item.icon size={22} strokeWidth={1.8} />
+            </div>
+            <span className="bottom-nav-label">{item.label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
