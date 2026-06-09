@@ -1,9 +1,35 @@
+import { useEffect, useState } from "react";
+
 interface PremiumModalProps {
   open: boolean;
   onClose: () => void;
+  onPurchase: () => Promise<void> | void;
 }
 
-export function PremiumModal({ open, onClose }: PremiumModalProps) {
+export function PremiumModal({ open, onClose, onPurchase }: PremiumModalProps) {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!open) {
+      setIsProcessing(false);
+      setIsSuccess(false);
+    }
+  }, [open]);
+
+  const handlePurchase = async () => {
+    if (isProcessing || isSuccess) return;
+
+    setIsProcessing(true);
+    try {
+      await onPurchase();
+      setIsSuccess(true);
+      window.setTimeout(onClose, 900);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   if (!open) return null;
 
   return (
@@ -54,16 +80,36 @@ export function PremiumModal({ open, onClose }: PremiumModalProps) {
             </li>
           </ul>
 
+          <div className="premium-checkout">
+            <div className="premium-checkout-label">Razorpay Checkout (Mock)</div>
+            <div className="premium-checkout-row">
+              <span>Plan</span>
+              <strong>Premium Access</strong>
+            </div>
+            <div className="premium-checkout-row">
+              <span>Amount</span>
+              <strong>₹499</strong>
+            </div>
+            <div className="premium-checkout-row">
+              <span>Payment methods</span>
+              <strong>UPI, Cards, Wallets</strong>
+            </div>
+          </div>
+
           <div className="premium-modal-actions">
-            <a
-              href="mailto:support@prepdoc.app?subject=Premium%20Subscription"
+            <button
+              type="button"
               className="premium-modal-cta"
+              onClick={handlePurchase}
+              disabled={isProcessing || isSuccess}
             >
-              Get Premium Access
-              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
-                <path d="M2 6h8M6 2l4 4-4 4" />
-              </svg>
-            </a>
+              {isSuccess ? "Payment Successful" : isProcessing ? "Opening Razorpay..." : "Pay with Razorpay"}
+              {!isSuccess && !isProcessing && (
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
+                  <path d="M2 6h8M6 2l4 4-4 4" />
+                </svg>
+              )}
+            </button>
             <button type="button" className="premium-modal-dismiss" onClick={onClose}>
               Maybe later
             </button>

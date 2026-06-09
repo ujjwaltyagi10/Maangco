@@ -47,6 +47,10 @@ function App() {
   const [completedRoadmapDays, setCompletedRoadmapDays] = useLocalStorage<
     number[]
   >("prepdoc.frontend.roadmap-days", []);
+  const [premiumAccess, setPremiumAccess] = useLocalStorage(
+    "prepdoc.premium-access",
+    false,
+  );
   const [authSession, setAuthSession] = useLocalStorage<AuthSession | null>(
     "prepdoc.auth-session",
     null,
@@ -283,61 +287,74 @@ function App() {
   const currentUser = authSession?.user ?? null;
   const userLabel = formatUserLabel(currentUser);
   const allowEmptyCurrentPassword = currentUser?.has_password === false;
-  const isPremium = currentUser?.is_premium === true;
+  const isPremium = currentUser?.is_premium === true || premiumAccess;
+
+  const handleBuyPremium = () => {
+    setShowPremiumModal(true);
+  };
+
+  const handlePremiumPurchase = async () => {
+    await new Promise((resolve) => window.setTimeout(resolve, 1200));
+    setPremiumAccess(true);
+  };
 
   return (
     <>
       <AppRouter
-      isPremium={isPremium}
-      onBuyPremium={() => setShowPremiumModal(true)}
-      authSession={authSession}
-      authStatus={authStatus}
-      authError={authError}
-      authInfo={authInfo}
-      authSubmitting={authSubmitting}
-      theme={theme}
-      onThemeChange={() => setTheme(theme === "dark" ? "light" : "dark")}
-      isSidebarCollapsed={isSidebarCollapsed}
-      onToggleSidebar={() => setIsSidebarCollapsed((current) => !current)}
-      onLogout={handleLogout}
-      onOpenChangePassword={() => {
-        setChangePasswordError(null);
-        setChangePasswordInfo(null);
-        setIsChangePasswordOpen(true);
-      }}
-      userLabel={userLabel}
-      lcSolvedCount={solvedDsaIds.length}
-      qDoneCount={completedFrontendIds.length}
-      solvedIds={solvedDsaIds}
-      bookmarkedIds={bookmarkedDsaIds}
-      companies={dsaCompanies}
-      questions={frontendQuestions}
-      roadmapWeeks={roadmapWeeks}
-      completedQuestionIds={completedFrontendIds}
-      completedRoadmapDays={completedRoadmapDays}
-      onSolvedIdsChange={setSolvedDsaIds}
-      onBookmarkedIdsChange={setBookmarkedDsaIds}
-      onCompletedQuestionIdsChange={setCompletedFrontendIds}
-      onCompletedRoadmapDaysChange={setCompletedRoadmapDays}
-      dsaProgress={dsaProgress}
-      frontendProgress={frontendProgress}
-      overallProgress={overallProgress}
-      solvedDsaCount={solvedDsaIds.length}
-      totalDsaCount={dsaQuestionCount}
-      completedFrontendCount={completedFrontendIds.length}
-      totalFrontendCount={frontendQuestionCount}
-      completedRoadmapCount={completedRoadmapDays.length}
-      totalRoadmapCount={roadmapDayCount}
-      companyCount={dsaCompanies.length}
-      onAuthSubmit={handleAuthSubmit}
-      onResendVerification={async (email) => {
-        await resendVerificationEmail(email);
-        setAuthInfo("Verification email sent.");
-      }}
-      onGoogleCallback={handleGoogleCallback}
+        isPremium={isPremium}
+        onBuyPremium={handleBuyPremium}
+        authSession={authSession}
+        authStatus={authStatus}
+        authError={authError}
+        authInfo={authInfo}
+        authSubmitting={authSubmitting}
+        theme={theme}
+        onThemeChange={() => setTheme(theme === "dark" ? "light" : "dark")}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onToggleSidebar={() => setIsSidebarCollapsed((current) => !current)}
+        onLogout={handleLogout}
+        onOpenChangePassword={() => {
+          setChangePasswordError(null);
+          setChangePasswordInfo(null);
+          setIsChangePasswordOpen(true);
+        }}
+        userLabel={userLabel}
+        lcSolvedCount={solvedDsaIds.length}
+        qDoneCount={completedFrontendIds.length}
+        solvedIds={solvedDsaIds}
+        bookmarkedIds={bookmarkedDsaIds}
+        companies={dsaCompanies}
+        questions={frontendQuestions}
+        roadmapWeeks={roadmapWeeks}
+        completedQuestionIds={completedFrontendIds}
+        completedRoadmapDays={completedRoadmapDays}
+        onSolvedIdsChange={setSolvedDsaIds}
+        onBookmarkedIdsChange={setBookmarkedDsaIds}
+        onCompletedQuestionIdsChange={setCompletedFrontendIds}
+        onCompletedRoadmapDaysChange={setCompletedRoadmapDays}
+        dsaProgress={dsaProgress}
+        frontendProgress={frontendProgress}
+        overallProgress={overallProgress}
+        solvedDsaCount={solvedDsaIds.length}
+        totalDsaCount={dsaQuestionCount}
+        completedFrontendCount={completedFrontendIds.length}
+        totalFrontendCount={frontendQuestionCount}
+        completedRoadmapCount={completedRoadmapDays.length}
+        totalRoadmapCount={roadmapDayCount}
+        companyCount={dsaCompanies.length}
+        onAuthSubmit={handleAuthSubmit}
+        onResendVerification={async (email) => {
+          await resendVerificationEmail(email);
+          setAuthInfo("Verification email sent.");
+        }}
+        onGoogleCallback={handleGoogleCallback}
       />
 
-      <PremiumModal open={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
+      <PremiumModal
+        open={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        onPurchase={handlePremiumPurchase}
+      />
 
       <ChangePasswordModal
         open={isChangePasswordOpen}
