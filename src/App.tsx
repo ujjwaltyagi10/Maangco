@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { ChangePasswordModal } from "./components/change-password-modal";
+import { PremiumModal } from "./components/premium-modal";
 import { AppRouter } from "./routes/app-router";
 import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, isValidEmail, loginUser, logoutUser, registerUser, requestPasswordReset, resetPassword, resendVerificationEmail, type AuthSession, type AuthUser } from "./lib/auth-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
@@ -58,6 +59,7 @@ function App() {
   const [changePasswordSubmitting, setChangePasswordSubmitting] = useState(false);
   const [changePasswordError, setChangePasswordError] = useState<string | null>(null);
   const [changePasswordInfo, setChangePasswordInfo] = useState<string | null>(null);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const authToken = authSession?.token;
 
@@ -281,10 +283,13 @@ function App() {
   const currentUser = authSession?.user ?? null;
   const userLabel = formatUserLabel(currentUser);
   const allowEmptyCurrentPassword = currentUser?.has_password === false;
+  const isPremium = currentUser?.is_premium === true;
 
   return (
     <>
       <AppRouter
+      isPremium={isPremium}
+      onBuyPremium={() => setShowPremiumModal(true)}
       authSession={authSession}
       authStatus={authStatus}
       authError={authError}
@@ -331,6 +336,8 @@ function App() {
       }}
       onGoogleCallback={handleGoogleCallback}
       />
+
+      <PremiumModal open={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
 
       <ChangePasswordModal
         open={isChangePasswordOpen}

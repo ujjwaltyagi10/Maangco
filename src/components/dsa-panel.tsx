@@ -1,9 +1,13 @@
 import type { Dispatch, SetStateAction } from "react";
-import { startTransition, useDeferredValue, useMemo, useState } from "react";
+import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 
 import type { DsaCompany, DsaQuestion, QuestionId } from "@/types/prepdoc";
 
+const ALL_ID = "all";
+
 interface DsaPanelProps {
+  isPremium: boolean;
+  onBuyPremium: () => void;
   companies: DsaCompany[];
   solvedIds: QuestionId[];
   bookmarkedIds: QuestionId[];
@@ -23,38 +27,53 @@ function freqToDots(freq: number): number {
 }
 
 export function DsaPanel({
+  isPremium,
+  onBuyPremium,
   companies,
   solvedIds,
   bookmarkedIds,
   onSolvedIdsChange,
   onBookmarkedIdsChange,
 }: DsaPanelProps) {
-  const [selectedCompanyId, setSelectedCompanyId] = useState(
-    companies[0]?.id ?? "",
-  );
+  const [selectedCompanyId, setSelectedCompanyId] = useState(ALL_ID);
   const [companySearch, setCompanySearch] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>("all");
   const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false);
   const [showUnsolvedOnly, setShowUnsolvedOnly] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>("freq");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
 
   const deferredCompanySearch = useDeferredValue(companySearch);
 
+  const allCompany = useMemo((): DsaCompany => {
+    const allQuestions = companies
+      .flatMap((c) => c.questions)
+      .sort((a, b) => b.frequency - a.frequency);
+    return {
+      id: ALL_ID,
+      name: "All",
+      logo: "",
+      accent: "#6c63ff",
+      questions: allQuestions,
+    };
+  }, [companies]);
+
+  const displayCompanies = useMemo((): DsaCompany[] => {
+    return [allCompany, ...companies];
+  }, [companies, allCompany]);
+
   const selectedCompany = useMemo(
-    () => companies.find((c) => c.id === selectedCompanyId) ?? companies[0],
-    [companies, selectedCompanyId],
+    () => displayCompanies.find((c) => c.id === selectedCompanyId) ?? allCompany,
+    [displayCompanies, selectedCompanyId, allCompany],
   );
 
   const visibleCompanies = useMemo(() => {
     const q = deferredCompanySearch.trim().toLowerCase();
-    return companies.filter((c) => c.name.toLowerCase().includes(q));
-  }, [companies, deferredCompanySearch]);
+    return displayCompanies.filter((c) => c.name.toLowerCase().includes(q));
+  }, [displayCompanies, deferredCompanySearch]);
 
-  const totalQuestionCount = useMemo(
-    () => companies.reduce((t, c) => t + c.questions.length, 0),
-    [companies],
-  );
-
+  const totalQuestionCount = allCompany.questions.length;
   const totalSolvedCount = solvedIds.length;
 
   const visibleQuestions = useMemo(() => {
@@ -77,6 +96,15 @@ export function DsaPanel({
       return b.frequency - a.frequency || a.number - b.number;
     });
   }, [bookmarkedIds, difficultyFilter, selectedCompany, showBookmarkedOnly, showUnsolvedOnly, solvedIds, sortMode]);
+
+  // Reset to page 1 whenever filters or selected company change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCompanyId, difficultyFilter, showBookmarkedOnly, showUnsolvedOnly, sortMode, deferredCompanySearch]);
+
+  const totalPages = Math.max(1, Math.ceil(visibleQuestions.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedQuestions = visibleQuestions.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   const selectedSolvedCount = selectedCompany?.questions.filter((q) => solvedIds.includes(q.id)).length ?? 0;
   const selectedProgress = selectedCompany
@@ -125,40 +153,65 @@ export function DsaPanel({
           </div>
           <div className="company-browser-tools">
             <div className="search-wrap company-search">
-            <input
-              className="co-search"
-              placeholder="Search company..."
-              value={companySearch}
-              onChange={(e) => {
-                const v = e.target.value;
-                startTransition(() => setCompanySearch(v));
-              }}
-              autoComplete="off"
-            />
+              <input
+                className="co-search"
+                placeholder="Search company..."
+                value={companySearch}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  startTransition(() => setCompanySearch(v));
+                }}
+                autoComplete="off"
+              />
             </div>
           </div>
         </div>
 
         <div className="company-list">
           {visibleCompanies.map((company) => {
-            const solved = company.questions.filter((q) => solvedIds.includes(q.id)).length;
+            const isAll = company.id === ALL_ID;
+            const isLocked = !isPremium && !isAll;
+            const solved = isLocked ? 0 : company.questions.filter((q) => solvedIds.includes(q.id)).length;
             return (
               <button
                 key={company.id}
                 type="button"
-                className={`co-item${selectedCompanyId === company.id ? " active" : ""}`}
-                onClick={() => setSelectedCompanyId(company.id)}
+                className={`co-item${selectedCompanyId === company.id ? " active" : ""}${isLocked ? " co-item--locked" : ""}${isAll ? " co-item--all" : ""}`}
+                onClick={() => {
+                  if (isLocked) { onBuyPremium(); return; }
+                  setSelectedCompanyId(company.id);
+                }}
               >
-                <div className="co-logo">
-                  <img src={company.logo} alt={company.name} />
+                <div className={`co-logo${isAll ? " co-logo--all" : ""}`}>
+                  {isAll ? (
+                    <span className="co-logo-all-icon">
+                      <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                        <rect x="1" y="1" width="6" height="6" rx="1.5" />
+                        <rect x="9" y="1" width="6" height="6" rx="1.5" />
+                        <rect x="1" y="9" width="6" height="6" rx="1.5" />
+                        <rect x="9" y="9" width="6" height="6" rx="1.5" />
+                      </svg>
+                    </span>
+                  ) : (
+                    <img src={company.logo} alt={company.name} />
+                  )}
+                  {isLocked && <span className="co-lock-badge">🔒</span>}
                 </div>
                 <div className="co-info">
                   <div className="co-name">{company.name}</div>
-                  <div className="co-count">{company.questions.length} questions</div>
+                  {isLocked ? (
+                    <div className="co-count co-count--premium">Premium only</div>
+                  ) : (
+                    <div className="co-count">{company.questions.length} questions</div>
+                  )}
                 </div>
-                <div className="co-prog">
-                  {solved}/{company.questions.length}
-                </div>
+                {isLocked ? (
+                  <div className="co-prog co-prog--locked">🔒</div>
+                ) : (
+                  <div className="co-prog">
+                    {solved}/{company.questions.length}
+                  </div>
+                )}
               </button>
             );
           })}
@@ -237,6 +290,15 @@ export function DsaPanel({
             <option value="diff">Sort: Difficulty</option>
             <option value="title">Sort: Title</option>
           </select>
+          <select
+            className="sort-select"
+            value={pageSize}
+            onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
+          >
+            <option value={50}>50 / page</option>
+            <option value={75}>75 / page</option>
+            <option value={100}>100 / page</option>
+          </select>
         </div>
       </div>
 
@@ -255,7 +317,7 @@ export function DsaPanel({
             </tr>
           </thead>
           <tbody>
-            {visibleQuestions.map((q) => {
+            {paginatedQuestions.map((q) => {
               const isSolved = solvedIds.includes(q.id);
               const isBookmarked = bookmarkedIds.includes(q.id);
               const dots = freqToDots(q.frequency);
@@ -292,11 +354,22 @@ export function DsaPanel({
                     </div>
                   </td>
                   <td>
-                    <div className="tag-list">
-                      {q.tags.map((tag) => (
-                        <span key={tag} className="tag">{tag}</span>
-                      ))}
-                    </div>
+                    {isPremium ? (
+                      <div className="tag-list">
+                        {q.tags.map((tag) => (
+                          <span key={tag} className="tag">{tag}</span>
+                        ))}
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="tag-locked-btn"
+                        onClick={onBuyPremium}
+                        title="Unlock tags with Premium"
+                      >
+                        🔒 Premium
+                      </button>
+                    )}
                   </td>
                   <td style={{ textAlign: "right" }}>
                     <button
@@ -311,7 +384,7 @@ export function DsaPanel({
                 </tr>
               );
             })}
-            {visibleQuestions.length === 0 && (
+            {paginatedQuestions.length === 0 && (
               <tr>
                 <td colSpan={7} style={{ textAlign: "center", padding: "3rem", color: "var(--muted)", fontSize: 14 }}>
                   No questions match the current filters.
@@ -321,6 +394,32 @@ export function DsaPanel({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            type="button"
+            className="page-btn"
+            disabled={safePage <= 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          >
+            ← Prev
+          </button>
+          <div className="page-info">
+            Page {safePage} of {totalPages}
+            <span className="page-count">· {visibleQuestions.length} questions</span>
+          </div>
+          <button
+            type="button"
+            className="page-btn"
+            disabled={safePage >= totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   );
 }

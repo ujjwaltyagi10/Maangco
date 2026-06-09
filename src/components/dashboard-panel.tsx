@@ -1,4 +1,6 @@
 interface DashboardPanelProps {
+  isPremium: boolean;
+  onBuyPremium: () => void;
   dsaProgress: number;
   frontendProgress: number;
   overallProgress: number;
@@ -47,6 +49,8 @@ const tips = [
 ];
 
 export function DashboardPanel({
+  isPremium,
+  onBuyPremium,
   dsaProgress,
   frontendProgress,
   overallProgress,
@@ -62,6 +66,49 @@ export function DashboardPanel({
 
   return (
     <div className="dashboard">
+      {/* FAANG Premium Card */}
+      {!isPremium && (
+        <div className="faang-premium-card">
+          <div className="faang-premium-left">
+            <div className="faang-premium-eyebrow">
+              <span className="faang-crown">⭐</span>
+              Premium Feature
+            </div>
+            <h2 className="faang-premium-title">Unlock FAANG Company Sheets</h2>
+            <p className="faang-premium-desc">
+              Get curated LeetCode sets from Google, Meta, Amazon, Apple &amp; Netflix — the 5 biggest tech companies in one place.
+            </p>
+            <div className="faang-premium-perks">
+              <div className="faang-perk">
+                <span className="faang-perk-icon">📊</span>
+                <span><strong>Overall FAANG Sheet</strong> — 500+ deduplicated questions across all 5 companies</span>
+              </div>
+              <div className="faang-perk">
+                <span className="faang-perk-icon">🎯</span>
+                <span><strong>Company-wise Sheets</strong> — Google, Meta, Amazon, Apple &amp; Netflix individually</span>
+              </div>
+              <div className="faang-perk">
+                <span className="faang-perk-icon">🏷️</span>
+                <span><strong>Question Tags</strong> — topic labels unlocked for every problem</span>
+              </div>
+            </div>
+          </div>
+          <div className="faang-premium-right">
+            <div className="faang-company-chips">
+              {["G", "M", "A", "🍎", "N"].map((l, i) => (
+                <div key={i} className="faang-chip">{l}</div>
+              ))}
+            </div>
+            <button type="button" className="faang-premium-cta" onClick={onBuyPremium}>
+              Get Premium Access
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
+                <path d="M2 6h8M6 2l4 4-4 4" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Hero */}
       <div className="dash-hero">
         <div className="dash-hero-text">

@@ -8,6 +8,8 @@ import { PrivateRoutes } from "./private-routes";
 import { PublicRoutes } from "./public-routes";
 
 export interface AppRouterProps {
+  isPremium: boolean;
+  onBuyPremium: () => void;
   authSession: AuthSession | null;
   authStatus: "loading" | "ready";
   authError: string | null;
@@ -69,6 +71,8 @@ export function AppRouter(props: AppRouterProps) {
         </div>
       ) : props.authSession?.token ? (
         <PrivateRoutes
+          isPremium={props.isPremium}
+          onBuyPremium={props.onBuyPremium}
           authSession={props.authSession}
           theme={props.theme}
           onThemeChange={props.onThemeChange}

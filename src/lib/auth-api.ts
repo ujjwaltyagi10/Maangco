@@ -12,6 +12,7 @@ export interface AuthUser {
   provider?: string;
   is_email_verified?: boolean;
   has_password?: boolean;
+  is_premium?: boolean;
   [key: string]: unknown;
 }
 

@@ -10,6 +10,8 @@ import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, Road
 import { panelFromPath, panelPath, ROUTES } from "./route-paths";
 
 interface PrivateRoutesProps {
+  isPremium: boolean;
+  onBuyPremium: () => void;
   authSession: AuthSession;
   theme: "light" | "dark";
   onThemeChange: () => void;
@@ -44,6 +46,8 @@ interface PrivateRoutesProps {
 }
 
 export function PrivateRoutes({
+  isPremium,
+  onBuyPremium,
   authSession,
   theme,
   onThemeChange,
@@ -105,6 +109,8 @@ export function PrivateRoutes({
           path={ROUTES.dashboard}
           element={
             <DashboardPanel
+              isPremium={isPremium}
+              onBuyPremium={onBuyPremium}
               dsaProgress={dsaProgress}
               frontendProgress={frontendProgress}
               overallProgress={overallProgress}
@@ -124,6 +130,8 @@ export function PrivateRoutes({
           path={ROUTES.dsa}
           element={
             <DsaPanel
+              isPremium={isPremium}
+              onBuyPremium={onBuyPremium}
               companies={companies}
               solvedIds={solvedIds}
               bookmarkedIds={bookmarkedIds}
