@@ -1,5 +1,11 @@
 import type { Dispatch, SetStateAction } from "react";
-import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+import {
+  startTransition,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import type { DsaCompany, DsaQuestion, QuestionId } from "@/types/prepdoc";
 
@@ -37,10 +43,13 @@ export function DsaPanel({
 }: DsaPanelProps) {
   const [selectedCompanyId, setSelectedCompanyId] = useState(ALL_ID);
   const [companySearch, setCompanySearch] = useState("");
-  const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>("all");
+  const [difficultyFilter, setDifficultyFilter] =
+    useState<DifficultyFilter>("all");
   const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false);
   const [showUnsolvedOnly, setShowUnsolvedOnly] = useState(false);
-  const [sortMode, setSortMode] = useState<SortMode>(isPremium ? "freq" : "num");
+  const [sortMode, setSortMode] = useState<SortMode>(
+    isPremium ? "freq" : "num",
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
 
@@ -74,7 +83,8 @@ export function DsaPanel({
   }, [companies, allCompany]);
 
   const selectedCompany = useMemo(
-    () => displayCompanies.find((c) => c.id === selectedCompanyId) ?? allCompany,
+    () =>
+      displayCompanies.find((c) => c.id === selectedCompanyId) ?? allCompany,
     [displayCompanies, selectedCompanyId, allCompany],
   );
 
@@ -90,7 +100,8 @@ export function DsaPanel({
     if (!selectedCompany) return [];
 
     const filtered = selectedCompany.questions.filter((q) => {
-      const matchesDiff = difficultyFilter === "all" || q.difficulty === difficultyFilter;
+      const matchesDiff =
+        difficultyFilter === "all" || q.difficulty === difficultyFilter;
       const matchesBm = !showBookmarkedOnly || bookmarkedIds.includes(q.id);
       const matchesUnsolved = !showUnsolvedOnly || !solvedIds.includes(q.id);
       return matchesDiff && matchesBm && matchesUnsolved;
@@ -99,24 +110,47 @@ export function DsaPanel({
     return filtered.sort((a, b) => {
       if (sortMode === "title") return a.title.localeCompare(b.title);
       if (sortMode === "diff") {
-        const rank = { Easy: 0, Medium: 1, Hard: 2 } satisfies Record<DsaQuestion["difficulty"], number>;
+        const rank = { Easy: 0, Medium: 1, Hard: 2 } satisfies Record<
+          DsaQuestion["difficulty"],
+          number
+        >;
         return rank[a.difficulty] - rank[b.difficulty];
       }
       if (sortMode === "num") return a.number - b.number;
       return b.frequency - a.frequency || a.number - b.number;
     });
-  }, [bookmarkedIds, difficultyFilter, selectedCompany, showBookmarkedOnly, showUnsolvedOnly, solvedIds, sortMode]);
+  }, [
+    bookmarkedIds,
+    difficultyFilter,
+    selectedCompany,
+    showBookmarkedOnly,
+    showUnsolvedOnly,
+    solvedIds,
+    sortMode,
+  ]);
 
   // Reset to page 1 whenever filters or selected company change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCompanyId, difficultyFilter, showBookmarkedOnly, showUnsolvedOnly, sortMode, deferredCompanySearch]);
+  }, [
+    selectedCompanyId,
+    difficultyFilter,
+    showBookmarkedOnly,
+    showUnsolvedOnly,
+    sortMode,
+    deferredCompanySearch,
+  ]);
 
   const totalPages = Math.max(1, Math.ceil(visibleQuestions.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
-  const paginatedQuestions = visibleQuestions.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const paginatedQuestions = visibleQuestions.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize,
+  );
 
-  const selectedSolvedCount = selectedCompany?.questions.filter((q) => solvedIds.includes(q.id)).length ?? 0;
+  const selectedSolvedCount =
+    selectedCompany?.questions.filter((q) => solvedIds.includes(q.id)).length ??
+    0;
   const selectedProgress = selectedCompany
     ? Math.round((selectedSolvedCount / selectedCompany.questions.length) * 100)
     : 0;
@@ -154,213 +188,248 @@ export function DsaPanel({
     <div className="dsa-panel">
       {/* LEFT: Stats + Table + Pagination */}
       <div className="dsa-main">
-
-      {/* Stats Row */}
-      <div className="stats-row">
-        <div className="stat-chip s">
-          <div className="n">{selectedSolvedCount}</div>
-          <div className="l">Solved</div>
-        </div>
-        <div className="stat-chip e">
-          <div className="n">{difficultyCounts.easy}</div>
-          <div className="l">Easy</div>
-        </div>
-        <div className="stat-chip m">
-          <div className="n">{difficultyCounts.medium}</div>
-          <div className="l">Medium</div>
-        </div>
-        <div className="stat-chip h">
-          <div className="n">{difficultyCounts.hard}</div>
-          <div className="l">Hard</div>
-        </div>
-        <div className="prog-bar-wrap">
-          <div className="prog-bar">
-            <div className="prog-bar-fill" style={{ width: `${selectedProgress}%` }} />
+        {/* Stats Row */}
+        <div className="stats-row">
+          <div className="stat-chip s">
+            <div className="n">{selectedSolvedCount}</div>
+            <div className="l">Solved</div>
           </div>
-          <div className="prog-pct">{selectedProgress}%</div>
-        </div>
-        <div className="toolbar-block">
-          {(["all", "Easy", "Medium", "Hard"] as const).map((d) => (
+          <div className="stat-chip e">
+            <div className="n">{difficultyCounts.easy}</div>
+            <div className="l">Easy</div>
+          </div>
+          <div className="stat-chip m">
+            <div className="n">{difficultyCounts.medium}</div>
+            <div className="l">Medium</div>
+          </div>
+          <div className="stat-chip h">
+            <div className="n">{difficultyCounts.hard}</div>
+            <div className="l">Hard</div>
+          </div>
+          <div className="prog-bar-wrap">
+            <div className="prog-bar">
+              <div
+                className="prog-bar-fill"
+                style={{ width: `${selectedProgress}%` }}
+              />
+            </div>
+            <div className="prog-pct">{selectedProgress}%</div>
+          </div>
+          <div className="toolbar-block">
+            {(["all", "Easy", "Medium", "Hard"] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                className={`filter-btn${d !== "all" ? ` ${d.toLowerCase().slice(0, d === "Medium" ? 3 : d.length)}` : ""}${difficultyFilter === d ? " active" : ""}`}
+                onClick={() => setDifficultyFilter(d)}
+              >
+                {d === "all" ? "All" : d}
+              </button>
+            ))}
             <button
-              key={d}
               type="button"
-              className={`filter-btn${d !== "all" ? ` ${d.toLowerCase().slice(0, d === "Medium" ? 3 : d.length)}` : ""}${difficultyFilter === d ? " active" : ""}`}
-              onClick={() => setDifficultyFilter(d)}
+              className={`filter-btn${showBookmarkedOnly ? " active" : ""}`}
+              onClick={() => setShowBookmarkedOnly((v) => !v)}
             >
-              {d === "all" ? "All" : d}
+              ★ Saved
             </button>
-          ))}
-          <button
-            type="button"
-            className={`filter-btn${showBookmarkedOnly ? " active" : ""}`}
-            onClick={() => setShowBookmarkedOnly((v) => !v)}
-          >
-            ★ Saved
-          </button>
-          <button
-            type="button"
-            className={`filter-btn${showUnsolvedOnly ? " active" : ""}`}
-            onClick={() => setShowUnsolvedOnly((v) => !v)}
-          >
-            Unsolved
-          </button>
-          <select
-            className="sort-select"
-            value={sortMode}
-            onChange={(e) => {
-              const val = e.target.value as SortMode;
-              if (val === "freq" && !isPremium) { onBuyPremium(); return; }
-              setSortMode(val);
-            }}
-          >
-            {isPremium && <option value="freq">Sort: Frequency</option>}
-            <option value="num">Sort: #Number</option>
-            <option value="diff">Sort: Difficulty</option>
-            <option value="title">Sort: Title</option>
-            {!isPremium && <option value="freq" disabled>Sort: Frequency 🔒</option>}
-          </select>
-          <select
-            className="sort-select"
-            value={pageSize}
-            onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
-          >
-            <option value={50}>50 / page</option>
-            <option value={75}>75 / page</option>
-            <option value={100}>100 / page</option>
-          </select>
+            <button
+              type="button"
+              className={`filter-btn${showUnsolvedOnly ? " active" : ""}`}
+              onClick={() => setShowUnsolvedOnly((v) => !v)}
+            >
+              Unsolved
+            </button>
+            <select
+              className="sort-select"
+              value={sortMode}
+              onChange={(e) => {
+                const val = e.target.value as SortMode;
+                if (val === "freq" && !isPremium) {
+                  onBuyPremium();
+                  return;
+                }
+                setSortMode(val);
+              }}
+            >
+              {isPremium && <option value="freq">Sort: Frequency</option>}
+              <option value="num">Sort: #Number</option>
+              <option value="diff">Sort: Difficulty</option>
+              <option value="title">Sort: Title</option>
+              {!isPremium && (
+                <option value="freq" disabled>
+                  Sort: Frequency 🔒
+                </option>
+              )}
+            </select>
+            <select
+              className="sort-select"
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={50}>50 / page</option>
+              <option value={75}>75 / page</option>
+              <option value={100}>100 / page</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      {/* Question Table */}
-      <div className="table-wrap">
-        <table className="q-table">
-          <thead>
-            <tr>
-              <th style={{ width: 36 }} />
-              <th>#</th>
-              <th>Title</th>
-              <th>Difficulty</th>
-              <th>Frequency</th>
-              <th>Tags</th>
-              <th style={{ textAlign: "right" }}>★</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedQuestions.map((q) => {
-              const isSolved = solvedIds.includes(q.id);
-              const isBookmarked = bookmarkedIds.includes(q.id);
-              const dots = freqToDots(q.frequency);
+        {/* Question Table */}
+        <div className="table-wrap">
+          <table className="q-table">
+            <thead>
+              <tr>
+                <th style={{ width: 36 }} />
+                <th>#</th>
+                <th>Title</th>
+                <th>Difficulty</th>
+                <th>Frequency</th>
+                <th>Tags</th>
+                <th style={{ textAlign: "right" }}>★</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedQuestions.map((q) => {
+                const isSolved = solvedIds.includes(q.id);
+                const isBookmarked = bookmarkedIds.includes(q.id);
+                const dots = freqToDots(q.frequency);
 
-              return (
-                <tr key={q.id} className={`q-row${isSolved ? " solved" : ""}`}>
-                  <td>
-                    <div
-                      className={`q-cb${isSolved ? " checked" : ""}`}
-                      role="checkbox"
-                      aria-checked={isSolved}
-                      tabIndex={0}
-                      onClick={() => toggleSolved(q.id)}
-                      onKeyDown={(e) => e.key === " " && toggleSolved(q.id)}
-                    />
-                  </td>
-                  <td className="q-num">{q.number}</td>
-                  <td className="q-title">
-                    <a href={q.url} target="_blank" rel="noopener noreferrer">
-                      {q.title}
-                    </a>
-                  </td>
-                  <td>
-                    <span className={`diff-badge ${q.difficulty}`}>{q.difficulty}</span>
-                  </td>
-                  <td>
-                    {isPremium ? (
-                      <div className="freq-bar">
-                        <div className="freq-dots">
-                          {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className={`freq-dot${i <= dots ? " on" : ""}`} />
+                return (
+                  <tr
+                    key={q.id}
+                    className={`q-row${isSolved ? " solved" : ""}`}
+                  >
+                    <td>
+                      <div
+                        className={`q-cb${isSolved ? " checked" : ""}`}
+                        role="checkbox"
+                        aria-checked={isSolved}
+                        tabIndex={0}
+                        onClick={() => toggleSolved(q.id)}
+                        onKeyDown={(e) => e.key === " " && toggleSolved(q.id)}
+                      />
+                    </td>
+                    <td className="q-num">{q.number}</td>
+                    <td className="q-title">
+                      <a href={q.url} target="_blank" rel="noopener noreferrer">
+                        {q.title}
+                      </a>
+                    </td>
+                    <td>
+                      <span className={`diff-badge ${q.difficulty}`}>
+                        {q.difficulty}
+                      </span>
+                    </td>
+                    <td>
+                      {isPremium ? (
+                        <div className="freq-bar">
+                          <div className="freq-dots">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                              <div
+                                key={i}
+                                className={`freq-dot${i <= dots ? " on" : ""}`}
+                              />
+                            ))}
+                          </div>
+                          <span className="freq-num">{q.frequency}%</span>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="tag-locked-btn"
+                          onClick={onBuyPremium}
+                          title="Unlock frequency data with Premium"
+                        >
+                          🔒 Premium
+                        </button>
+                      )}
+                    </td>
+                    <td>
+                      {isPremium ? (
+                        <div className="tag-list">
+                          {q.tags.map((tag) => (
+                            <span key={tag} className="tag">
+                              {tag}
+                            </span>
                           ))}
                         </div>
-                        <span className="freq-num">{q.frequency}%</span>
-                      </div>
-                    ) : (
+                      ) : (
+                        <button
+                          type="button"
+                          className="tag-locked-btn"
+                          onClick={onBuyPremium}
+                          title="Unlock tags with Premium"
+                        >
+                          🔒 Premium
+                        </button>
+                      )}
+                    </td>
+                    <td style={{ textAlign: "right" }}>
                       <button
                         type="button"
-                        className="tag-locked-btn"
-                        onClick={onBuyPremium}
-                        title="Unlock frequency data with Premium"
+                        className={`bm-btn${isBookmarked ? " active" : ""}`}
+                        onClick={() => toggleBookmark(q.id)}
+                        aria-label={
+                          isBookmarked ? "Remove bookmark" : "Bookmark"
+                        }
                       >
-                        🔒 Premium
+                        ★
                       </button>
-                    )}
-                  </td>
-                  <td>
-                    {isPremium ? (
-                      <div className="tag-list">
-                        {q.tags.map((tag) => (
-                          <span key={tag} className="tag">{tag}</span>
-                        ))}
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        className="tag-locked-btn"
-                        onClick={onBuyPremium}
-                        title="Unlock tags with Premium"
-                      >
-                        🔒 Premium
-                      </button>
-                    )}
-                  </td>
-                  <td style={{ textAlign: "right" }}>
-                    <button
-                      type="button"
-                      className={`bm-btn${isBookmarked ? " active" : ""}`}
-                      onClick={() => toggleBookmark(q.id)}
-                      aria-label={isBookmarked ? "Remove bookmark" : "Bookmark"}
-                    >
-                      ★
-                    </button>
+                    </td>
+                  </tr>
+                );
+              })}
+              {paginatedQuestions.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={7}
+                    style={{
+                      textAlign: "center",
+                      padding: "3rem",
+                      color: "var(--muted)",
+                      fontSize: 14,
+                    }}
+                  >
+                    No questions match the current filters.
                   </td>
                 </tr>
-              );
-            })}
-            {paginatedQuestions.length === 0 && (
-              <tr>
-                <td colSpan={7} style={{ textAlign: "center", padding: "3rem", color: "var(--muted)", fontSize: 14 }}>
-                  No questions match the current filters.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button
-            type="button"
-            className="page-btn"
-            disabled={safePage <= 1}
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-          >
-            ← Prev
-          </button>
-          <div className="page-info">
-            Page {safePage} of {totalPages}
-            <span className="page-count">· {visibleQuestions.length} questions</span>
-          </div>
-          <button
-            type="button"
-            className="page-btn"
-            disabled={safePage >= totalPages}
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-          >
-            Next →
-          </button>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
-      </div>{/* end .dsa-main */}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              type="button"
+              className="page-btn"
+              disabled={safePage <= 1}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            >
+              ← Prev
+            </button>
+            <div className="page-info">
+              Page {safePage} of {totalPages}
+              <span className="page-count">
+                · {visibleQuestions.length} questions
+              </span>
+            </div>
+            <button
+              type="button"
+              className="page-btn"
+              disabled={safePage >= totalPages}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            >
+              Next →
+            </button>
+          </div>
+        )}
+      </div>
+      {/* end .dsa-main */}
 
       {/* RIGHT: Company Browser Sidebar */}
       <aside className="dsa-sidebar">
@@ -383,21 +452,32 @@ export function DsaPanel({
           {visibleCompanies.map((company) => {
             const isAll = company.id === ALL_ID;
             const isLocked = !isPremium && !isAll;
-            const solved = isLocked ? 0 : company.questions.filter((q) => solvedIds.includes(q.id)).length;
+            const solved = isLocked
+              ? 0
+              : company.questions.filter((q) => solvedIds.includes(q.id))
+                  .length;
             return (
               <button
                 key={company.id}
                 type="button"
                 className={`co-item co-item--sidebar${selectedCompanyId === company.id ? " active" : ""}${isLocked ? " co-item--locked" : ""}${isAll ? " co-item--all" : ""}`}
                 onClick={() => {
-                  if (isLocked) { onBuyPremium(); return; }
+                  if (isLocked) {
+                    onBuyPremium();
+                    return;
+                  }
                   setSelectedCompanyId(company.id);
                 }}
               >
                 <div className={`co-logo${isAll ? " co-logo--all" : ""}`}>
                   {isAll ? (
                     <span className="co-logo-all-icon">
-                      <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                      <svg
+                        viewBox="0 0 16 16"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                      >
                         <rect x="1" y="1" width="6" height="6" rx="1.5" />
                         <rect x="9" y="1" width="6" height="6" rx="1.5" />
                         <rect x="1" y="9" width="6" height="6" rx="1.5" />
@@ -411,14 +491,14 @@ export function DsaPanel({
                 </div>
                 <div className="co-info">
                   <div className="co-name">{company.name}</div>
-                  {isLocked ? (
+                  {isLocked && (
                     <div className="co-count co-count--premium">Premium</div>
-                  ) : (
-                    <div className="co-count">{company.questions.length} q</div>
                   )}
                 </div>
                 {!isLocked && (
-                  <div className="co-prog">{solved}/{company.questions.length}</div>
+                  <div className="co-prog">
+                    {solved}/{company.questions.length}
+                  </div>
                 )}
               </button>
             );
