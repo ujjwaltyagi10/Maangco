@@ -152,94 +152,8 @@ export function DsaPanel({
 
   return (
     <div className="dsa-panel">
-      {/* Company Browser */}
-      <section className="company-browser">
-        <div className="company-browser-head">
-          <div className="company-browser-copy">
-            <div className="company-browser-title">Browse Companies</div>
-            <div className="logo-sub">
-              Pick one company to load its most frequent DSA interview questions.
-            </div>
-          </div>
-          <div className="company-browser-tools">
-            <div className="search-wrap company-search">
-              <input
-                className="co-search"
-                placeholder="Search company..."
-                value={companySearch}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  startTransition(() => setCompanySearch(v));
-                }}
-                autoComplete="off"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="company-list">
-          {visibleCompanies.map((company) => {
-            const isAll = company.id === ALL_ID;
-            const isLocked = !isPremium && !isAll;
-            const solved = isLocked ? 0 : company.questions.filter((q) => solvedIds.includes(q.id)).length;
-            return (
-              <button
-                key={company.id}
-                type="button"
-                className={`co-item${selectedCompanyId === company.id ? " active" : ""}${isLocked ? " co-item--locked" : ""}${isAll ? " co-item--all" : ""}`}
-                onClick={() => {
-                  if (isLocked) { onBuyPremium(); return; }
-                  setSelectedCompanyId(company.id);
-                }}
-              >
-                <div className={`co-logo${isAll ? " co-logo--all" : ""}`}>
-                  {isAll ? (
-                    <span className="co-logo-all-icon">
-                      <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-                        <rect x="1" y="1" width="6" height="6" rx="1.5" />
-                        <rect x="9" y="1" width="6" height="6" rx="1.5" />
-                        <rect x="1" y="9" width="6" height="6" rx="1.5" />
-                        <rect x="9" y="9" width="6" height="6" rx="1.5" />
-                      </svg>
-                    </span>
-                  ) : (
-                    <img src={company.logo} alt={company.name} />
-                  )}
-                  {isLocked && <span className="co-lock-badge">🔒</span>}
-                </div>
-                <div className="co-info">
-                  <div className="co-name">{company.name}</div>
-                  {isLocked ? (
-                    <div className="co-count co-count--premium">Premium only</div>
-                  ) : (
-                    <div className="co-count">{company.questions.length} questions</div>
-                  )}
-                </div>
-                {isLocked ? (
-                  <div className="co-prog co-prog--locked">🔒</div>
-                ) : (
-                  <div className="co-prog">
-                    {solved}/{company.questions.length}
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="company-progress">
-          <div className="global-stats">
-            <div className="gs-label">Overall progress</div>
-            <div className="gs-bar">
-              <div className="gs-fill" style={{ width: `${globalPct}%` }} />
-            </div>
-            <div className="gs-nums">
-              <span>{totalSolvedCount} solved</span>
-              <span>{totalQuestionCount} total</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* LEFT: Stats + Table + Pagination */}
+      <div className="dsa-main">
 
       {/* Stats Row */}
       <div className="stats-row">
@@ -446,6 +360,82 @@ export function DsaPanel({
           </button>
         </div>
       )}
+      </div>{/* end .dsa-main */}
+
+      {/* RIGHT: Company Browser Sidebar */}
+      <aside className="dsa-sidebar">
+        <div className="dsa-sidebar-head">
+          <div className="company-browser-title">Companies</div>
+          <div className="logo-sub">Select to filter questions</div>
+          <input
+            className="co-search co-search--sidebar"
+            placeholder="Search..."
+            value={companySearch}
+            onChange={(e) => {
+              const v = e.target.value;
+              startTransition(() => setCompanySearch(v));
+            }}
+            autoComplete="off"
+          />
+        </div>
+
+        <div className="dsa-sidebar-companies">
+          {visibleCompanies.map((company) => {
+            const isAll = company.id === ALL_ID;
+            const isLocked = !isPremium && !isAll;
+            const solved = isLocked ? 0 : company.questions.filter((q) => solvedIds.includes(q.id)).length;
+            return (
+              <button
+                key={company.id}
+                type="button"
+                className={`co-item co-item--sidebar${selectedCompanyId === company.id ? " active" : ""}${isLocked ? " co-item--locked" : ""}${isAll ? " co-item--all" : ""}`}
+                onClick={() => {
+                  if (isLocked) { onBuyPremium(); return; }
+                  setSelectedCompanyId(company.id);
+                }}
+              >
+                <div className={`co-logo${isAll ? " co-logo--all" : ""}`}>
+                  {isAll ? (
+                    <span className="co-logo-all-icon">
+                      <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                        <rect x="1" y="1" width="6" height="6" rx="1.5" />
+                        <rect x="9" y="1" width="6" height="6" rx="1.5" />
+                        <rect x="1" y="9" width="6" height="6" rx="1.5" />
+                        <rect x="9" y="9" width="6" height="6" rx="1.5" />
+                      </svg>
+                    </span>
+                  ) : (
+                    <img src={company.logo} alt={company.name} />
+                  )}
+                  {isLocked && <span className="co-lock-badge">🔒</span>}
+                </div>
+                <div className="co-info">
+                  <div className="co-name">{company.name}</div>
+                  {isLocked ? (
+                    <div className="co-count co-count--premium">Premium</div>
+                  ) : (
+                    <div className="co-count">{company.questions.length} q</div>
+                  )}
+                </div>
+                {!isLocked && (
+                  <div className="co-prog">{solved}/{company.questions.length}</div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="dsa-sidebar-footer">
+          <div className="gs-label">Overall progress</div>
+          <div className="gs-bar">
+            <div className="gs-fill" style={{ width: `${globalPct}%` }} />
+          </div>
+          <div className="gs-nums">
+            <span>{totalSolvedCount} solved</span>
+            <span>{totalQuestionCount} total</span>
+          </div>
+        </div>
+      </aside>
     </div>
   );
 }
