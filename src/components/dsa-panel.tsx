@@ -52,6 +52,7 @@ export function DsaPanel({
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const deferredCompanySearch = useDeferredValue(companySearch);
 
@@ -432,89 +433,149 @@ export function DsaPanel({
       {/* end .dsa-main */}
 
       {/* RIGHT: Company Browser Sidebar */}
-      <aside className="dsa-sidebar">
-        <div className="dsa-sidebar-head">
-          <div className="company-browser-title">Companies</div>
-          <div className="logo-sub">Select to filter questions</div>
-          <input
-            className="co-search co-search--sidebar"
-            placeholder="Search..."
-            value={companySearch}
-            onChange={(e) => {
-              const v = e.target.value;
-              startTransition(() => setCompanySearch(v));
-            }}
-            autoComplete="off"
-          />
-        </div>
-
-        <div className="dsa-sidebar-companies">
-          {visibleCompanies.map((company) => {
-            const isAll = company.id === ALL_ID;
-            const isLocked = !isPremium && !isAll;
-            const solved = isLocked
-              ? 0
-              : company.questions.filter((q) => solvedIds.includes(q.id))
-                  .length;
-            return (
+      <aside className={`dsa-sidebar${sidebarCollapsed ? " dsa-sidebar--collapsed" : ""}`}>
+        {sidebarCollapsed ? (
+          /* ── COLLAPSED: logo strip ── */
+          <>
+            <div className="dsa-sidebar-collapse-toggle">
               <button
-                key={company.id}
                 type="button"
-                className={`co-item co-item--sidebar${selectedCompanyId === company.id ? " active" : ""}${isLocked ? " co-item--locked" : ""}${isAll ? " co-item--all" : ""}`}
-                onClick={() => {
-                  if (isLocked) {
-                    onBuyPremium();
-                    return;
-                  }
-                  setSelectedCompanyId(company.id);
-                }}
+                className="dsa-sidebar-toggle-btn"
+                onClick={() => setSidebarCollapsed(false)}
+                aria-label="Expand companies"
               >
-                <div className={`co-logo${isAll ? " co-logo--all" : ""}`}>
-                  {isAll ? (
-                    <span className="co-logo-all-icon">
-                      <svg
-                        viewBox="0 0 16 16"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                      >
-                        <rect x="1" y="1" width="6" height="6" rx="1.5" />
-                        <rect x="9" y="1" width="6" height="6" rx="1.5" />
-                        <rect x="1" y="9" width="6" height="6" rx="1.5" />
-                        <rect x="9" y="9" width="6" height="6" rx="1.5" />
-                      </svg>
-                    </span>
-                  ) : (
-                    <img src={company.logo} alt={company.name} />
-                  )}
-                  {isLocked && <span className="co-lock-badge">🔒</span>}
-                </div>
-                <div className="co-info">
-                  <div className="co-name">{company.name}</div>
-                  {isLocked && (
-                    <div className="co-count co-count--premium">Premium</div>
-                  )}
-                </div>
-                {!isLocked && (
-                  <div className="co-prog">
-                    {solved}/{company.questions.length}
-                  </div>
-                )}
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="14" height="14">
+                  <path d="M6 3l-4 5 4 5M10 3l4 5-4 5" />
+                </svg>
               </button>
-            );
-          })}
-        </div>
+            </div>
+            <div className="dsa-sidebar-logo-strip">
+              {displayCompanies.map((company) => {
+                const isAll = company.id === ALL_ID;
+                const isActive = selectedCompanyId === company.id;
+                return (
+                  <button
+                    key={company.id}
+                    type="button"
+                    className={`dsa-logo-pill${isActive ? " active" : ""}`}
+                    title={company.name}
+                    onClick={() => {
+                      if (!isPremium && !isAll) { onBuyPremium(); return; }
+                      setSelectedCompanyId(company.id);
+                    }}
+                  >
+                    {isAll ? (
+                      <span className="co-logo-all-icon co-logo-all-icon--pill">
+                        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor">
+                          <rect x="1" y="1" width="6" height="6" rx="1.5" />
+                          <rect x="9" y="1" width="6" height="6" rx="1.5" />
+                          <rect x="1" y="9" width="6" height="6" rx="1.5" />
+                          <rect x="9" y="9" width="6" height="6" rx="1.5" />
+                        </svg>
+                      </span>
+                    ) : (
+                      <img src={company.logo} alt={company.name} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="dsa-sidebar-collapsed-footer">
+              <div className="dsa-collapsed-ratio">{totalSolvedCount}<span>/{totalQuestionCount}</span></div>
+            </div>
+          </>
+        ) : (
+          /* ── EXPANDED: full sidebar ── */
+          <>
+            <div className="dsa-sidebar-head">
+              <div className="dsa-sidebar-head-row">
+                <div>
+                  <div className="company-browser-title">Companies</div>
+                  <div className="logo-sub">Select to filter questions</div>
+                </div>
+                <button
+                  type="button"
+                  className="dsa-sidebar-toggle-btn"
+                  onClick={() => setSidebarCollapsed(true)}
+                  aria-label="Collapse companies"
+                >
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="14" height="14">
+                    <path d="M10 3l4 5-4 5M6 3L2 8l4 5" />
+                  </svg>
+                </button>
+              </div>
+              <input
+                className="co-search co-search--sidebar"
+                placeholder="Search..."
+                value={companySearch}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  startTransition(() => setCompanySearch(v));
+                }}
+                autoComplete="off"
+              />
+            </div>
 
-        <div className="dsa-sidebar-footer">
-          <div className="gs-label">Overall progress</div>
-          <div className="gs-bar">
-            <div className="gs-fill" style={{ width: `${globalPct}%` }} />
-          </div>
-          <div className="gs-nums">
-            <span>{totalSolvedCount} solved</span>
-            <span>{totalQuestionCount} total</span>
-          </div>
-        </div>
+            <div className="dsa-sidebar-companies">
+              {visibleCompanies.map((company) => {
+                const isAll = company.id === ALL_ID;
+                const isLocked = !isPremium && !isAll;
+                const solved = isLocked
+                  ? 0
+                  : company.questions.filter((q) => solvedIds.includes(q.id)).length;
+                return (
+                  <button
+                    key={company.id}
+                    type="button"
+                    className={`co-item co-item--sidebar${selectedCompanyId === company.id ? " active" : ""}${isLocked ? " co-item--locked" : ""}${isAll ? " co-item--all" : ""}`}
+                    onClick={() => {
+                      if (isLocked) { onBuyPremium(); return; }
+                      setSelectedCompanyId(company.id);
+                    }}
+                  >
+                    <div className={`co-logo${isAll ? " co-logo--all" : ""}`}>
+                      {isAll ? (
+                        <span className="co-logo-all-icon">
+                          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                            <rect x="1" y="1" width="6" height="6" rx="1.5" />
+                            <rect x="9" y="1" width="6" height="6" rx="1.5" />
+                            <rect x="1" y="9" width="6" height="6" rx="1.5" />
+                            <rect x="9" y="9" width="6" height="6" rx="1.5" />
+                          </svg>
+                        </span>
+                      ) : (
+                        <img src={company.logo} alt={company.name} />
+                      )}
+                      {isLocked && <span className="co-lock-badge">🔒</span>}
+                    </div>
+                    <div className="co-info">
+                      <div className="co-name">{company.name}</div>
+                      {isLocked && (
+                        <div className="co-count co-count--premium">Premium</div>
+                      )}
+                    </div>
+                    {!isLocked && (
+                      <div className="co-prog">
+                        {solved}/{company.questions.length}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="dsa-sidebar-footer">
+              <div className="gs-label">Overall progress</div>
+              <div className="gs-bar">
+                <div className="gs-fill" style={{ width: `${globalPct}%` }} />
+              </div>
+              <div className="gs-nums">
+                <span>{totalSolvedCount} solved</span>
+                <span>{totalQuestionCount} total</span>
+              </div>
+            </div>
+          </>
+        )}
       </aside>
     </div>
   );

@@ -946,12 +946,130 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: width 0.2s ease;
 }
 
+.dsa-sidebar--collapsed {
+  width: 60px;
+}
+
+/* ── Collapsed: toggle button at top ── */
+.dsa-sidebar-collapse-toggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.dsa-sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.dsa-sidebar-toggle-btn:hover {
+  background: var(--surface3);
+  border-color: var(--border2);
+  color: var(--text1);
+}
+
+/* ── Collapsed: logo strip ── */
+.dsa-sidebar-logo-strip {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 0;
+}
+
+.dsa-logo-pill {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.dsa-logo-pill:hover {
+  border-color: var(--border2);
+  background: var(--surface3);
+}
+
+.dsa-logo-pill.active {
+  border-color: var(--accent);
+  background: var(--green-bg);
+}
+
+.dsa-logo-pill img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.co-logo-all-icon--pill {
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Collapsed: footer with ratio ── */
+.dsa-sidebar-collapsed-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dsa-collapsed-ratio {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: "DM Mono", monospace;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.dsa-collapsed-ratio span {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* ── Expanded: header row with toggle on the right ── */
 .dsa-sidebar-head {
   padding: 1rem 1rem 0.75rem;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+}
+
+.dsa-sidebar-head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
 }
 
 .dsa-sidebar-head .company-browser-title {
@@ -966,7 +1084,6 @@ body {
   font-size: 11px;
   color: var(--muted);
   font-family: "DM Mono", monospace;
-  margin-bottom: 0.65rem;
 }
 
 .co-search--sidebar {
