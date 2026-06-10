@@ -5,8 +5,9 @@ import { AppShell } from "@/components/app-shell";
 import { DashboardPanel } from "@/components/dashboard-panel";
 import { DsaPanel } from "@/components/dsa-panel";
 import { FrontendPanel } from "@/components/frontend-panel";
+import { SystemDesignPanel } from "@/components/system-design-panel";
 import type { AuthSession } from "@/lib/auth-api";
-import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek } from "@/types/prepdoc";
+import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/prepdoc";
 import { panelFromPath, panelPath, ROUTES } from "./route-paths";
 
 interface PrivateRoutesProps {
@@ -27,6 +28,9 @@ interface PrivateRoutesProps {
   companies: DsaCompany[];
   questions: FrontendQuestion[];
   roadmapWeeks: RoadmapWeek[];
+  systemDesignQuestions: SystemDesignQuestion[];
+  completedSystemDesignIds: SystemDesignQuestionId[];
+  onCompletedSystemDesignIdsChange: Dispatch<SetStateAction<SystemDesignQuestionId[]>>;
   completedQuestionIds: FrontendQuestionId[];
   completedRoadmapDays: number[];
   onSolvedIdsChange: Dispatch<SetStateAction<QuestionId[]>>;
@@ -61,6 +65,9 @@ export function PrivateRoutes({
   solvedIds,
   bookmarkedIds,
   companies,
+  systemDesignQuestions,
+  completedSystemDesignIds,
+  onCompletedSystemDesignIdsChange,
   questions,
   roadmapWeeks,
   completedQuestionIds,
@@ -137,6 +144,16 @@ export function PrivateRoutes({
               bookmarkedIds={bookmarkedIds}
               onSolvedIdsChange={onSolvedIdsChange}
               onBookmarkedIdsChange={onBookmarkedIdsChange}
+            />
+          }
+        />
+        <Route
+          path={ROUTES.systemDesign}
+          element={
+            <SystemDesignPanel
+              questions={systemDesignQuestions}
+              completedIds={completedSystemDesignIds}
+              onCompletedIdsChange={onCompletedSystemDesignIdsChange}
             />
           }
         />

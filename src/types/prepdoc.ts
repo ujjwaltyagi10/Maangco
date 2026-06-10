@@ -1,4 +1,28 @@
-export type AppPanel = "dashboard" | "dsa" | "frontend";
+export type AppPanel = "dashboard" | "dsa" | "system-design" | "frontend";
+
+export type SystemDesignFrequency = "High" | "Medium" | "Low";
+
+export type SystemDesignCategory =
+  | "Infrastructure"
+  | "Messaging & Streaming"
+  | "Storage & Data"
+  | "Product & Social"
+  | "Search & Geo"
+  | "Finance & Payments"
+  | "Distributed Systems"
+  | "AI & ML Systems";
+
+export interface SystemDesignQuestion {
+  id: string;
+  number: number;
+  title: string;
+  companies: string[];
+  frequency: SystemDesignFrequency;
+  category: SystemDesignCategory;
+  timeframe: string;
+}
+
+export type SystemDesignQuestionId = SystemDesignQuestion["id"];
 
 export interface DsaQuestion {
   id: string;

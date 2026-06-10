@@ -6,8 +6,9 @@ import { AppRouter } from "./routes/app-router";
 import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, isValidEmail, loginUser, logoutUser, registerUser, requestPasswordReset, resetPassword, resendVerificationEmail, type AuthSession, type AuthUser } from "./lib/auth-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
 import { dsaCompanies } from "./data/dsa";
+import { systemDesignQuestions } from "./data/system-design";
 import { frontendQuestions, roadmapWeeks } from "./data/frontend";
-import type { FrontendQuestionId, QuestionId } from "./types/prepdoc";
+import type { FrontendQuestionId, QuestionId, SystemDesignQuestionId } from "./types/prepdoc";
 import { ROUTES, type AuthSubmitResult } from "./routes/route-paths";
 import "./App.css";
 
@@ -41,6 +42,9 @@ function App() {
     "prepdoc.dsa.bookmarked",
     [],
   );
+  const [completedSystemDesignIds, setCompletedSystemDesignIds] = useLocalStorage<
+    SystemDesignQuestionId[]
+  >("prepdoc.sd.completed", []);
   const [completedFrontendIds, setCompletedFrontendIds] = useLocalStorage<
     FrontendQuestionId[]
   >("prepdoc.frontend.completed", []);
@@ -324,6 +328,9 @@ function App() {
         solvedIds={solvedDsaIds}
         bookmarkedIds={bookmarkedDsaIds}
         companies={dsaCompanies}
+        systemDesignQuestions={systemDesignQuestions}
+        completedSystemDesignIds={completedSystemDesignIds}
+        onCompletedSystemDesignIdsChange={setCompletedSystemDesignIds}
         questions={frontendQuestions}
         roadmapWeeks={roadmapWeeks}
         completedQuestionIds={completedFrontendIds}

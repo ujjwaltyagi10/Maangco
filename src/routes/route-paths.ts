@@ -17,6 +17,7 @@ export const ROUTES = {
   googleCallback: "/auth/google/callback",
   dashboard: "/dashboard",
   dsa: "/dsa",
+  systemDesign: "/system-design",
   frontend: "/frontend",
 } as const;
 
@@ -43,6 +44,8 @@ export function panelPath(panel: AppPanel) {
       return ROUTES.dashboard;
     case "dsa":
       return ROUTES.dsa;
+    case "system-design":
+      return ROUTES.systemDesign;
     case "frontend":
       return ROUTES.frontend;
     default:
@@ -53,6 +56,7 @@ export function panelPath(panel: AppPanel) {
 export function panelFromPath(pathname: string): AppPanel {
   const path = pathname.toLowerCase();
   if (path === ROUTES.dsa) return "dsa";
+  if (path === ROUTES.systemDesign) return "system-design";
   if (path === ROUTES.frontend) return "frontend";
   return "dashboard";
 }

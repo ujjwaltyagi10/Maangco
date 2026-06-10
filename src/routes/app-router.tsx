@@ -2,7 +2,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { BrowserRouter } from "react-router-dom";
 
 import type { AuthSession } from "@/lib/auth-api";
-import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek } from "@/types/prepdoc";
+import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/prepdoc";
 import type { AuthSubmitResult } from "./route-paths";
 import { PrivateRoutes } from "./private-routes";
 import { PublicRoutes } from "./public-routes";
@@ -27,6 +27,9 @@ export interface AppRouterProps {
   solvedIds: QuestionId[];
   bookmarkedIds: QuestionId[];
   companies: DsaCompany[];
+  systemDesignQuestions: SystemDesignQuestion[];
+  completedSystemDesignIds: SystemDesignQuestionId[];
+  onCompletedSystemDesignIdsChange: Dispatch<SetStateAction<SystemDesignQuestionId[]>>;
   questions: FrontendQuestion[];
   roadmapWeeks: RoadmapWeek[];
   completedQuestionIds: FrontendQuestionId[];
@@ -86,6 +89,9 @@ export function AppRouter(props: AppRouterProps) {
           solvedIds={props.solvedIds}
           bookmarkedIds={props.bookmarkedIds}
           companies={props.companies}
+          systemDesignQuestions={props.systemDesignQuestions}
+          completedSystemDesignIds={props.completedSystemDesignIds}
+          onCompletedSystemDesignIdsChange={props.onCompletedSystemDesignIdsChange}
           questions={props.questions}
           roadmapWeeks={props.roadmapWeeks}
           completedQuestionIds={props.completedQuestionIds}

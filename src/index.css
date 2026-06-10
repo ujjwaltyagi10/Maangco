@@ -1437,6 +1437,7 @@ body {
   border-radius: 20px;
   font-family: "DM Mono", monospace;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .diff-badge.Easy {
@@ -2971,5 +2972,165 @@ body {
     align-items: flex-start;
     flex-direction: row;
     flex-wrap: wrap;
+  }
+}
+
+/* ── SYSTEM DESIGN PANEL ── */
+.sd-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  min-height: 0;
+}
+
+.sd-top {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.sd-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 1rem 1rem 0.75rem;
+}
+
+.sd-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text1);
+  margin: 0 0 2px;
+  letter-spacing: -0.02em;
+}
+
+.sd-subtitle {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+  font-family: "DM Mono", monospace;
+}
+
+.sd-stats-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Filter bar: search + selects + toggle in one row */
+.sd-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.6rem 1rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.sd-filter-search {
+  flex: 1;
+  min-width: 200px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface2);
+  color: var(--text1);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.sd-filter-search::placeholder {
+  color: var(--muted);
+}
+
+.sd-filter-search:focus {
+  border-color: var(--border2);
+  background: var(--surface);
+}
+
+.sd-filter-selects {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sd-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sd-select-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  white-space: nowrap;
+}
+
+.sd-select {
+  height: 32px;
+  padding: 0 24px 0 8px;
+  font-size: 12px;
+}
+
+.sd-studied-btn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.sd-studied-btn:hover {
+  border-color: var(--border2);
+  background: var(--surface);
+}
+
+.sd-studied-btn.active {
+  background: var(--green-bg);
+  border-color: var(--green-light);
+  color: var(--green);
+  font-weight: 600;
+}
+
+.sd-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .sd-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sd-filter-search {
+    min-width: unset;
+  }
+
+  .sd-filter-selects {
+    flex-wrap: wrap;
+  }
+
+  .sd-header {
+    flex-direction: column;
   }
 }
