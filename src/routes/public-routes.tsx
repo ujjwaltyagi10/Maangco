@@ -212,6 +212,7 @@ export function PublicRoutes({
             onThemeChange={onThemeChange}
             onSignIn={() => navigate(ROUTES.login)}
             onGetStarted={() => navigate(ROUTES.signup)}
+            onStartFree={() => navigate(ROUTES.dashboard)}
           />
         }
       />

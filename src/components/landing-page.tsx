@@ -5,6 +5,7 @@ interface LandingPageProps {
   onThemeChange: () => void;
   onSignIn: () => void;
   onGetStarted: () => void;
+  onStartFree: () => void;
 }
 
 const companies = [
@@ -174,6 +175,7 @@ export function LandingPage({
   onThemeChange,
   onSignIn,
   onGetStarted,
+  onStartFree,
 }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -380,9 +382,9 @@ export function LandingPage({
               <button
                 type="button"
                 className="lbtn-primary lbtn-lg lbtn-glow"
-                onClick={onGetStarted}
+                onClick={onStartFree}
               >
-                Start cracking FAANG
+                Start Learning for Free
                 <svg
                   viewBox="0 0 20 20"
                   fill="currentColor"

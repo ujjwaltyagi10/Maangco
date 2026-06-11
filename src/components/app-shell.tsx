@@ -8,13 +8,17 @@ interface AppShellProps {
   onPanelChange: (panel: AppPanel) => void;
   theme: "light" | "dark";
   onThemeChange: () => void;
+  isAuthenticated: boolean;
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
   lcSolvedCount: number;
   qDoneCount: number;
   userLabel: string;
+  onSignIn: () => void;
+  onSignUp: () => void;
   onLogout: () => void;
   onOpenChangePassword: () => void;
+  isLocked?: boolean;
   children: ReactNode;
 }
 
@@ -37,13 +41,17 @@ export function AppShell({
   onPanelChange,
   theme,
   onThemeChange,
+  isAuthenticated,
   isSidebarCollapsed,
   onToggleSidebar,
   lcSolvedCount,
   qDoneCount,
   userLabel,
+  onSignIn,
+  onSignUp,
   onLogout,
   onOpenChangePassword,
+  isLocked,
   children,
 }: AppShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -70,7 +78,11 @@ export function AppShell({
       .toUpperCase() || "U";
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", width: "100%" }}>
+    <div
+      className={isLocked ? "app-shell app-shell--locked" : "app-shell"}
+      style={{ display: "flex", height: "100vh", overflow: "hidden", width: "100%" }}
+      aria-hidden={isLocked ? true : undefined}
+    >
       {/* SIDEBAR */}
       <aside className={`sidebar${isSidebarCollapsed ? " collapsed" : ""}`}>
         <div className="sidebar-logo">
@@ -144,89 +156,178 @@ export function AppShell({
               <strong>{qDoneCount}</strong> Q done
             </div>
 
-            {/* Profile dropdown */}
-            <div className="profile-menu-wrap" ref={menuRef}>
-              <button
-                type="button"
-                className={`profile-menu-btn${menuOpen ? " open" : ""}`}
-                onClick={() => setMenuOpen((o) => !o)}
-                aria-label="Open user menu"
-                aria-expanded={menuOpen}
-              >
-                <div className="profile-avatar">{userInitials}</div>
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="profile-chevron"
-                  style={{ width: 12, height: 12 }}
+            {isAuthenticated ? (
+              <div className="profile-menu-wrap" ref={menuRef}>
+                <button
+                  type="button"
+                  className={`profile-menu-btn${menuOpen ? " open" : ""}`}
+                  onClick={() => setMenuOpen((o) => !o)}
+                  aria-label="Open user menu"
+                  aria-expanded={menuOpen}
                 >
-                  <path d="M5 8l5 5 5-5H5z" />
-                </svg>
-              </button>
+                  <div className="profile-avatar">{userInitials}</div>
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="profile-chevron"
+                    style={{ width: 12, height: 12 }}
+                  >
+                    <path d="M5 8l5 5 5-5H5z" />
+                  </svg>
+                </button>
 
-              {menuOpen ? (
-                <div className="profile-dropdown">
-                  <div className="profile-dropdown-header">
-                    <div className="profile-avatar profile-avatar--lg">{userInitials}</div>
-                    <div style={{ minWidth: 0 }}>
-                      <div className="profile-dropdown-name">{userLabel}</div>
-                      <div className="profile-dropdown-sub">Signed in</div>
+                {menuOpen ? (
+                  <div className="profile-dropdown">
+                    <div className="profile-dropdown-header">
+                      <div className="profile-avatar profile-avatar--lg">{userInitials}</div>
+                      <div style={{ minWidth: 0 }}>
+                        <div className="profile-dropdown-name">{userLabel}</div>
+                        <div className="profile-dropdown-sub">Signed in</div>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="profile-dropdown-divider" />
+                    <div className="profile-dropdown-divider" />
 
-                  <button
-                    type="button"
-                    className="profile-dropdown-item"
-                    onClick={() => { onThemeChange(); setMenuOpen(false); }}
-                  >
-                    <span className="profile-dropdown-item-icon">
-                      {theme === "light" ? (
-                        <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: 14, height: 14 }}>
-                          <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
-                        </svg>
-                      ) : (
+                    <button
+                      type="button"
+                      className="profile-dropdown-item"
+                      onClick={() => { onThemeChange(); setMenuOpen(false); }}
+                    >
+                      <span className="profile-dropdown-item-icon">
+                        {theme === "light" ? (
+                          <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: 14, height: 14 }}>
+                            <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
+                          </svg>
+                        ) : (
+                          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                            <circle cx="10" cy="10" r="3.2" />
+                            <path d="M10 1.8V4.1M10 15.9V18.2M1.8 10H4.1M15.9 10H18.2M4.2 4.2L5.8 5.8M14.2 14.2L15.8 15.8M4.2 15.8L5.8 14.2M14.2 5.8L15.8 4.2" />
+                          </svg>
+                        )}
+                      </span>
+                      {theme === "light" ? "Dark Mode" : "Light Mode"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="profile-dropdown-item"
+                      onClick={() => { onOpenChangePassword(); setMenuOpen(false); }}
+                    >
+                      <span className="profile-dropdown-item-icon">
                         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
-                          <circle cx="10" cy="10" r="3.2" />
-                          <path d="M10 1.8V4.1M10 15.9V18.2M1.8 10H4.1M15.9 10H18.2M4.2 4.2L5.8 5.8M14.2 14.2L15.8 15.8M4.2 15.8L5.8 14.2M14.2 5.8L15.8 4.2" />
+                          <rect x="3" y="9" width="14" height="10" rx="2" />
+                          <path d="M7 9V6a3 3 0 0 1 6 0v3" />
                         </svg>
-                      )}
-                    </span>
-                    {theme === "light" ? "Dark Mode" : "Light Mode"}
-                  </button>
+                      </span>
+                      Change Password
+                    </button>
 
-                  <button
-                    type="button"
-                    className="profile-dropdown-item"
-                    onClick={() => { onOpenChangePassword(); setMenuOpen(false); }}
+                    <div className="profile-dropdown-divider" />
+
+                    <button
+                      type="button"
+                      className="profile-dropdown-item profile-dropdown-item--danger"
+                      onClick={() => { onLogout(); setMenuOpen(false); }}
+                    >
+                      <span className="profile-dropdown-item-icon">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                          <path d="M7 3H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3M13 14l4-4-4-4M17 10H7" />
+                        </svg>
+                      </span>
+                      Sign Out
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <div className="profile-menu-wrap" ref={menuRef}>
+                <button
+                  type="button"
+                  className={`profile-menu-btn${menuOpen ? " open" : ""}`}
+                  onClick={() => setMenuOpen((o) => !o)}
+                  aria-label="Open guest menu"
+                  aria-expanded={menuOpen}
+                >
+                  <div className="profile-avatar">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 14, height: 14 }}>
+                      <path d="M3 6h14M3 10h14M3 14h14" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="profile-chevron"
+                    style={{ width: 12, height: 12 }}
                   >
-                    <span className="profile-dropdown-item-icon">
-                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
-                        <rect x="3" y="9" width="14" height="10" rx="2" />
-                        <path d="M7 9V6a3 3 0 0 1 6 0v3" />
-                      </svg>
-                    </span>
-                    Change Password
-                  </button>
+                    <path d="M5 8l5 5 5-5H5z" />
+                  </svg>
+                </button>
 
-                  <div className="profile-dropdown-divider" />
+                {menuOpen ? (
+                  <div className="profile-dropdown">
+                    <div className="profile-dropdown-header">
+                      <div className="profile-avatar profile-avatar--lg">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
+                          <path d="M3 6h14M3 10h14M3 14h14" strokeLinecap="round" />
+                        </svg>
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div className="profile-dropdown-name">Guest</div>
+                        <div className="profile-dropdown-sub">Browse or sign in</div>
+                      </div>
+                    </div>
 
-                  <button
-                    type="button"
-                    className="profile-dropdown-item profile-dropdown-item--danger"
-                    onClick={() => { onLogout(); setMenuOpen(false); }}
-                  >
-                    <span className="profile-dropdown-item-icon">
-                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
-                        <path d="M7 3H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3M13 14l4-4-4-4M17 10H7" />
-                      </svg>
-                    </span>
-                    Sign Out
-                  </button>
-                </div>
-              ) : null}
-            </div>
+                    <div className="profile-dropdown-divider" />
+
+                    <button
+                      type="button"
+                      className="profile-dropdown-item"
+                      onClick={() => { onThemeChange(); setMenuOpen(false); }}
+                    >
+                      <span className="profile-dropdown-item-icon">
+                        {theme === "light" ? (
+                          <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: 14, height: 14 }}>
+                            <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
+                          </svg>
+                        ) : (
+                          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                            <circle cx="10" cy="10" r="3.2" />
+                            <path d="M10 1.8V4.1M10 15.9V18.2M1.8 10H4.1M15.9 10H18.2M4.2 4.2L5.8 5.8M14.2 14.2L15.8 15.8M4.2 15.8L5.8 14.2M14.2 5.8L15.8 4.2" />
+                          </svg>
+                        )}
+                      </span>
+                      {theme === "light" ? "Dark Mode" : "Light Mode"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="profile-dropdown-item"
+                      onClick={() => { onSignIn(); setMenuOpen(false); }}
+                    >
+                      <span className="profile-dropdown-item-icon">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                          <path d="M7 3H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3M13 14l4-4-4-4M17 10H7" />
+                        </svg>
+                      </span>
+                      Sign In
+                    </button>
+
+                    <button
+                      type="button"
+                      className="profile-dropdown-item"
+                      onClick={() => { onSignUp(); setMenuOpen(false); }}
+                    >
+                      <span className="profile-dropdown-item-icon">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                          <path d="M10 2.5v15M2.5 10h15" />
+                        </svg>
+                      </span>
+                      Get Started
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            )}
           </div>
         </div>
 

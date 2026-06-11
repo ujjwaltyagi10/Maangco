@@ -2,6 +2,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import { AppShell } from "@/components/app-shell";
+import { AuthGateModal } from "@/components/auth-gate-modal";
 import { DashboardPanel } from "@/components/dashboard-panel";
 import { DsaPanel } from "@/components/dsa-panel";
 import { FrontendPanel } from "@/components/frontend-panel";
@@ -13,7 +14,7 @@ import { panelFromPath, panelPath, ROUTES } from "./route-paths";
 interface PrivateRoutesProps {
   isPremium: boolean;
   onBuyPremium: () => void;
-  authSession: AuthSession;
+  authSession: AuthSession | null;
   theme: "light" | "dark";
   onThemeChange: () => void;
   isSidebarCollapsed: boolean;
@@ -90,88 +91,103 @@ export function PrivateRoutes({
   const navigate = useNavigate();
   const location = useLocation();
   const activePanel = panelFromPath(location.pathname);
-
-  if (!authSession?.token) {
-    return <Navigate to={ROUTES.login} replace />;
-  }
+  const onSignIn = () => navigate(ROUTES.login);
+  const onSignUp = () => navigate(ROUTES.signup);
+  const isAuthenticated = Boolean(authSession?.token);
+  const isFrontendFree = activePanel === "frontend";
+  const isLocked = !isAuthenticated && !isFrontendFree;
 
   return (
-    <AppShell
-      activePanel={activePanel}
-      onPanelChange={(panel) => {
-        navigate(panelPath(panel));
-      }}
-      theme={theme}
-      onThemeChange={onThemeChange}
-      isSidebarCollapsed={isSidebarCollapsed}
-      onToggleSidebar={onToggleSidebar}
-      lcSolvedCount={lcSolvedCount}
-      qDoneCount={qDoneCount}
-      userLabel={userLabel}
-      onLogout={onLogout}
-      onOpenChangePassword={onOpenChangePassword}
-    >
-      <Routes>
-        <Route
-          path={ROUTES.dashboard}
-          element={
-            <DashboardPanel
-              isPremium={isPremium}
-              onBuyPremium={onBuyPremium}
-              dsaProgress={dsaProgress}
-              frontendProgress={frontendProgress}
-              overallProgress={overallProgress}
-              solvedDsaCount={solvedDsaCount}
-              totalDsaCount={totalDsaCount}
-              completedFrontendCount={completedFrontendCount}
-              totalFrontendCount={totalFrontendCount}
-              completedRoadmapDays={completedRoadmapCount}
-              totalRoadmapDays={totalRoadmapCount}
-              companyCount={companyCount}
-              onOpenDsa={() => navigate(ROUTES.dsa)}
-              onOpenFrontend={() => navigate(ROUTES.frontend)}
-            />
-          }
+    <>
+      <AppShell
+        activePanel={activePanel}
+        onPanelChange={(panel) => {
+          navigate(panelPath(panel));
+        }}
+        theme={theme}
+        onThemeChange={onThemeChange}
+        isAuthenticated={isAuthenticated}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onToggleSidebar={onToggleSidebar}
+        lcSolvedCount={lcSolvedCount}
+        qDoneCount={qDoneCount}
+        userLabel={userLabel}
+        onSignIn={onSignIn}
+        onSignUp={onSignUp}
+        onLogout={onLogout}
+        onOpenChangePassword={onOpenChangePassword}
+        isLocked={isLocked}
+      >
+        <Routes>
+          <Route
+            path={ROUTES.dashboard}
+            element={
+              <DashboardPanel
+                isPremium={isPremium}
+                onBuyPremium={onBuyPremium}
+                dsaProgress={dsaProgress}
+                frontendProgress={frontendProgress}
+                overallProgress={overallProgress}
+                solvedDsaCount={solvedDsaCount}
+                totalDsaCount={totalDsaCount}
+                completedFrontendCount={completedFrontendCount}
+                totalFrontendCount={totalFrontendCount}
+                completedRoadmapDays={completedRoadmapCount}
+                totalRoadmapDays={totalRoadmapCount}
+                companyCount={companyCount}
+                onOpenDsa={() => navigate(ROUTES.dsa)}
+                onOpenFrontend={() => navigate(ROUTES.frontend)}
+              />
+            }
+          />
+          <Route
+            path={ROUTES.dsa}
+            element={
+              <DsaPanel
+                isPremium={isPremium}
+                onBuyPremium={onBuyPremium}
+                companies={companies}
+                solvedIds={solvedIds}
+                bookmarkedIds={bookmarkedIds}
+                onSolvedIdsChange={onSolvedIdsChange}
+                onBookmarkedIdsChange={onBookmarkedIdsChange}
+              />
+            }
+          />
+          <Route
+            path={ROUTES.systemDesign}
+            element={
+              <SystemDesignPanel
+                questions={systemDesignQuestions}
+                completedIds={completedSystemDesignIds}
+                onCompletedIdsChange={onCompletedSystemDesignIdsChange}
+              />
+            }
+          />
+          <Route
+            path={ROUTES.frontend}
+            element={
+              <FrontendPanel
+                questions={questions}
+                roadmapWeeks={roadmapWeeks}
+                completedQuestionIds={completedQuestionIds}
+                completedRoadmapDays={completedRoadmapDays}
+                onCompletedQuestionIdsChange={onCompletedQuestionIdsChange}
+                onCompletedRoadmapDaysChange={onCompletedRoadmapDaysChange}
+              />
+            }
+          />
+          <Route path="*" element={<Navigate to={ROUTES.dashboard} replace />} />
+        </Routes>
+      </AppShell>
+
+      {isLocked ? (
+        <AuthGateModal
+          theme={theme}
+          onThemeChange={onThemeChange}
+          onBrowseFrontend={() => navigate(ROUTES.frontend)}
         />
-        <Route
-          path={ROUTES.dsa}
-          element={
-            <DsaPanel
-              isPremium={isPremium}
-              onBuyPremium={onBuyPremium}
-              companies={companies}
-              solvedIds={solvedIds}
-              bookmarkedIds={bookmarkedIds}
-              onSolvedIdsChange={onSolvedIdsChange}
-              onBookmarkedIdsChange={onBookmarkedIdsChange}
-            />
-          }
-        />
-        <Route
-          path={ROUTES.systemDesign}
-          element={
-            <SystemDesignPanel
-              questions={systemDesignQuestions}
-              completedIds={completedSystemDesignIds}
-              onCompletedIdsChange={onCompletedSystemDesignIdsChange}
-            />
-          }
-        />
-        <Route
-          path={ROUTES.frontend}
-          element={
-            <FrontendPanel
-              questions={questions}
-              roadmapWeeks={roadmapWeeks}
-              completedQuestionIds={completedQuestionIds}
-              completedRoadmapDays={completedRoadmapDays}
-              onCompletedQuestionIdsChange={onCompletedQuestionIdsChange}
-              onCompletedRoadmapDaysChange={onCompletedRoadmapDaysChange}
-            />
-          }
-        />
-        <Route path="*" element={<Navigate to={ROUTES.dashboard} replace />} />
-      </Routes>
-    </AppShell>
+      ) : null}
+    </>
   );
 }

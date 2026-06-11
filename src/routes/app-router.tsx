@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useLocation } from "react-router-dom";
 
 import type { AuthSession } from "@/lib/auth-api";
 import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/prepdoc";
@@ -60,9 +60,21 @@ export interface AppRouterProps {
   onGoogleCallback: (session: AuthSession) => Promise<void> | void;
 }
 
-export function AppRouter(props: AppRouterProps) {
+function AppRouterContent(props: AppRouterProps) {
+  const location = useLocation();
+  const path = location.pathname.toLowerCase();
+  const isAppRoute =
+    path === "/dashboard" ||
+    path === "/dsa" ||
+    path === "/system-design" ||
+    path === "/frontend" ||
+    path.startsWith("/dashboard/") ||
+    path.startsWith("/dsa/") ||
+    path.startsWith("/system-design/") ||
+    path.startsWith("/frontend/");
+
   return (
-    <BrowserRouter>
+    <>
       {props.authStatus === "loading" ? (
         <div className="app-loading-screen">
           <div className="app-loading-logo">
@@ -72,7 +84,7 @@ export function AppRouter(props: AppRouterProps) {
           </div>
           <div className="app-loading-text">PrepDoc</div>
         </div>
-      ) : props.authSession?.token ? (
+      ) : isAppRoute ? (
         <PrivateRoutes
           isPremium={props.isPremium}
           onBuyPremium={props.onBuyPremium}
@@ -124,6 +136,14 @@ export function AppRouter(props: AppRouterProps) {
           onThemeChange={props.onThemeChange}
         />
       )}
+    </>
+  );
+}
+
+export function AppRouter(props: AppRouterProps) {
+  return (
+    <BrowserRouter>
+      <AppRouterContent {...props} />
     </BrowserRouter>
   );
 }

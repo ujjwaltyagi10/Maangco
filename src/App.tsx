@@ -298,7 +298,7 @@ function App() {
   };
 
   const currentUser = authSession?.user ?? null;
-  const userLabel = formatUserLabel(currentUser);
+  const userLabel = currentUser ? formatUserLabel(currentUser) : "Guest";
   const allowEmptyCurrentPassword = currentUser?.has_password === false;
   // Backend is the sole source of truth — subscription.isActive from /api/me
   // premiumAccess is only an optimistic flag set right after payment (cleared on refresh)

@@ -531,6 +531,34 @@ a.lbtn-lg {
   gap: 12px;
   margin-bottom: 44px;
 }
+
+.lhero-free-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  border: none;
+  background: transparent;
+  color: var(--green);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
+}
+
+.lhero-free-btn:hover {
+  color: var(--accent2);
+}
+
+.lhero-free-btn:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 4px;
+  border-radius: 10px;
+}
 .lhero-v2-stats {
   display: flex;
   gap: 0;
@@ -1460,6 +1488,152 @@ a.lbtn-lg {
   color: var(--text1);
 }
 
+.app-shell--locked .sidebar,
+.app-shell--locked .app-body {
+  filter: blur(7px) saturate(0.7);
+  pointer-events: none;
+  user-select: none;
+}
+
+.auth-gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(10, 10, 12, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.auth-gate-card {
+  width: min(460px, 100%);
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.35);
+  background: var(--surface);
+}
+
+.auth-gate-mini {
+  padding: 24px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.auth-gate-mini-top {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.auth-gate-theme-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.auth-gate-theme-btn:hover {
+  background: var(--surface3);
+  color: var(--text1);
+  border-color: var(--border2);
+}
+
+.auth-gate-mini-icon {
+  width: 92px;
+  height: 92px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(74, 124, 65, 0.16), rgba(124, 184, 112, 0.1));
+  color: var(--green);
+  border: 1px solid rgba(74, 124, 65, 0.24);
+}
+
+.auth-gate-mini-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text1);
+  line-height: 1.1;
+}
+
+.auth-gate-mini-subtitle {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text2);
+  max-width: 300px;
+}
+
+.auth-gate-mini-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.auth-gate-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text1);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.auth-gate-action:hover {
+  background: var(--surface3);
+  border-color: var(--border2);
+  transform: translateY(-1px);
+}
+
+.auth-gate-action--primary {
+  background: linear-gradient(135deg, #4a7c41, #6ba860);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(74, 124, 65, 0.22);
+}
+
+.auth-gate-action--primary:hover {
+  background: linear-gradient(135deg, #456f3d, #629c56);
+}
+
+.auth-gate-link {
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.auth-gate-link:hover {
+  color: var(--text1);
+}
+
 .auth-form-body {
   flex: 1;
   display: flex;
@@ -2223,6 +2397,9 @@ a.lbtn-lg {
     width: 100%;
     border-right: none;
   }
+  .auth-gate-card {
+    width: min(440px, 100%);
+  }
 }
 
 @media (max-width: 640px) {
@@ -2241,6 +2418,38 @@ a.lbtn-lg {
   }
   .lhero-title {
     font-size: clamp(34px, 8vw, 56px);
+  }
+  .lhero-v2-ctas {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 26px;
+  }
+  .lhero-v2-ctas .lbtn-primary,
+  .lhero-v2-ctas .lbtn-outline {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 18px;
+    font-size: 13px;
+  }
+  .lhero-v2-ctas .lbtn-primary {
+    letter-spacing: -0.02em;
+  }
+  .auth-gate-overlay {
+    padding: 10px;
+  }
+  .auth-gate-card {
+    width: 100%;
+    border-radius: 22px;
+  }
+  .auth-gate-mini {
+    padding: 18px 16px 16px;
+  }
+  .auth-gate-mini-icon {
+    width: 82px;
+    height: 82px;
+  }
+  .auth-gate-mini-actions {
+    flex-direction: column;
   }
 }
 

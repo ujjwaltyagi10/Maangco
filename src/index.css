@@ -537,6 +537,46 @@ body {
   gap: 8px;
 }
 
+.topnav-guest-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.topnav-guest-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text1);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.topnav-guest-btn:hover {
+  background: var(--surface3);
+  border-color: var(--border2);
+  transform: translateY(-1px);
+}
+
+.topnav-guest-btn--primary {
+  background: linear-gradient(135deg, #4a7c41, #6ba860);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(74, 124, 65, 0.24);
+}
+
+.topnav-guest-btn--primary:hover {
+  background: linear-gradient(135deg, #456f3d, #629c56);
+}
+
 .topnav-stat {
   background: var(--surface2);
   border: 1px solid var(--border);
