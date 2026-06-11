@@ -182,37 +182,39 @@ export function LandingPage({
       {/* ── NAVBAR ── */}
       <nav className="landing-nav">
         <div className="landing-container">
-          <div className="flex items-center h-16 gap-6">
-            <a href="/" className="landing-logo flex-shrink-0">
-              <div className="landing-logo-mark">
-                <svg viewBox="0 0 20 20" width="16" height="16">
-                  <path
-                    d="M10 1L2 6v8l8 5 8-5V6L10 1zm0 2.3L16 7v6l-6 3.7L4 13V7l6-3.7z"
-                    fill="white"
-                  />
-                </svg>
-              </div>
-              <span className="landing-logo-text">
-                Prep<em>Doc</em>
-              </span>
-            </a>
+          <div className="landing-nav-row">
+            <div className="landing-nav-left">
+              <a href="/" className="landing-logo flex-shrink-0">
+                <div className="landing-logo-mark">
+                  <svg viewBox="0 0 20 20" width="16" height="16">
+                    <path
+                      d="M10 1L2 6v8l8 5 8-5V6L10 1zm0 2.3L16 7v6l-6 3.7L4 13V7l6-3.7z"
+                      fill="white"
+                    />
+                  </svg>
+                </div>
+                <span className="landing-logo-text">
+                  Prep<em>Doc</em>
+                </span>
+              </a>
 
-            <div className="hidden lg:flex items-center gap-1 flex-1">
-              <a href="#features" className="landing-nav-link">
-                Features
-              </a>
-              <a href="#pricing" className="landing-nav-link">
-                Pricing
-              </a>
-              <a href="#testimonials" className="landing-nav-link">
-                Reviews
-              </a>
-              <a href="#faq" className="landing-nav-link">
-                FAQ
-              </a>
+              <div className="hidden lg:flex items-center gap-1 flex-1">
+                <a href="#features" className="landing-nav-link">
+                  Features
+                </a>
+                <a href="#pricing" className="landing-nav-link">
+                  Pricing
+                </a>
+                <a href="#testimonials" className="landing-nav-link">
+                  Reviews
+                </a>
+                <a href="#faq" className="landing-nav-link">
+                  FAQ
+                </a>
+              </div>
             </div>
 
-            <div className="hidden lg:flex items-center gap-2 ml-auto">
+            <div className="hidden lg:flex items-center gap-2">
               <button
                 type="button"
                 className="lnav-theme-btn"
@@ -255,7 +257,7 @@ export function LandingPage({
               </button>
             </div>
 
-            <div className="flex lg:hidden items-center gap-2 ml-auto">
+            <div className="landing-nav-mobile">
               <button
                 type="button"
                 className="lnav-theme-btn"
