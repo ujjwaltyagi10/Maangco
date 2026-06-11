@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ChangePasswordModal } from "./components/change-password-modal";
 import { PremiumModal } from "./components/premium-modal";
 import { AppRouter } from "./routes/app-router";
-import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, isValidEmail, loginUser, logoutUser, registerUser, requestPasswordReset, resetPassword, resendVerificationEmail, type AuthSession, type AuthUser } from "./lib/auth-api";
+import { AuthExpiredError, changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, isValidEmail, loginUser, logoutUser, refreshAccessToken, registerUser, requestPasswordReset, resetPassword, resendVerificationEmail, type AuthSession, type AuthUser } from "./lib/auth-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
 import { dsaCompanies } from "./data/dsa";
 import { systemDesignQuestions } from "./data/system-design";
@@ -86,17 +86,21 @@ function App() {
 
       try {
         const session = await getCurrentUser(authToken);
-        if (!cancelled) {
-          setAuthSession(session);
-        }
-      } catch {
-        if (!cancelled) {
-          setAuthSession(null);
+        if (!cancelled) setAuthSession(session);
+      } catch (error) {
+        if (error instanceof AuthExpiredError) {
+          // Access token expired — try to silently refresh using the cookie
+          try {
+            const newSession = await refreshAccessToken();
+            if (!cancelled) setAuthSession(newSession);
+          } catch {
+            if (!cancelled) setAuthSession(null);
+          }
+        } else {
+          if (!cancelled) setAuthSession(null);
         }
       } finally {
-        if (!cancelled) {
-          setAuthStatus("ready");
-        }
+        if (!cancelled) setAuthStatus("ready");
       }
     }
 

@@ -222,6 +222,13 @@ function withAuth(init: RequestInit, token?: string): RequestInit {
   };
 }
 
+export class AuthExpiredError extends Error {
+  constructor() {
+    super("Session expired");
+    this.name = "AuthExpiredError";
+  }
+}
+
 function authErrorFromResponse(result: ApiResponse, fallbackMessage: string) {
   const message = extractMessage(result.data) || fallbackMessage;
   return new Error(message);
@@ -298,6 +305,10 @@ export async function logoutUser(token: string) {
 
 export async function getCurrentUser(token: string) {
   const result = await requestJson(mePath, withAuth({ method: "GET" }, token));
+
+  if (result.response.status === 401 || result.response.status === 403) {
+    throw new AuthExpiredError();
+  }
 
   if (!result.response.ok) {
     throw authErrorFromResponse(result, "Unable to load your profile.");
