@@ -2805,8 +2805,8 @@ body {
 .premium-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2818,12 +2818,15 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 0;
   max-width: 460px;
   width: 100%;
   position: relative;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
   overflow: hidden;
+  /* Flex column so header + scroll + footer stack properly */
+  display: flex;
+  flex-direction: column;
+  max-height: min(92vh, 720px);
 }
 
 .premium-modal-close {
@@ -2853,13 +2856,14 @@ body {
 /* ── Modal gradient header card ── */
 .premium-modal-header {
   background: linear-gradient(135deg, #2d1b6b 0%, #1a0f3e 40%, #0a1a3e 100%);
-  padding: 2rem 2rem 1.5rem;
+  padding: 1.5rem 1.5rem 1.25rem;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .pmh-orb {
@@ -2916,32 +2920,69 @@ body {
   color: rgba(255, 255, 255, 0.7);
 }
 
-.pmh-chips {
+/* ── Company marquee ── */
+.pmh-marquee {
   position: relative;
   z-index: 1;
+  width: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+}
+
+.pmh-marquee-track {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
+  gap: 8px;
+  width: max-content;
+  animation: pmh-scroll 28s linear infinite;
+}
+
+.pmh-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes pmh-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 .pmh-chip {
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.18);
   color: rgba(255, 255, 255, 0.85);
   font-size: 11px;
   font-weight: 600;
-  backdrop-filter: blur(4px);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Scrollable wrapper ── */
+.premium-modal-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
 }
 
 /* ── Modal body ── */
 .premium-modal-body {
-  padding: 1.5rem 2rem 2rem;
+  padding: 1.5rem 1.75rem 1rem;
   background: var(--surface);
   position: relative;
   z-index: 1;
+}
+
+/* ── Sticky footer with CTA ── */
+.premium-modal-footer {
+  flex-shrink: 0;
+  padding: 0.75rem 1.75rem 1.25rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .premium-modal-title {
@@ -3034,11 +3075,12 @@ body {
 }
 
 .premium-modal-cta {
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 12px 20px;
+  padding: 13px 20px;
   background: linear-gradient(135deg, #7c3aed 0%, #9f56f0 100%);
   color: #fff;
   border: none;
@@ -3047,7 +3089,6 @@ body {
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  text-decoration: none;
   letter-spacing: -0.01em;
   transition: box-shadow 0.2s, transform 0.15s;
 }
@@ -3071,13 +3112,108 @@ body {
   font-size: 13px;
   cursor: pointer;
   font-family: inherit;
-  padding: 6px;
+  padding: 4px;
   text-align: center;
   transition: color 0.15s;
+  width: 100%;
 }
 
 .premium-modal-dismiss:hover {
   color: var(--text2);
+}
+
+/* ── Plan toggle ── */
+.plan-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 1.25rem;
+}
+
+.plan-toggle-btn {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Light mode active */
+.plan-toggle-btn--active {
+  background: #ffffff;
+  color: #1a1814;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.14);
+}
+
+/* Dark mode — surface colors are near-identical, use explicit overrides */
+[data-theme="dark"] .plan-toggle {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .plan-toggle-btn {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+[data-theme="dark"] .plan-toggle-btn--active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+.plan-toggle-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(74, 222, 128, 0.15);
+  color: #16a34a;
+}
+
+[data-theme="dark"] .plan-toggle-badge {
+  background: rgba(74, 222, 128, 0.18);
+  color: #4ade80;
+}
+
+.plan-toggle-btn--active .plan-toggle-badge {
+  background: rgba(124, 58, 237, 0.12);
+  color: #7c3aed;
+}
+
+[data-theme="dark"] .plan-toggle-btn--active .plan-toggle-badge {
+  background: rgba(167, 139, 250, 0.2);
+  color: #a78bfa;
+}
+
+.premium-checkout-period {
+  font-weight: 400;
+  color: var(--text3);
+  font-size: 12px;
+  margin-left: 2px;
+}
+
+/* ── Error message ── */
+.premium-modal-error {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
 }
 
 @media (max-width: 640px) {

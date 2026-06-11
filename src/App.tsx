@@ -297,9 +297,16 @@ function App() {
     setShowPremiumModal(true);
   };
 
-  const handlePremiumPurchase = async () => {
-    await new Promise((resolve) => window.setTimeout(resolve, 1200));
+  const handlePaymentSuccess = async () => {
     setPremiumAccess(true);
+    if (authToken) {
+      try {
+        const session = await getCurrentUser(authToken);
+        setAuthSession(session);
+      } catch {
+        // keep local premium flag if refresh fails
+      }
+    }
   };
 
   return (
@@ -360,7 +367,9 @@ function App() {
       <PremiumModal
         open={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
-        onPurchase={handlePremiumPurchase}
+        authToken={authToken}
+        userEmail={currentUser?.email}
+        onPaymentSuccess={handlePaymentSuccess}
       />
 
       <ChangePasswordModal
