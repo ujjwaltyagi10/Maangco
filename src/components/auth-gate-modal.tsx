@@ -61,7 +61,7 @@ export function AuthGateModal({
             <button
               type="button"
               className="auth-gate-action auth-gate-action--primary"
-              onClick={() => onBrowseFrontend?.()}
+              onClick={() => navigate(ROUTES.dashboard, { replace: true })}
             >
               Free preview
             </button>
