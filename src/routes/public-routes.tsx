@@ -17,9 +17,12 @@ interface AuthSubmitInput {
 
 interface PublicRoutesProps {
   authSession: AuthSession | null;
+  userLabel: string;
   onAuthSubmit: (input: AuthSubmitInput) => Promise<AuthSubmitResult>;
   onResendVerification: (email: string) => Promise<void>;
   onGoogleCallback: (session: AuthSession) => Promise<void> | void;
+  onLogout: () => void | Promise<void>;
+  onOpenChangePassword: () => void;
   authError: string | null;
   authInfo: string | null;
   isSubmitting: boolean;
@@ -185,9 +188,12 @@ function GoogleCallbackPage({ onGoogleCallback }: Pick<PublicRoutesProps, "onGoo
 
 export function PublicRoutes({
   authSession,
+  userLabel,
   onAuthSubmit,
   onResendVerification,
   onGoogleCallback,
+  onLogout,
+  onOpenChangePassword,
   authError,
   authInfo,
   isSubmitting,
@@ -198,7 +204,10 @@ export function PublicRoutes({
   const navigate = useNavigate();
   const mode = useMemo(() => authModeFromPath(location.pathname), [location.pathname]);
 
-  if (authSession?.token) {
+  const isAuthenticated = Boolean(authSession?.token);
+
+  // Redirect logged-in users away from auth screens only (not the landing page)
+  if (isAuthenticated && location.pathname !== ROUTES.landing) {
     return <Navigate to={ROUTES.dashboard} replace />;
   }
 
@@ -213,6 +222,11 @@ export function PublicRoutes({
             onSignIn={() => navigate(ROUTES.login)}
             onGetStarted={() => navigate(ROUTES.signup)}
             onStartFree={() => navigate(ROUTES.dashboard)}
+            isAuthenticated={isAuthenticated}
+            userLabel={userLabel}
+            onGoToDashboard={() => navigate(ROUTES.dashboard)}
+            onLogout={onLogout}
+            onOpenChangePassword={onOpenChangePassword}
           />
         }
       />

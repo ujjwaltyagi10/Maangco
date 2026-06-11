@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface LandingPageProps {
   theme: "light" | "dark";
@@ -6,6 +6,11 @@ interface LandingPageProps {
   onSignIn: () => void;
   onGetStarted: () => void;
   onStartFree: () => void;
+  isAuthenticated?: boolean;
+  userLabel?: string;
+  onGoToDashboard?: () => void;
+  onLogout?: () => void;
+  onOpenChangePassword?: () => void;
 }
 
 const companies = [
@@ -170,14 +175,37 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+function getInitials(label: string) {
+  const parts = label.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return label.slice(0, 2).toUpperCase();
+}
+
 export function LandingPage({
   theme,
   onThemeChange,
   onSignIn,
   onGetStarted,
   onStartFree,
+  isAuthenticated = false,
+  userLabel = "",
+  onGoToDashboard,
+  onLogout,
+  onOpenChangePassword,
 }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const avatarMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target as Node)) {
+        setAvatarMenuOpen(false);
+      }
+    }
+    if (avatarMenuOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [avatarMenuOpen]);
 
   return (
     <div className="landing w-full min-w-0">
@@ -217,46 +245,146 @@ export function LandingPage({
             </div>
 
             <div className="hidden lg:flex items-center gap-2">
-              <button
-                type="button"
-                className="lnav-theme-btn"
-                onClick={onThemeChange}
-                aria-label="Toggle theme"
-              >
-                {theme === "light" ? (
-                  <svg
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    width="15"
-                    height="15"
+              {!isAuthenticated && (
+                <button
+                  type="button"
+                  className="lnav-theme-btn"
+                  onClick={onThemeChange}
+                  aria-label="Toggle theme"
+                >
+                  {theme === "light" ? (
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      width="15"
+                      height="15"
+                    >
+                      <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
+                    </svg>
+                  ) : (
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      width="15"
+                      height="15"
+                    >
+                      <circle cx="10" cy="10" r="3.2" />
+                      <path d="M10 2V4M10 16V18M2 10H4M16 10H18M4.9 4.9L6.3 6.3M13.7 13.7L15.1 15.1M4.9 15.1L6.3 13.7M13.7 6.3L15.1 4.9" />
+                    </svg>
+                  )}
+                </button>
+              )}
+              {isAuthenticated ? (
+                <div className="profile-menu-wrap" ref={avatarMenuRef}>
+                  <button
+                    type="button"
+                    className={`profile-menu-btn${avatarMenuOpen ? " open" : ""}`}
+                    onClick={() => setAvatarMenuOpen((o) => !o)}
+                    aria-label="Open user menu"
+                    aria-expanded={avatarMenuOpen}
                   >
-                    <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
-                  </svg>
-                ) : (
-                  <svg
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    width="15"
-                    height="15"
+                    <div className="profile-avatar">{getInitials(userLabel)}</div>
+                    <svg viewBox="0 0 20 20" fill="currentColor" className="profile-chevron" style={{ width: 12, height: 12 }}>
+                      <path d="M5 8l5 5 5-5H5z" />
+                    </svg>
+                  </button>
+
+                  {avatarMenuOpen ? (
+                    <div className="profile-dropdown" style={{ right: 0, left: "auto", top: "calc(100% + 8px)" }}>
+                      <div className="profile-dropdown-header">
+                        <div className="profile-avatar profile-avatar--lg">{getInitials(userLabel)}</div>
+                        <div style={{ minWidth: 0 }}>
+                          <div className="profile-dropdown-name">{userLabel}</div>
+                          <div className="profile-dropdown-sub">Signed in</div>
+                        </div>
+                      </div>
+
+                      <div className="profile-dropdown-divider" />
+
+                      <button
+                        type="button"
+                        className="profile-dropdown-item"
+                        onClick={() => { onGoToDashboard?.(); setAvatarMenuOpen(false); }}
+                      >
+                        <span className="profile-dropdown-item-icon">
+                          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                            <rect x="2" y="3" width="7" height="7" rx="1" />
+                            <rect x="11" y="3" width="7" height="7" rx="1" />
+                            <rect x="2" y="11" width="7" height="7" rx="1" />
+                            <rect x="11" y="11" width="7" height="7" rx="1" />
+                          </svg>
+                        </span>
+                        Dashboard
+                      </button>
+
+                      <button
+                        type="button"
+                        className="profile-dropdown-item"
+                        onClick={() => { onThemeChange(); setAvatarMenuOpen(false); }}
+                      >
+                        <span className="profile-dropdown-item-icon">
+                          {theme === "light" ? (
+                            <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: 14, height: 14 }}>
+                              <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                              <circle cx="10" cy="10" r="3.2" />
+                              <path d="M10 1.8V4.1M10 15.9V18.2M1.8 10H4.1M15.9 10H18.2M4.2 4.2L5.8 5.8M14.2 14.2L15.8 15.8M4.2 15.8L5.8 14.2M14.2 5.8L15.8 4.2" />
+                            </svg>
+                          )}
+                        </span>
+                        {theme === "light" ? "Dark Mode" : "Light Mode"}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="profile-dropdown-item"
+                        onClick={() => { onOpenChangePassword?.(); setAvatarMenuOpen(false); }}
+                      >
+                        <span className="profile-dropdown-item-icon">
+                          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                            <rect x="3" y="9" width="14" height="10" rx="2" />
+                            <path d="M7 9V6a3 3 0 0 1 6 0v3" />
+                          </svg>
+                        </span>
+                        Change Password
+                      </button>
+
+                      <div className="profile-dropdown-divider" />
+
+                      <button
+                        type="button"
+                        className="profile-dropdown-item profile-dropdown-item--danger"
+                        onClick={() => { onLogout?.(); setAvatarMenuOpen(false); }}
+                      >
+                        <span className="profile-dropdown-item-icon">
+                          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                            <path d="M7 3H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3M13 14l4-4-4-4M17 10H7" />
+                          </svg>
+                        </span>
+                        Sign Out
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <>
+                  <button type="button" className="lnav-sign-in" onClick={onSignIn}>
+                    Sign In
+                  </button>
+                  <button
+                    type="button"
+                    className="lnav-get-started"
+                    onClick={onGetStarted}
                   >
-                    <circle cx="10" cy="10" r="3.2" />
-                    <path d="M10 2V4M10 16V18M2 10H4M16 10H18M4.9 4.9L6.3 6.3M13.7 13.7L15.1 15.1M4.9 15.1L6.3 13.7M13.7 6.3L15.1 4.9" />
-                  </svg>
-                )}
-              </button>
-              <button type="button" className="lnav-sign-in" onClick={onSignIn}>
-                Sign In
-              </button>
-              <button
-                type="button"
-                className="lnav-get-started"
-                onClick={onGetStarted}
-              >
-                Get Started →
-              </button>
+                    Get Started →
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="landing-nav-mobile">
@@ -329,20 +457,32 @@ export function LandingPage({
                 ),
               )}
               <div className="flex gap-2 mt-2">
-                <button
-                  type="button"
-                  className="lnav-sign-in flex-1"
-                  onClick={onSignIn}
-                >
-                  Sign In
-                </button>
-                <button
-                  type="button"
-                  className="lnav-get-started flex-1"
-                  onClick={onGetStarted}
-                >
-                  Get Started
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    type="button"
+                    className="lnav-get-started flex-1"
+                    onClick={onGoToDashboard}
+                  >
+                    Go to Dashboard →
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="lnav-sign-in flex-1"
+                      onClick={onSignIn}
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      type="button"
+                      className="lnav-get-started flex-1"
+                      onClick={onGetStarted}
+                    >
+                      Get Started
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ) : null}

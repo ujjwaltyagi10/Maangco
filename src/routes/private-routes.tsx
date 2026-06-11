@@ -106,6 +106,7 @@ export function PrivateRoutes({
         onPanelChange={(panel) => {
           navigate(panelPath(panel));
         }}
+        onLogoClick={() => navigate("/")}
         theme={theme}
         onThemeChange={onThemeChange}
         isAuthenticated={isAuthenticated}

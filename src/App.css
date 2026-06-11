@@ -314,6 +314,29 @@ a.lbtn-lg {
   box-shadow: 0 4px 20px rgba(74, 124, 65, 0.5);
   transform: translateY(-1px);
 }
+.lnav-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4a7c41, #6ba860);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(74, 124, 65, 0.35);
+  transition: box-shadow 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+.lnav-user-avatar:hover {
+  box-shadow: 0 4px 16px rgba(74, 124, 65, 0.5);
+  transform: translateY(-1px);
+}
 
 /* ─────────────────────────────────────────
    HERO v2 — SPLIT LAYOUT

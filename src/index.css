@@ -152,6 +152,16 @@ body {
   overflow: hidden;
 }
 
+.sidebar-logo--btn {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--sidebar-border);
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
 .sidebar.collapsed .sidebar-logo {
   padding: 0;
   justify-content: center;

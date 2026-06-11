@@ -6,6 +6,7 @@ import type { AppPanel } from "@/types/prepdoc";
 interface AppShellProps {
   activePanel: AppPanel;
   onPanelChange: (panel: AppPanel) => void;
+  onLogoClick?: () => void;
   theme: "light" | "dark";
   onThemeChange: () => void;
   isAuthenticated: boolean;
@@ -39,6 +40,7 @@ const panelLabels: Record<AppPanel, string> = {
 export function AppShell({
   activePanel,
   onPanelChange,
+  onLogoClick,
   theme,
   onThemeChange,
   isAuthenticated,
@@ -85,7 +87,11 @@ export function AppShell({
     >
       {/* SIDEBAR */}
       <aside className={`sidebar${isSidebarCollapsed ? " collapsed" : ""}`}>
-        <div className="sidebar-logo">
+        <button
+          type="button"
+          className="sidebar-logo sidebar-logo--btn"
+          onClick={onLogoClick}
+        >
           <div className="logo-icon">
             <svg viewBox="0 0 20 20">
               <path d="M10 1L2 6v8l8 5 8-5V6L10 1zm0 2.3L16 7v6l-6 3.7L4 13V7l6-3.7z" />
@@ -94,7 +100,7 @@ export function AppShell({
           <div className="logo-text">
             Prep<span>Doc</span>
           </div>
-        </div>
+        </button>
 
         <div className="sidebar-section-label">Navigation</div>
         {navItems.map((item) => (

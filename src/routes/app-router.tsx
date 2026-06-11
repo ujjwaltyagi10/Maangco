@@ -126,9 +126,12 @@ function AppRouterContent(props: AppRouterProps) {
       ) : (
         <PublicRoutes
           authSession={props.authSession}
+          userLabel={props.userLabel}
           onAuthSubmit={props.onAuthSubmit}
           onResendVerification={props.onResendVerification}
           onGoogleCallback={props.onGoogleCallback}
+          onLogout={props.onLogout}
+          onOpenChangePassword={props.onOpenChangePassword}
           authError={props.authError}
           authInfo={props.authInfo}
           isSubmitting={props.authSubmitting}
