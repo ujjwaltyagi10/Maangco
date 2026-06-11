@@ -38,11 +38,11 @@ const features = [
 
 
 interface PublicDashboardPreviewProps {
-  companyCount: number;
+  companyCount?: number;
   theme: "light" | "dark";
   onSignIn: () => void;
   onSignUp: () => void;
-  onBrowseFrontend: () => void;
+  onBrowseFrontend?: () => void;
 }
 
 export function PublicDashboardPreview({

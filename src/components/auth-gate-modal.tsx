@@ -5,13 +5,11 @@ import { ROUTES } from "@/routes/route-paths";
 interface AuthGateModalProps {
   theme: "light" | "dark";
   onThemeChange: () => void;
-  onBrowseFrontend?: () => void;
 }
 
 export function AuthGateModal({
   theme,
   onThemeChange,
-  onBrowseFrontend,
 }: AuthGateModalProps) {
   const navigate = useNavigate();
 

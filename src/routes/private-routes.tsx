@@ -198,7 +198,6 @@ export function PrivateRoutes({
         <AuthGateModal
           theme={theme}
           onThemeChange={onThemeChange}
-          onBrowseFrontend={() => navigate(ROUTES.frontend)}
         />
       ) : null}
     </>
