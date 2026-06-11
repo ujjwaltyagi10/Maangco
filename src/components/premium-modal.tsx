@@ -19,15 +19,15 @@ const ALL_COMPANIES = [
 const PLANS: Record<PlanType, { label: string; price: string; period: string; billing: string; badge?: string }> = {
   monthly: {
     label: "Monthly",
-    price: "₹499",
+    price: "₹299",
     period: "/month",
     billing: "Billed every month",
   },
   yearly: {
     label: "Yearly",
-    price: "₹2,999",
+    price: "₹1,999",
     period: "/year",
-    billing: "Save ~50% · Billed once a year",
+    billing: "Save ~44% · Billed once a year",
     badge: "Best Value",
   },
 };
