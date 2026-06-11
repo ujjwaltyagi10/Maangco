@@ -6,6 +6,7 @@ import { AuthGateModal } from "@/components/auth-gate-modal";
 import { DashboardPanel } from "@/components/dashboard-panel";
 import { DsaPanel } from "@/components/dsa-panel";
 import { FrontendPanel } from "@/components/frontend-panel";
+import { PublicDashboardPreview } from "@/components/public-dashboard-preview";
 import { SystemDesignPanel } from "@/components/system-design-panel";
 import type { AuthSession } from "@/lib/auth-api";
 import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/prepdoc";
@@ -95,7 +96,8 @@ export function PrivateRoutes({
   const onSignUp = () => navigate(ROUTES.signup);
   const isAuthenticated = Boolean(authSession?.token);
   const isFrontendFree = activePanel === "frontend";
-  const isLocked = !isAuthenticated && !isFrontendFree;
+  const isDashboardPreview = !isAuthenticated && activePanel === "dashboard";
+  const isLocked = !isAuthenticated && !isFrontendFree && !isDashboardPreview;
 
   return (
     <>
@@ -122,22 +124,32 @@ export function PrivateRoutes({
           <Route
             path={ROUTES.dashboard}
             element={
-              <DashboardPanel
-                isPremium={isPremium}
-                onBuyPremium={onBuyPremium}
-                dsaProgress={dsaProgress}
-                frontendProgress={frontendProgress}
-                overallProgress={overallProgress}
-                solvedDsaCount={solvedDsaCount}
-                totalDsaCount={totalDsaCount}
-                completedFrontendCount={completedFrontendCount}
-                totalFrontendCount={totalFrontendCount}
-                completedRoadmapDays={completedRoadmapCount}
-                totalRoadmapDays={totalRoadmapCount}
-                companyCount={companyCount}
-                onOpenDsa={() => navigate(ROUTES.dsa)}
-                onOpenFrontend={() => navigate(ROUTES.frontend)}
-              />
+              isAuthenticated ? (
+                <DashboardPanel
+                  isPremium={isPremium}
+                  onBuyPremium={onBuyPremium}
+                  dsaProgress={dsaProgress}
+                  frontendProgress={frontendProgress}
+                  overallProgress={overallProgress}
+                  solvedDsaCount={solvedDsaCount}
+                  totalDsaCount={totalDsaCount}
+                  completedFrontendCount={completedFrontendCount}
+                  totalFrontendCount={totalFrontendCount}
+                  completedRoadmapDays={completedRoadmapCount}
+                  totalRoadmapDays={totalRoadmapCount}
+                  companyCount={companyCount}
+                  onOpenDsa={() => navigate(ROUTES.dsa)}
+                  onOpenFrontend={() => navigate(ROUTES.frontend)}
+                />
+              ) : (
+                <PublicDashboardPreview
+                  companyCount={companyCount}
+                  theme={theme}
+                  onSignIn={onSignIn}
+                  onSignUp={onSignUp}
+                  onBrowseFrontend={() => navigate(ROUTES.frontend)}
+                />
+              )
             }
           />
           <Route
