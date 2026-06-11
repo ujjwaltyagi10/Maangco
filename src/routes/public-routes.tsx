@@ -19,7 +19,7 @@ interface PublicRoutesProps {
   authSession: AuthSession | null;
   onAuthSubmit: (input: AuthSubmitInput) => Promise<AuthSubmitResult>;
   onResendVerification: (email: string) => Promise<void>;
-  onGoogleCallback: (session: AuthSession) => void;
+  onGoogleCallback: (session: AuthSession) => Promise<void> | void;
   authError: string | null;
   authInfo: string | null;
   isSubmitting: boolean;
@@ -129,32 +129,36 @@ function GoogleCallbackPage({ onGoogleCallback }: Pick<PublicRoutesProps, "onGoo
   const [message, setMessage] = useState("Completing Google sign-in...");
 
   useEffect(() => {
-    const callback = parseAuthCallbackSearch(location.search);
-    if (callback.success === "false") {
-      setStatus("error");
-      setMessage(callback.message || "Google authentication failed.");
-      return;
+    async function run() {
+      const callback = parseAuthCallbackSearch(location.search);
+      if (callback.success === "false") {
+        setStatus("error");
+        setMessage(callback.message || "Google authentication failed.");
+        return;
+      }
+      if (!callback.token) {
+        setStatus("error");
+        setMessage("Google callback did not include an access token.");
+        return;
+      }
+      const session: AuthSession = {
+        token: callback.token,
+        user: {
+          ...(callback.user ?? {}),
+          first_name: callback.user?.first_name || callback.user?.name?.split(" ")?.[0] || callback.name?.split(" ")?.[0],
+          last_name: callback.user?.last_name || callback.user?.name?.split(" ").slice(1).join(" ") || undefined,
+          name: callback.user?.name || [callback.user?.first_name, callback.user?.last_name].filter(Boolean).join(" ") || callback.name,
+          email: callback.user?.email || callback.email,
+          provider: callback.user?.provider || "google",
+        },
+      };
+      await onGoogleCallback(session);
+      setStatus("success");
+      setMessage("Google authentication successful.");
+      navigate(ROUTES.dashboard, { replace: true });
     }
-    if (!callback.token) {
-      setStatus("error");
-      setMessage("Google callback did not include an access token.");
-      return;
-    }
-    const session: AuthSession = {
-      token: callback.token,
-      user: {
-        ...(callback.user ?? {}),
-        first_name: callback.user?.first_name || callback.user?.name?.split(" ")?.[0] || callback.name?.split(" ")?.[0],
-        last_name: callback.user?.last_name || callback.user?.name?.split(" ").slice(1).join(" ") || undefined,
-        name: callback.user?.name || [callback.user?.first_name, callback.user?.last_name].filter(Boolean).join(" ") || callback.name,
-        email: callback.user?.email || callback.email,
-        provider: callback.user?.provider || "google",
-      },
-    };
-    onGoogleCallback(session);
-    setStatus("success");
-    setMessage("Google authentication successful.");
-    navigate(ROUTES.dashboard, { replace: true });
+
+    void run();
   }, [location.search, navigate, onGoogleCallback]);
 
   return (

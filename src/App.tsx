@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ChangePasswordModal } from "./components/change-password-modal";
 import { PremiumModal } from "./components/premium-modal";
 import { AppRouter } from "./routes/app-router";
-import { AuthExpiredError, changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, isValidEmail, loginUser, logoutUser, refreshAccessToken, registerUser, requestPasswordReset, resetPassword, resendVerificationEmail, type AuthSession, type AuthUser } from "./lib/auth-api";
+import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, isValidEmail, loginUser, logoutUser, registerUser, requestPasswordReset, resetPassword, resendVerificationEmail, type AuthSession, type AuthUser } from "./lib/auth-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
 import { dsaCompanies } from "./data/dsa";
 import { systemDesignQuestions } from "./data/system-design";
@@ -23,6 +23,37 @@ function formatUserLabel(user: AuthUser | null) {
   }
 
   return "Unknown user";
+}
+
+async function hydrateSessionFromBackend(
+  token: string,
+  fallbackUser?: AuthUser,
+): Promise<AuthSession> {
+  const session = await getCurrentUser(token);
+
+  return {
+    token: session.token,
+    user: {
+      ...fallbackUser,
+      ...session.user,
+    },
+  };
+}
+
+async function tryHydrateSessionFromBackend(
+  token: string,
+  fallbackUser?: AuthUser,
+): Promise<AuthSession> {
+  try {
+    return await hydrateSessionFromBackend(token, fallbackUser);
+  } catch {
+    return {
+      token,
+      user: {
+        ...fallbackUser,
+      },
+    };
+  }
 }
 
 function App() {
@@ -51,10 +82,9 @@ function App() {
   const [completedRoadmapDays, setCompletedRoadmapDays] = useLocalStorage<
     number[]
   >("prepdoc.frontend.roadmap-days", []);
-  const [premiumAccess, setPremiumAccess] = useLocalStorage(
-    "prepdoc.premium-access",
-    false,
-  );
+  // Optimistic in-memory flag — resets on refresh so localStorage tampering has no effect.
+  // Source of truth is currentUser.subscription.isActive from the backend.
+  const [premiumAccess, setPremiumAccess] = useState(false);
   const [authSession, setAuthSession] = useLocalStorage<AuthSession | null>(
     "prepdoc.auth-session",
     null,
@@ -76,40 +106,13 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    let cancelled = false;
+    // Remove legacy localStorage premium flag — backend subscription is now the source of truth
+    localStorage.removeItem("prepdoc.premium-access");
+  }, []);
 
-    async function restoreSession() {
-      if (!authToken) {
-        if (!cancelled) setAuthStatus("ready");
-        return;
-      }
-
-      try {
-        const session = await getCurrentUser(authToken);
-        if (!cancelled) setAuthSession(session);
-      } catch (error) {
-        if (error instanceof AuthExpiredError) {
-          // Access token expired — try to silently refresh using the cookie
-          try {
-            const newSession = await refreshAccessToken();
-            if (!cancelled) setAuthSession(newSession);
-          } catch {
-            if (!cancelled) setAuthSession(null);
-          }
-        } else {
-          if (!cancelled) setAuthSession(null);
-        }
-      } finally {
-        if (!cancelled) setAuthStatus("ready");
-      }
-    }
-
-    void restoreSession();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [authToken, setAuthSession]);
+  useEffect(() => {
+    setAuthStatus("ready");
+  }, []);
 
   const dsaQuestionCount = useMemo(
     () => dsaCompanies.reduce((total, company) => total + company.questions.length, 0),
@@ -222,7 +225,8 @@ function App() {
         email: email.trim().toLowerCase(),
         password,
       });
-      setAuthSession(session);
+      const hydratedSession = await tryHydrateSessionFromBackend(session.token, session.user);
+      setAuthSession(hydratedSession);
       return { nextRoute: ROUTES.dashboard };
     } catch (error) {
       setAuthError(getAuthErrorMessage(error));
@@ -232,8 +236,9 @@ function App() {
     }
   };
 
-  const handleGoogleCallback = (session: AuthSession) => {
-    setAuthSession(session);
+  const handleGoogleCallback = async (session: AuthSession) => {
+    const hydratedSession = await tryHydrateSessionFromBackend(session.token, session.user);
+    setAuthSession(hydratedSession);
     setAuthError(null);
     setAuthInfo("Google sign-in completed.");
   };
@@ -295,7 +300,9 @@ function App() {
   const currentUser = authSession?.user ?? null;
   const userLabel = formatUserLabel(currentUser);
   const allowEmptyCurrentPassword = currentUser?.has_password === false;
-  const isPremium = currentUser?.is_premium === true || premiumAccess;
+  // Backend is the sole source of truth — subscription.isActive from /api/me
+  // premiumAccess is only an optimistic flag set right after payment (cleared on refresh)
+  const isPremium = currentUser?.subscription?.isActive === true || premiumAccess;
 
   const handleBuyPremium = () => {
     setShowPremiumModal(true);
@@ -305,7 +312,7 @@ function App() {
     setPremiumAccess(true);
     if (authToken) {
       try {
-        const session = await getCurrentUser(authToken);
+        const session = await tryHydrateSessionFromBackend(authToken, authSession?.user);
         setAuthSession(session);
       } catch {
         // keep local premium flag if refresh fails

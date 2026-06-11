@@ -2,6 +2,14 @@ export const AUTH_API_BASE_URL =
   (import.meta.env.VITE_AUTH_API_BASE_URL as string | undefined)?.trim() ||
   "https://lcauth-backend.onrender.com";
 
+export interface AuthSubscription {
+  plan: string;
+  billing: string;
+  status: string;
+  isActive: boolean;
+  expiresAt: string | null;
+}
+
 export interface AuthUser {
   id?: string | number;
   first_name?: string;
@@ -12,7 +20,7 @@ export interface AuthUser {
   provider?: string;
   is_email_verified?: boolean;
   has_password?: boolean;
-  is_premium?: boolean;
+  subscription?: AuthSubscription;
   [key: string]: unknown;
 }
 
@@ -314,10 +322,22 @@ export async function getCurrentUser(token: string) {
     throw authErrorFromResponse(result, "Unable to load your profile.");
   }
 
-  return {
-    token,
-    user: extractUser(result.data),
-  };
+  const user = extractUser(result.data);
+
+  // Attach subscription from top-level response field
+  const record = pickObject(result.data);
+  const sub = record ? pickObject(record.subscription) : null;
+  if (sub && typeof sub.isActive === "boolean") {
+    user.subscription = {
+      plan: typeof sub.plan === "string" ? sub.plan : "",
+      billing: typeof sub.billing === "string" ? sub.billing : "",
+      status: typeof sub.status === "string" ? sub.status : "",
+      isActive: sub.isActive,
+      expiresAt: typeof sub.expiresAt === "string" ? sub.expiresAt : null,
+    };
+  }
+
+  return { token, user };
 }
 
 export async function changePassword(

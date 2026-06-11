@@ -57,7 +57,7 @@ export interface AppRouterProps {
     resetToken: string;
   }) => Promise<AuthSubmitResult>;
   onResendVerification: (email: string) => Promise<void>;
-  onGoogleCallback: (session: AuthSession) => void;
+  onGoogleCallback: (session: AuthSession) => Promise<void> | void;
 }
 
 export function AppRouter(props: AppRouterProps) {
