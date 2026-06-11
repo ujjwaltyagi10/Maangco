@@ -87,10 +87,13 @@ export function AppShell({
     >
       {/* SIDEBAR */}
       <aside className={`sidebar${isSidebarCollapsed ? " collapsed" : ""}`}>
-        <button
-          type="button"
-          className="sidebar-logo sidebar-logo--btn"
+        <div
+          className="sidebar-logo"
           onClick={onLogoClick}
+          style={{ cursor: onLogoClick ? "pointer" : undefined }}
+          role={onLogoClick ? "button" : undefined}
+          tabIndex={onLogoClick ? 0 : undefined}
+          onKeyDown={onLogoClick ? (e) => { if (e.key === "Enter" || e.key === " ") onLogoClick(); } : undefined}
         >
           <div className="logo-icon">
             <svg viewBox="0 0 20 20">
@@ -100,7 +103,7 @@ export function AppShell({
           <div className="logo-text">
             Prep<span>Doc</span>
           </div>
-        </button>
+        </div>
 
         <div className="sidebar-section-label">Navigation</div>
         {navItems.map((item) => (
