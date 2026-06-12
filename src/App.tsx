@@ -341,8 +341,6 @@ function App() {
           setIsChangePasswordOpen(true);
         }}
         userLabel={userLabel}
-        lcSolvedCount={solvedDsaIds.length}
-        qDoneCount={completedFrontendIds.length}
         solvedIds={solvedDsaIds}
         bookmarkedIds={bookmarkedDsaIds}
         companies={dsaCompanies}

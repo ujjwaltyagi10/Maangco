@@ -12,8 +12,6 @@ interface AppShellProps {
   isAuthenticated: boolean;
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
-  lcSolvedCount: number;
-  qDoneCount: number;
   userLabel: string;
   onSignIn: () => void;
   onSignUp: () => void;
@@ -46,8 +44,6 @@ export function AppShell({
   isAuthenticated,
   isSidebarCollapsed,
   onToggleSidebar,
-  lcSolvedCount,
-  qDoneCount,
   userLabel,
   onSignIn,
   onSignUp,
@@ -158,13 +154,6 @@ export function AppShell({
           </div>
 
           <div className="topnav-actions">
-            <div className="topnav-stat">
-              <strong>{lcSolvedCount}</strong> LC solved
-            </div>
-            <div className="topnav-stat">
-              <strong>{qDoneCount}</strong> Q done
-            </div>
-
             {isAuthenticated ? (
               <div className="profile-menu-wrap" ref={menuRef}>
                 <button

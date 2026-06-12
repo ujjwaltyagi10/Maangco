@@ -24,8 +24,7 @@ interface PrivateRoutesProps {
   onLogout: () => void | Promise<void>;
   onOpenChangePassword: () => void;
   userLabel: string;
-  lcSolvedCount: number;
-  qDoneCount: number;
+
   solvedIds: QuestionId[];
   bookmarkedIds: QuestionId[];
   companies: DsaCompany[];
@@ -63,8 +62,7 @@ export function PrivateRoutes({
   onLogout,
   onOpenChangePassword,
   userLabel,
-  lcSolvedCount,
-  qDoneCount,
+
   solvedIds,
   bookmarkedIds,
   companies,
@@ -115,8 +113,7 @@ export function PrivateRoutes({
         isAuthenticated={isAuthenticated}
         isSidebarCollapsed={isSidebarCollapsed}
         onToggleSidebar={onToggleSidebar}
-        lcSolvedCount={lcSolvedCount}
-        qDoneCount={qDoneCount}
+
         userLabel={userLabel}
         onSignIn={onSignIn}
         onSignUp={onSignUp}
@@ -134,6 +131,7 @@ export function PrivateRoutes({
                   onBuyPremium={onBuyPremium}
                   dsaProgress={dsaProgress}
                   frontendProgress={frontendProgress}
+                  systemDesignProgress={systemDesignQuestions.length > 0 ? Math.round((completedSystemDesignIds.length / systemDesignQuestions.length) * 100) : 0}
                   overallProgress={overallProgress}
                   solvedDsaCount={solvedDsaCount}
                   totalDsaCount={totalDsaCount}
@@ -141,9 +139,11 @@ export function PrivateRoutes({
                   totalFrontendCount={totalFrontendCount}
                   completedRoadmapDays={completedRoadmapCount}
                   totalRoadmapDays={totalRoadmapCount}
-                  companyCount={companyCount}
+                  completedSystemDesignCount={completedSystemDesignIds.length}
+                  totalSystemDesignCount={systemDesignQuestions.length}
                   onOpenDsa={() => navigate(ROUTES.dsa)}
                   onOpenFrontend={() => navigate(ROUTES.frontend)}
+                  onOpenSystemDesign={() => navigate(ROUTES.systemDesign)}
                 />
               ) : (
                 <PublicDashboardPreview
