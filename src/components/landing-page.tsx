@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
+const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url).href;
+const DSADarkVid = new URL("../assets/Video/DSADark.webm", import.meta.url).href;
+const SDLightVid = new URL("../assets/Video/SDLight.webm", import.meta.url).href;
+const SDDarkVid = new URL("../assets/Video/DSDark.webm", import.meta.url).href;
+
 interface LandingPageProps {
   theme: "light" | "dark";
   onThemeChange: () => void;
@@ -651,6 +656,51 @@ export function LandingPage({
                 {c}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── VIDEO SHOWCASE ── */}
+      <section className="lsection lvideo-section">
+        <div className="landing-container">
+          <div className="lsection-header">
+            <div className="lsection-tag">See it in action</div>
+            <h2 className="lsection-title">The exact tools you'll use every day.</h2>
+            <p className="lsection-sub">
+              Live previews of the DSA tracker and system design roadmap — exactly what you get after signing up.
+            </p>
+          </div>
+          <div className="lvideo-grid">
+            <div className="lvideo-card">
+              <div className="lvideo-header">
+                <div className="lvideo-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}>⚡</div>
+                <div>
+                  <div className="lvideo-name">DSA Practice</div>
+                  <div className="lvideo-hint">Company-wise sheets, frequency &amp; tags</div>
+                </div>
+                <div className="lvideo-live-badge">Live</div>
+              </div>
+              <div className="lvideo-frame">
+                <video autoPlay loop muted playsInline preload="metadata" key={theme === "dark" ? DSADarkVid : DSALightVid}>
+                  <source src={theme === "dark" ? DSADarkVid : DSALightVid} type="video/webm" />
+                </video>
+              </div>
+            </div>
+            <div className="lvideo-card">
+              <div className="lvideo-header">
+                <div className="lvideo-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}>🏗️</div>
+                <div>
+                  <div className="lvideo-name">System Design</div>
+                  <div className="lvideo-hint">150-question roadmap with depth &amp; tracking</div>
+                </div>
+                <div className="lvideo-live-badge">Live</div>
+              </div>
+              <div className="lvideo-frame">
+                <video autoPlay loop muted playsInline preload="metadata" key={theme === "dark" ? SDDarkVid : SDLightVid}>
+                  <source src={theme === "dark" ? SDDarkVid : SDLightVid} type="video/webm" />
+                </video>
+              </div>
+            </div>
           </div>
         </div>
       </section>

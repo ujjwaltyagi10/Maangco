@@ -147,7 +147,7 @@ a.lbtn-lg {
 
 /* ── Section shells ── */
 .lsection {
-  padding: 96px 0;
+  padding: 66px 0;
 }
 .lsection--alt {
   background: var(--surface);
