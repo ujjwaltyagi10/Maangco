@@ -564,7 +564,7 @@ export function DsaPanel({
               />
             </div>
 
-            <div className="dsa-sidebar-companies">
+            <div className={`dsa-sidebar-companies${!isPremium ? " dsa-sidebar-companies--gated" : ""}`}>
               {/* "All Companies" — only shown to premium users */}
               {isPremium &&
                 visibleCompanies

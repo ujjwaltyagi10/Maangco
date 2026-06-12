@@ -2499,14 +2499,28 @@ a.lbtn-lg {
 }
 
 /* ── DSA Sidebar inline premium gate ── */
+
+/* When non-premium: convert sidebar companies to flex so gate-wrap fills full height */
+.dsa-sidebar-companies--gated {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  align-content: unset !important;
+}
+
 .dsa-companies-gate-wrap {
   position: relative;
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
-  min-height: 280px;
   overflow: hidden;
   width: 100%;
+}
+
+/* When inside a gated container, fill full available height */
+.dsa-sidebar-companies--gated .dsa-companies-gate-wrap {
+  flex: 1;
+  min-height: 0;
 }
 
 .dsa-companies-list {
@@ -2518,9 +2532,12 @@ a.lbtn-lg {
 
 .dsa-companies-list--blurred {
   filter: blur(3px);
-  opacity: 0.45;
+  opacity: 0.55;
   pointer-events: none;
   user-select: none;
+  /* Fade out the list smoothly so it transitions into the gate */
+  -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 80%);
+  mask-image: linear-gradient(to bottom, black 30%, transparent 80%);
 }
 
 .dsa-companies-gate {
@@ -2533,7 +2550,12 @@ a.lbtn-lg {
   justify-content: center;
   gap: 8px;
   padding: 16px 12px;
-  background: linear-gradient(to bottom, transparent 0%, var(--surface2) 25%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--surface) 65%, transparent) 30%,
+    var(--surface) 48%
+  );
 }
 
 .dsa-gate-icon {
