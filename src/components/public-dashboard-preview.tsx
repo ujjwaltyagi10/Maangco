@@ -56,6 +56,28 @@ export function PublicDashboardPreview({
 
   return (
     <div className="dashboard dashboard--public">
+      {/* Hero */}
+      <section className="pd-hero-card">
+        <div className="pd-hero-inner">
+          <div className="pd-badge">Free preview — explore before you sign in</div>
+          <h1 className="pd-title">
+            Your complete <span>interview</span> prep hub.
+          </h1>
+          <p className="pd-sub">
+            DSA company sheets, system design roadmaps, and frontend prep — all in one place.
+            Track progress, bookmark problems, and crack your next role.
+          </p>
+        </div>
+        <div className="pd-hero-ctas">
+          <button type="button" className="lbtn-primary lbtn-lg" onClick={onSignUp}>
+            Get Started Free
+          </button>
+          <button type="button" className="lbtn-outline lbtn-lg" onClick={onSignIn}>
+            Sign In
+          </button>
+        </div>
+      </section>
+
       {/* Video Showcase */}
       <div className="pd-video-grid">
         <div className="pd-video-card">
@@ -131,23 +153,6 @@ export function PublicDashboardPreview({
         ))}
       </section>
 
-      {/* CTA Card */}
-      <div className="pd-cta-card">
-        <div className="pd-cta-left">
-          <div className="pd-cta-title">Ready to crack your next interview?</div>
-          <div className="pd-cta-sub">
-            Track DSA, system design, and frontend prep — all in one place. Free to start.
-          </div>
-        </div>
-        <div className="pd-cta-actions">
-          <button type="button" className="lbtn-primary lbtn-lg" onClick={onSignUp}>
-            Get Started Free
-          </button>
-          <button type="button" className="lbtn-outline lbtn-lg" onClick={onSignIn}>
-            Sign In
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
