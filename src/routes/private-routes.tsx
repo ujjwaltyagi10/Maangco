@@ -125,7 +125,7 @@ export function PrivateRoutes({
           <Route
             path={ROUTES.dashboard}
             element={
-              isAuthenticated ? (
+              isAuthenticated && isPremium ? (
                 <DashboardPanel
                   isPremium={isPremium}
                   onBuyPremium={onBuyPremium}
@@ -151,7 +151,8 @@ export function PrivateRoutes({
                   theme={theme}
                   onSignIn={onSignIn}
                   onSignUp={onSignUp}
-                  onBrowseFrontend={() => navigate(ROUTES.frontend)}
+                  isPremiumMode={isAuthenticated && !isPremium}
+                  onBuyPremium={onBuyPremium}
                 />
               )
             }

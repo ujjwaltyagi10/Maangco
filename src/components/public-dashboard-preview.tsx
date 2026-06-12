@@ -43,12 +43,16 @@ interface PublicDashboardPreviewProps {
   onSignIn: () => void;
   onSignUp: () => void;
   onBrowseFrontend?: () => void;
+  isPremiumMode?: boolean;
+  onBuyPremium?: () => void;
 }
 
 export function PublicDashboardPreview({
   theme,
   onSignIn,
   onSignUp,
+  isPremiumMode = false,
+  onBuyPremium,
 }: PublicDashboardPreviewProps) {
   const isDark = theme === "dark";
   const dsaVid = isDark ? DSADarkVid : DSALightVid;
@@ -57,26 +61,65 @@ export function PublicDashboardPreview({
   return (
     <div className="dashboard dashboard--public">
       {/* Hero */}
-      <section className="pd-hero-card">
-        <div className="pd-hero-inner">
-          <div className="pd-badge">Free preview — explore before you sign in</div>
-          <h1 className="pd-title">
-            Your complete <span>interview</span> prep hub.
-          </h1>
-          <p className="pd-sub">
-            DSA company sheets, system design roadmaps, and frontend prep — all in one place.
-            Track progress, bookmark problems, and crack your next role.
-          </p>
-        </div>
-        <div className="pd-hero-ctas">
-          <button type="button" className="lbtn-primary lbtn-lg" onClick={onSignUp}>
-            Get Started Free
-          </button>
-          <button type="button" className="lbtn-outline lbtn-lg" onClick={onSignIn}>
-            Sign In
-          </button>
-        </div>
-      </section>
+      {isPremiumMode ? (
+        <section className="pd-premium-hero">
+          <div className="pd-premium-orb pd-premium-orb-1" />
+          <div className="pd-premium-orb pd-premium-orb-2" />
+
+          <div className="pd-premium-left">
+            <div className="pd-premium-label-row">
+              <div className="pd-premium-crown">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 8l4 6 6-9 6 9 4-6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8Z" />
+                </svg>
+              </div>
+              <span className="pd-premium-eyebrow">PrepDoc Premium</span>
+            </div>
+            <h2 className="pd-premium-title">
+              Unlock everything.{" "}
+              <span className="pd-premium-title-accent">Crack any interview.</span>
+            </h2>
+            <div className="pd-premium-pills">
+              <span className="pd-premium-pill">⚡ 840+ DSA</span>
+              <span className="pd-premium-pill">🏗️ 150 System Design</span>
+              <span className="pd-premium-pill">💬 275 Interview Qs</span>
+              <span className="pd-premium-pill">🏢 25+ Companies</span>
+            </div>
+          </div>
+
+          <div className="pd-premium-right">
+            <div className="pd-premium-price-hint">Starting at ₹299 / month</div>
+            <button type="button" className="pd-premium-cta" onClick={onBuyPremium}>
+              <span>Upgrade to Premium</span>
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" width="11" height="11">
+                <path d="M2 6h8M6 2l4 4-4 4" />
+              </svg>
+            </button>
+            <div className="pd-premium-note">Cancel anytime · Instant access</div>
+          </div>
+        </section>
+      ) : (
+        <section className="pd-hero-card">
+          <div className="pd-hero-inner">
+            <div className="pd-badge">Free preview — explore before you sign in</div>
+            <h1 className="pd-title">
+              Your complete <span>interview</span> prep hub.
+            </h1>
+            <p className="pd-sub">
+              DSA company sheets, system design roadmaps, and frontend prep — all in one place.
+              Track progress, bookmark problems, and crack your next role.
+            </p>
+          </div>
+          <div className="pd-hero-ctas">
+            <button type="button" className="lbtn-primary lbtn-lg" onClick={onSignUp}>
+              Get Started Free
+            </button>
+            <button type="button" className="lbtn-outline lbtn-lg" onClick={onSignIn}>
+              Sign In
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* Video Showcase */}
       <div className="pd-video-grid">
