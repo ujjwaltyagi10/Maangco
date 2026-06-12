@@ -58,7 +58,6 @@ export function DashboardPanel({
   completedFrontendCount,
   completedRoadmapDays,
   totalRoadmapDays,
-  companyCount,
   onOpenDsa,
   onOpenFrontend,
 }: DashboardPanelProps) {
@@ -81,7 +80,7 @@ export function DashboardPanel({
             <div className="faang-premium-perks">
               <div className="faang-perk">
                 <span className="faang-perk-icon">📊</span>
-                <span><strong>Overall FAANG Sheet</strong> — 500+ deduplicated questions across all 5 companies</span>
+                <span><strong>Overall FAANG Sheet</strong> — 840+ questions across all 5 companies</span>
               </div>
               <div className="faang-perk">
                 <span className="faang-perk-icon">🎯</span>
@@ -152,11 +151,12 @@ export function DashboardPanel({
                 <div className="card-stat-label">Solved</div>
               </div>
               <div className="card-stat">
-                <div className="card-stat-val">640+</div>
+                <div className="card-stat-val">840+</div>
                 <div className="card-stat-label">Total</div>
               </div>
               <div className="card-stat">
-                <div className="card-stat-val">{companyCount}</div>
+                {/* <div className="card-stat-val">{companyCount}</div> */}
+                <div className="card-stat-val">25</div>
                 <div className="card-stat-label">Companies</div>
               </div>
             </div>

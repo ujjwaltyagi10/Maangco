@@ -14,6 +14,8 @@ interface FrontendPanelProps {
   completedRoadmapDays: number[];
   onCompletedQuestionIdsChange: Dispatch<SetStateAction<FrontendQuestionId[]>>;
   onCompletedRoadmapDaysChange: Dispatch<SetStateAction<number[]>>;
+  isPremium?: boolean;
+  onBuyPremium?: () => void;
 }
 
 type FrontendTab = "roadmap" | "questions";
@@ -65,6 +67,8 @@ export function FrontendPanel({
   completedRoadmapDays,
   onCompletedQuestionIdsChange,
   onCompletedRoadmapDaysChange,
+  isPremium = false,
+  onBuyPremium,
 }: FrontendPanelProps) {
   const [activeTab, setActiveTab] = useState<FrontendTab>("roadmap");
   const [searchValue, setSearchValue] = useState("");
@@ -173,7 +177,16 @@ export function FrontendPanel({
             onClick={() => setActiveTab("questions")}
           >
             💬 Interview Questions
-            <span className="fe-tab-count">{questions.length}</span>
+            {isPremium ? (
+              <span className="fe-tab-count">{questions.length}</span>
+            ) : (
+              <span className="fe-tab-lock">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
+                  <rect x="2.5" y="7" width="11" height="8" rx="1.5" />
+                  <path d="M5 7V5a3 3 0 0 1 6 0v2" />
+                </svg>
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -313,6 +326,21 @@ export function FrontendPanel({
 
         {/* INTERVIEW QUESTIONS TAB */}
         {activeTab === "questions" ? (
+          <>
+          {!isPremium ? (
+            <div className="fe-questions-gate">
+              <div className="dsa-gate-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 8l4 6 6-9 6 9 4-6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8Z" />
+                </svg>
+              </div>
+              <div className="fe-gate-title">Interview Questions</div>
+              <div className="fe-gate-sub">275 curated questions across JS, React, TypeScript, Testing &amp; more — unlock with Premium.</div>
+              <button type="button" className="dsa-gate-btn fe-gate-btn" onClick={onBuyPremium}>
+                Upgrade to Premium
+              </button>
+            </div>
+          ) : (
           <>
             {/* Progress bar */}
             <div
@@ -513,6 +541,8 @@ export function FrontendPanel({
                 </div>
               </div>
             </div>
+          </>
+          )}
           </>
         ) : null}
       </div>

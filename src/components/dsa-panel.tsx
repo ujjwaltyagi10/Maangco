@@ -254,7 +254,7 @@ export function DsaPanel({
               }}
             >
               {isPremium && <option value="freq">Sort: Frequency</option>}
-              <option value="num">Sort: #Number</option>
+              <option value="num">Sort: Number</option>
               <option value="diff">Sort: Difficulty</option>
               <option value="title">Sort: Title</option>
               {!isPremium && (
@@ -433,7 +433,9 @@ export function DsaPanel({
       {/* end .dsa-main */}
 
       {/* RIGHT: Company Browser Sidebar */}
-      <aside className={`dsa-sidebar${sidebarCollapsed ? " dsa-sidebar--collapsed" : ""}`}>
+      <aside
+        className={`dsa-sidebar${sidebarCollapsed ? " dsa-sidebar--collapsed" : ""}`}
+      >
         {sidebarCollapsed ? (
           /* ── COLLAPSED: logo strip ── */
           <>
@@ -444,44 +446,82 @@ export function DsaPanel({
                 onClick={() => setSidebarCollapsed(false)}
                 aria-label="Expand companies"
               >
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="14" height="14">
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  width="14"
+                  height="14"
+                >
                   <path d="M6 3l-4 5 4 5M10 3l4 5-4 5" />
                 </svg>
               </button>
             </div>
-            <div className="dsa-sidebar-logo-strip">
-              {displayCompanies.map((company) => {
-                const isAll = company.id === ALL_ID;
-                const isActive = selectedCompanyId === company.id;
-                return (
-                  <button
-                    key={company.id}
-                    type="button"
-                    className={`dsa-logo-pill${isActive ? " active" : ""}`}
-                    title={company.name}
-                    onClick={() => {
-                      if (!isPremium && !isAll) { onBuyPremium(); return; }
-                      setSelectedCompanyId(company.id);
-                    }}
+            <div className="dsa-collapsed-logo-wrap">
+              {!isPremium && (
+                <div className="dsa-collapsed-gate">
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    width="22"
+                    height="22"
                   >
-                    {isAll ? (
-                      <span className="co-logo-all-icon co-logo-all-icon--pill">
-                        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor">
-                          <rect x="1" y="1" width="6" height="6" rx="1.5" />
-                          <rect x="9" y="1" width="6" height="6" rx="1.5" />
-                          <rect x="1" y="9" width="6" height="6" rx="1.5" />
-                          <rect x="9" y="9" width="6" height="6" rx="1.5" />
-                        </svg>
-                      </span>
-                    ) : (
-                      <img src={company.logo} alt={company.name} />
-                    )}
-                  </button>
-                );
-              })}
+                    <rect x="3" y="9" width="14" height="10" rx="2" />
+                    <path d="M7 9V6a3 3 0 0 1 6 0v3" />
+                  </svg>
+                </div>
+              )}
+              <div
+                className={`dsa-sidebar-logo-strip${!isPremium ? " dsa-sidebar-logo-strip--blurred" : ""}`}
+              >
+                {displayCompanies.map((company) => {
+                  const isAll = company.id === ALL_ID;
+                  const isActive = selectedCompanyId === company.id;
+                  return (
+                    <button
+                      key={company.id}
+                      type="button"
+                      className={`dsa-logo-pill${isActive ? " active" : ""}`}
+                      title={company.name}
+                      tabIndex={!isPremium ? -1 : undefined}
+                      onClick={() => {
+                        if (!isPremium) return;
+                        setSelectedCompanyId(company.id);
+                      }}
+                    >
+                      {isAll ? (
+                        <span className="co-logo-all-icon co-logo-all-icon--pill">
+                          <svg
+                            viewBox="0 0 16 16"
+                            width="18"
+                            height="18"
+                            fill="currentColor"
+                          >
+                            <rect x="1" y="1" width="6" height="6" rx="1.5" />
+                            <rect x="9" y="1" width="6" height="6" rx="1.5" />
+                            <rect x="1" y="9" width="6" height="6" rx="1.5" />
+                            <rect x="9" y="9" width="6" height="6" rx="1.5" />
+                          </svg>
+                        </span>
+                      ) : (
+                        <img src={company.logo} alt={company.name} />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             <div className="dsa-sidebar-collapsed-footer">
-              <div className="dsa-collapsed-ratio">{totalSolvedCount}<span>/{totalQuestionCount}</span></div>
+              <div className="dsa-collapsed-ratio">
+                {totalSolvedCount}
+                <span>/{totalQuestionCount}</span>
+              </div>
             </div>
           </>
         ) : (
@@ -499,7 +539,15 @@ export function DsaPanel({
                   onClick={() => setSidebarCollapsed(true)}
                   aria-label="Collapse companies"
                 >
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="14" height="14">
+                  <svg
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    width="14"
+                    height="14"
+                  >
                     <path d="M10 3l4 5-4 5M6 3L2 8l4 5" />
                   </svg>
                 </button>
@@ -517,51 +565,117 @@ export function DsaPanel({
             </div>
 
             <div className="dsa-sidebar-companies">
-              {visibleCompanies.map((company) => {
-                const isAll = company.id === ALL_ID;
-                const isLocked = !isPremium && !isAll;
-                const solved = isLocked
-                  ? 0
-                  : company.questions.filter((q) => solvedIds.includes(q.id)).length;
-                return (
-                  <button
-                    key={company.id}
-                    type="button"
-                    className={`co-item co-item--sidebar${selectedCompanyId === company.id ? " active" : ""}${isLocked ? " co-item--locked" : ""}${isAll ? " co-item--all" : ""}`}
-                    onClick={() => {
-                      if (isLocked) { onBuyPremium(); return; }
-                      setSelectedCompanyId(company.id);
-                    }}
-                  >
-                    <div className={`co-logo${isAll ? " co-logo--all" : ""}`}>
-                      {isAll ? (
-                        <span className="co-logo-all-icon">
-                          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-                            <rect x="1" y="1" width="6" height="6" rx="1.5" />
-                            <rect x="9" y="1" width="6" height="6" rx="1.5" />
-                            <rect x="1" y="9" width="6" height="6" rx="1.5" />
-                            <rect x="9" y="9" width="6" height="6" rx="1.5" />
-                          </svg>
-                        </span>
-                      ) : (
-                        <img src={company.logo} alt={company.name} />
-                      )}
-                      {isLocked && <span className="co-lock-badge">🔒</span>}
+              {/* "All Companies" — only shown to premium users */}
+              {isPremium &&
+                visibleCompanies
+                  .filter((c) => c.id === ALL_ID)
+                  .map((company) => {
+                    const solved = company.questions.filter((q) =>
+                      solvedIds.includes(q.id),
+                    ).length;
+                    return (
+                      <button
+                        key={company.id}
+                        type="button"
+                        className={`co-item co-item--sidebar co-item--all${selectedCompanyId === company.id ? " active" : ""}`}
+                        onClick={() => setSelectedCompanyId(company.id)}
+                      >
+                        <div className="co-logo co-logo--all">
+                          <span className="co-logo-all-icon">
+                            <svg
+                              viewBox="0 0 16 16"
+                              width="16"
+                              height="16"
+                              fill="currentColor"
+                            >
+                              <rect x="1" y="1" width="6" height="6" rx="1.5" />
+                              <rect x="9" y="1" width="6" height="6" rx="1.5" />
+                              <rect x="1" y="9" width="6" height="6" rx="1.5" />
+                              <rect x="9" y="9" width="6" height="6" rx="1.5" />
+                            </svg>
+                          </span>
+                        </div>
+                        <div className="co-info">
+                          <div className="co-name">{company.name}</div>
+                        </div>
+                        <div className="co-prog">
+                          {solved}/{company.questions.length}
+                        </div>
+                      </button>
+                    );
+                  })}
+
+              {/* Company-specific list — gated for non-premium */}
+              <div className="dsa-companies-gate-wrap">
+                {!isPremium && (
+                  <div className="dsa-companies-gate">
+                    <div className="dsa-gate-icon">
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="22"
+                        height="22"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M2 8l4 6 6-9 6 9 4-6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8Z" />
+                      </svg>
                     </div>
-                    <div className="co-info">
-                      <div className="co-name">{company.name}</div>
-                      {isLocked && (
-                        <div className="co-count co-count--premium">Premium</div>
-                      )}
+                    <div className="dsa-gate-title">Company Sheets</div>
+                    <div className="dsa-gate-sub">
+                      25+ company-wise lists with frequency data &amp; tags
                     </div>
-                    {!isLocked && (
-                      <div className="co-prog">
-                        {solved}/{company.questions.length}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
+                    <button
+                      type="button"
+                      className="dsa-gate-btn"
+                      onClick={onBuyPremium}
+                    >
+                      Upgrade to Premium
+                    </button>
+                  </div>
+                )}
+                <div
+                  className={
+                    !isPremium
+                      ? "dsa-companies-list dsa-companies-list--blurred"
+                      : "dsa-companies-list"
+                  }
+                >
+                  {visibleCompanies
+                    .filter((c) => c.id !== ALL_ID)
+                    .map((company) => {
+                      const solved = isPremium
+                        ? company.questions.filter((q) =>
+                            solvedIds.includes(q.id),
+                          ).length
+                        : 0;
+                      return (
+                        <button
+                          key={company.id}
+                          type="button"
+                          className={`co-item co-item--sidebar${selectedCompanyId === company.id ? " active" : ""}`}
+                          onClick={() => {
+                            if (!isPremium) return;
+                            setSelectedCompanyId(company.id);
+                          }}
+                          tabIndex={!isPremium ? -1 : undefined}
+                        >
+                          <div className="co-logo">
+                            <img src={company.logo} alt={company.name} />
+                          </div>
+                          <div className="co-info">
+                            <div className="co-name">{company.name}</div>
+                          </div>
+                          <div className="co-prog">
+                            {solved}/{company.questions.length}
+                          </div>
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
             </div>
 
             <div className="dsa-sidebar-footer">

@@ -1587,6 +1587,12 @@ a.lbtn-lg {
   border: 1px solid rgba(74, 124, 65, 0.24);
 }
 
+.premium-gate-icon {
+  background: linear-gradient(135deg, rgba(160, 96, 32, 0.14), rgba(192, 120, 48, 0.08));
+  color: var(--amber);
+  border-color: rgba(160, 96, 32, 0.22);
+}
+
 .auth-gate-mini-title {
   font-size: 20px;
   font-weight: 800;
@@ -2490,4 +2496,165 @@ a.lbtn-lg {
   .landing-nav-mobile {
     display: none;
   }
+}
+
+/* ── DSA Sidebar inline premium gate ── */
+.dsa-companies-gate-wrap {
+  position: relative;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.dsa-companies-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px;
+  align-content: start;
+}
+
+.dsa-companies-list--blurred {
+  filter: blur(3px);
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+}
+
+.dsa-companies-gate {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: linear-gradient(to bottom, transparent 0%, var(--surface2) 25%);
+}
+
+.dsa-gate-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(160, 96, 32, 0.14), rgba(192, 120, 48, 0.08));
+  color: var(--amber);
+  border: 1px solid rgba(160, 96, 32, 0.22);
+  margin-bottom: 2px;
+}
+
+.dsa-gate-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text1);
+  letter-spacing: -0.01em;
+}
+
+.dsa-gate-sub {
+  font-size: 11px;
+  color: var(--text2);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 160px;
+}
+
+.dsa-gate-btn {
+  margin-top: 6px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #4a7c41, #6ba860);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 3px 10px rgba(74, 124, 65, 0.28);
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.dsa-gate-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ── DSA collapsed sidebar premium gate ── */
+.dsa-collapsed-logo-wrap {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dsa-sidebar-logo-strip--blurred {
+  filter: blur(3px);
+  opacity: 0.4;
+  pointer-events: none;
+  user-select: none;
+}
+
+.dsa-collapsed-gate {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, transparent 0%, var(--surface2) 20%);
+  color: var(--amber);
+}
+
+/* ── Frontend Panel interview questions premium gate ── */
+.fe-tab-lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: var(--amber-bg);
+  color: var(--amber);
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.fe-questions-gate {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 48px 24px;
+}
+
+.fe-gate-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text1);
+  letter-spacing: -0.02em;
+}
+
+.fe-gate-sub {
+  font-size: 13px;
+  color: var(--text2);
+  text-align: center;
+  line-height: 1.6;
+  max-width: 340px;
+}
+
+.fe-gate-btn {
+  margin-top: 4px;
+  padding: 11px 28px;
+  font-size: 13px;
+  width: auto;
+  border-radius: 12px;
 }

@@ -4,6 +4,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-
 import { AppShell } from "@/components/app-shell";
 import { AuthGateModal } from "@/components/auth-gate-modal";
 import { DashboardPanel } from "@/components/dashboard-panel";
+import { PremiumGateModal } from "@/components/premium-gate-modal";
 import { DsaPanel } from "@/components/dsa-panel";
 import { FrontendPanel } from "@/components/frontend-panel";
 import { PublicDashboardPreview } from "@/components/public-dashboard-preview";
@@ -97,7 +98,9 @@ export function PrivateRoutes({
   const isAuthenticated = Boolean(authSession?.token);
   const isFrontendFree = activePanel === "frontend";
   const isDashboardPreview = !isAuthenticated && activePanel === "dashboard";
-  const isLocked = !isAuthenticated && !isFrontendFree && !isDashboardPreview;
+  const isAuthLocked = !isAuthenticated && !isFrontendFree && !isDashboardPreview;
+  const isPremiumLocked = isAuthenticated && !isPremium && activePanel === "system-design";
+  const isLocked = isAuthLocked || isPremiumLocked;
 
   return (
     <>
@@ -170,11 +173,20 @@ export function PrivateRoutes({
           <Route
             path={ROUTES.systemDesign}
             element={
-              <SystemDesignPanel
-                questions={systemDesignQuestions}
-                completedIds={completedSystemDesignIds}
-                onCompletedIdsChange={onCompletedSystemDesignIdsChange}
-              />
+              isPremiumLocked ? (
+                <PublicDashboardPreview
+                  companyCount={companyCount}
+                  theme={theme}
+                  onSignIn={onSignIn}
+                  onSignUp={onSignUp}
+                />
+              ) : (
+                <SystemDesignPanel
+                  questions={systemDesignQuestions}
+                  completedIds={completedSystemDesignIds}
+                  onCompletedIdsChange={onCompletedSystemDesignIdsChange}
+                />
+              )
             }
           />
           <Route
@@ -187,6 +199,8 @@ export function PrivateRoutes({
                 completedRoadmapDays={completedRoadmapDays}
                 onCompletedQuestionIdsChange={onCompletedQuestionIdsChange}
                 onCompletedRoadmapDaysChange={onCompletedRoadmapDaysChange}
+                isPremium={isPremium}
+                onBuyPremium={onBuyPremium}
               />
             }
           />
@@ -194,10 +208,17 @@ export function PrivateRoutes({
         </Routes>
       </AppShell>
 
-      {isLocked ? (
+      {isAuthLocked ? (
         <AuthGateModal
           theme={theme}
           onThemeChange={onThemeChange}
+        />
+      ) : null}
+      {isPremiumLocked ? (
+        <PremiumGateModal
+          theme={theme}
+          onThemeChange={onThemeChange}
+          onBuyPremium={() => { navigate(ROUTES.dashboard); onBuyPremium(); }}
         />
       ) : null}
     </>

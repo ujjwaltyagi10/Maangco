@@ -2020,6 +2020,8 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── FRONTEND ROADMAP ── */
@@ -2937,6 +2939,7 @@ body {
 ───────────────────────────────────────── */
 .co-item--all {
   border-color: rgba(108, 99, 255, 0.35) !important;
+  grid-column: 1 / -1;
 }
 
 .co-item--all.active {
