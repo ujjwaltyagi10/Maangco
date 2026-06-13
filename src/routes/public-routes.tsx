@@ -24,6 +24,7 @@ interface PublicRoutesProps {
   onLogout: () => void | Promise<void>;
   onOpenChangePassword: () => void;
   onBuyPremium?: (plan?: "monthly" | "yearly") => void;
+  isPremium?: boolean;
   authError: string | null;
   authInfo: string | null;
   isSubmitting: boolean;
@@ -196,6 +197,7 @@ export function PublicRoutes({
   onLogout,
   onOpenChangePassword,
   onBuyPremium,
+  isPremium,
   authError,
   authInfo,
   isSubmitting,
@@ -230,6 +232,7 @@ export function PublicRoutes({
             onLogout={onLogout}
             onOpenChangePassword={onOpenChangePassword}
             onBuyPremium={onBuyPremium}
+            isPremium={isPremium}
           />
         }
       />

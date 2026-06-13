@@ -130,6 +130,7 @@ function AppRouterContent(props: AppRouterProps) {
           onLogout={props.onLogout}
           onOpenChangePassword={props.onOpenChangePassword}
           onBuyPremium={props.onBuyPremium}
+          isPremium={props.isPremium}
           authError={props.authError}
           authInfo={props.authInfo}
           isSubmitting={props.authSubmitting}

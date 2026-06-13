@@ -18,6 +18,7 @@ interface LandingPageProps {
   onLogout?: () => void;
   onOpenChangePassword?: () => void;
   onBuyPremium?: (plan?: "monthly" | "yearly") => void;
+  isPremium?: boolean;
 }
 
 const companies = [
@@ -200,6 +201,7 @@ export function LandingPage({
   onLogout,
   onOpenChangePassword,
   onBuyPremium,
+  isPremium = false,
 }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
@@ -528,24 +530,34 @@ export function LandingPage({
             </p>
 
             <div className="lhero-v2-ctas">
-              <button
-                type="button"
-                className="lbtn-primary lbtn-lg lbtn-glow"
-                onClick={onStartFree}
-              >
-                Start Learning for Free
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  width="15"
-                  height="15"
+              {isPremium ? (
+                <button
+                  type="button"
+                  className="lbtn-primary lbtn-lg lbtn-glow"
+                  onClick={onGoToDashboard}
                 >
-                  <path d="M7 5l6 5-6 5V5z" />
-                </svg>
-              </button>
-              <a href="#pricing" className="lbtn-outline lbtn-lg">
-                View Pricing
-              </a>
+                  Go to Dashboard
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+                    <path d="M7 5l6 5-6 5V5z" />
+                  </svg>
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="lbtn-primary lbtn-lg lbtn-glow"
+                    onClick={onStartFree}
+                  >
+                    Start Learning for Free
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+                      <path d="M7 5l6 5-6 5V5z" />
+                    </svg>
+                  </button>
+                  <a href="#pricing" className="lbtn-outline lbtn-lg">
+                    View Pricing
+                  </a>
+                </>
+              )}
             </div>
 
             <div className="lhero-v2-stats">
@@ -936,7 +948,7 @@ export function LandingPage({
       </section>
 
       {/* ── PRICING ── */}
-      <section className="lsection" id="pricing">
+      {!isPremium && <section className="lsection" id="pricing">
         <div className="landing-container">
           <div className="lsection-header">
             <div className="lsection-tag">Pricing</div>
@@ -1013,10 +1025,10 @@ export function LandingPage({
             Secure payment · Cancel anytime · All major cards accepted
           </p>
         </div>
-      </section>
+      </section>}
 
       {/* ── FINANCIAL AID ── */}
-      <section className="lsection lfa-section" id="financial-aid">
+      {!isPremium && <section className="lsection lfa-section" id="financial-aid">
         <div className="landing-container">
           <div className="lfa-card">
             {/* Left: text content */}
@@ -1076,7 +1088,7 @@ export function LandingPage({
             </div>
           </div>
         </div>
-      </section>
+      </section>}
 
       <FinancialAidModal open={aidModalOpen} onClose={() => setAidModalOpen(false)} />
 
