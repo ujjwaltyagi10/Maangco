@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { FinancialAidModal } from "./financial-aid-modal";
 
 const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url).href;
 const DSADarkVid = new URL("../assets/Video/DSADark.webm", import.meta.url).href;
@@ -200,6 +201,7 @@ export function LandingPage({
 }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const [aidModalOpen, setAidModalOpen] = useState(false);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -1010,6 +1012,71 @@ export function LandingPage({
           </p>
         </div>
       </section>
+
+      {/* ── FINANCIAL AID ── */}
+      <section className="lsection lfa-section" id="financial-aid">
+        <div className="landing-container">
+          <div className="lfa-card">
+            {/* Left: text content */}
+            <div className="lfa-card-left">
+              <div className="lfa-tag">Financial Aid</div>
+              <h2 className="lfa-title">Can't afford it right now?</h2>
+              <p className="lfa-sub">
+                Financial barriers shouldn't stop anyone from cracking their dream job. If you
+                genuinely can't afford Premium, apply — every application is reviewed personally
+                and approved applicants get <strong>3 months free</strong>.
+              </p>
+              <ul className="lfa-checklist">
+                <li className="lfa-check-row">
+                  <svg className="lfa-check-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6l3 3 5-5" /></svg>
+                  <span className="lfa-check-text">3 months of full Premium access, completely free</span>
+                </li>
+                <li className="lfa-check-row">
+                  <svg className="lfa-check-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6l3 3 5-5" /></svg>
+                  <span className="lfa-check-text">Every application reviewed personally, not by bots</span>
+                </li>
+                <li className="lfa-check-row">
+                  <svg className="lfa-check-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6l3 3 5-5" /></svg>
+                  <span className="lfa-check-text">No credit card required, ever</span>
+                </li>
+                <li className="lfa-check-row">
+                  <svg className="lfa-check-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6l3 3 5-5" /></svg>
+                  <span className="lfa-check-text">Response within 2–3 business days</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Right: action panel */}
+            <div className="lfa-card-right">
+              <p className="lfa-card-right-title">Apply in 2 minutes</p>
+              <div className="lfa-stats">
+                <div className="lfa-stat">
+                  <div className="lfa-stat-num">3 mo</div>
+                  <div className="lfa-stat-lbl">Free access if approved</div>
+                </div>
+                <div className="lfa-stat-divider" />
+                <div className="lfa-stat">
+                  <div className="lfa-stat-num">2–3</div>
+                  <div className="lfa-stat-lbl">Days to review</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="lfa-cta-btn"
+                onClick={() => setAidModalOpen(true)}
+              >
+                Apply for Financial Aid
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11">
+                  <path d="M2 6h8M6 2l4 4-4 4" />
+                </svg>
+              </button>
+              <p className="lfa-cta-note">Reviewed Mon – Fri · No card required</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <FinancialAidModal open={aidModalOpen} onClose={() => setAidModalOpen(false)} />
 
       {/* ── FAQ ── */}
       <section className="lsection lsection--alt" id="faq">
