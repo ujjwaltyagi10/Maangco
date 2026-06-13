@@ -40,14 +40,16 @@ const CHECK_ICON = (
 );
 
 export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuccess, onSignInRequired, defaultPlan }: PremiumModalProps) {
-  const [selectedPlan, setSelectedPlan] = useState<PlanType>(defaultPlan ?? "monthly");
+  const [selectedPlan, setSelectedPlan] = useState<PlanType>(
+    defaultPlan === "monthly" || defaultPlan === "yearly" ? defaultPlan : "monthly"
+  );
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setSelectedPlan(defaultPlan ?? "monthly");
+      setSelectedPlan(defaultPlan === "monthly" || defaultPlan === "yearly" ? defaultPlan : "monthly");
     } else {
       setIsProcessing(false);
       setError(null);

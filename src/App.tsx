@@ -306,7 +306,8 @@ function App() {
   const isPremium = currentUser?.subscription?.isActive === true || premiumAccess;
 
   const handleBuyPremium = (plan?: "monthly" | "yearly") => {
-    setPremiumModalDefaultPlan(plan ?? "monthly");
+    const safePlan = plan === "monthly" || plan === "yearly" ? plan : "monthly";
+    setPremiumModalDefaultPlan(safePlan);
     setShowPremiumModal(true);
   };
 
