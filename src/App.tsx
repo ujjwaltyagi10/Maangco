@@ -379,6 +379,10 @@ function App() {
         authToken={authToken}
         userEmail={currentUser?.email}
         onPaymentSuccess={handlePaymentSuccess}
+        onSignInRequired={() => {
+          setShowPremiumModal(false);
+          void handleLogout();
+        }}
       />
 
       <ChangePasswordModal

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createSubscription, type PlanType } from "../lib/subscription-api";
+import { createSubscription, SubscriptionAuthError, type PlanType } from "../lib/subscription-api";
 
 interface PremiumModalProps {
   open: boolean;
@@ -7,6 +7,7 @@ interface PremiumModalProps {
   authToken: string | undefined;
   userEmail: string | undefined;
   onPaymentSuccess: () => void;
+  onSignInRequired?: () => void;
 }
 
 const ALL_COMPANIES = [
@@ -16,31 +17,38 @@ const ALL_COMPANIES = [
   "Snowflake", "TCS", "Airbnb", "Pinterest", "Oracle", "Visa",
 ];
 
-const PLANS: Record<PlanType, { label: string; price: string; period: string; billing: string; badge?: string }> = {
+const PLANS: Record<PlanType, { label: string; price: string; period: string; billing: string }> = {
   monthly: {
     label: "Monthly",
     price: "₹299",
-    period: "/month",
+    period: "/mo",
     billing: "Billed every month",
   },
   yearly: {
     label: "Yearly",
     price: "₹1,999",
-    period: "/year",
-    billing: "Save ~44% · Billed once a year",
-    badge: "Best Value",
+    period: "/yr",
+    billing: "~₹167/mo · Billed once a year",
   },
 };
 
-export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuccess }: PremiumModalProps) {
+const CHECK_ICON = (
+  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 6l3 3 5-5" />
+  </svg>
+);
+
+export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuccess, onSignInRequired }: PremiumModalProps) {
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("monthly");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
     if (!open) {
       setIsProcessing(false);
       setError(null);
+      setSessionExpired(false);
     }
   }, [open]);
 
@@ -59,6 +67,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
 
     setIsProcessing(true);
     setError(null);
+    setSessionExpired(false);
 
     try {
       const data = await createSubscription(authToken, selectedPlan);
@@ -72,7 +81,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
           email: data.prefill.email || userEmail || "",
           contact: data.prefill.contact || "",
         },
-        theme: { color: "#7c3aed" },
+        theme: { color: "#4a7c41" },
         handler: () => {
           onPaymentSuccess();
           onClose();
@@ -86,7 +95,12 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
 
       rzp.open();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Payment failed. Please try again.");
+      if (err instanceof SubscriptionAuthError) {
+        setSessionExpired(true);
+        setError("Your session has expired. Please sign in again to continue.");
+      } else {
+        setError(err instanceof Error ? err.message : "Payment failed. Please try again.");
+      }
       setIsProcessing(false);
     }
   };
@@ -99,122 +113,204 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
   return (
     <div className="premium-modal-overlay" onClick={onClose}>
       <div className="premium-modal" onClick={(e) => e.stopPropagation()}>
+
+        {/* Close */}
         <button type="button" className="premium-modal-close" onClick={onClose} aria-label="Close">
-          ✕
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
+            <path d="M1 1l10 10M11 1L1 11" />
+          </svg>
         </button>
 
-        {/* Gradient header — fixed, not scrollable */}
-        <div className="premium-modal-header">
-          <div className="pmh-orb pmh-orb--1" />
-          <div className="pmh-orb pmh-orb--2" />
-          <div className="pmh-orb pmh-orb--3" />
-          <div className="pmh-content">
-            <div className="pmh-icon">⭐</div>
-            <div className="pmh-label">Premium Access</div>
+        {/* ── LEFT — Feature showcase ── */}
+        <div className="pm-left">
+          <div className="pm-left-orb pm-left-orb--1" />
+          <div className="pm-left-orb pm-left-orb--2" />
+
+          <div className="pm-left-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 20h20M4 20l2-8 6 4 6-4 2 8" />
+              <circle cx="4" cy="10" r="1.5" fill="#d4a04a" stroke="none" />
+              <circle cx="20" cy="10" r="1.5" fill="#d4a04a" stroke="none" />
+              <circle cx="12" cy="6" r="1.5" fill="#d4a04a" stroke="none" />
+            </svg>
+            <span>PrepDoc Premium</span>
           </div>
 
-          {/* Infinite marquee of all companies */}
-          <div className="pmh-marquee">
-            <div className="pmh-marquee-track">
-              {marqueeItems.map((name, i) => (
-                <div key={i} className="pmh-chip">{name}</div>
-              ))}
+          <div className="pm-left-heading">
+            <h2 className="pm-left-title">
+              Unlock everything.<br />
+              <span className="pm-left-accent">Crack any interview.</span>
+            </h2>
+            <p className="pm-left-sub">Everything you need for MAANG and top-tier tech interviews — in one place.</p>
+          </div>
+
+          <ul className="pm-feat-list">
+            <li className="pm-feat-item">
+              <div className="pm-feat-check">{CHECK_ICON}</div>
+              <div className="pm-feat-info">
+                <span className="pm-feat-name">840+ DSA Questions</span>
+                <span className="pm-feat-desc">Company sheets with frequency &amp; topic tags</span>
+              </div>
+            </li>
+            <li className="pm-feat-item">
+              <div className="pm-feat-check">{CHECK_ICON}</div>
+              <div className="pm-feat-info">
+                <span className="pm-feat-name">25+ Company Sheets</span>
+                <span className="pm-feat-desc">Google, Meta, Amazon, Apple, Netflix &amp; more</span>
+              </div>
+            </li>
+            <li className="pm-feat-item">
+              <div className="pm-feat-check">{CHECK_ICON}</div>
+              <div className="pm-feat-info">
+                <span className="pm-feat-name">System Design — 150 Qs</span>
+                <span className="pm-feat-desc">Full HLD + LLD roadmap with depth tracking</span>
+              </div>
+            </li>
+            <li className="pm-feat-item">
+              <div className="pm-feat-check">{CHECK_ICON}</div>
+              <div className="pm-feat-info">
+                <span className="pm-feat-name">275 Interview Questions</span>
+                <span className="pm-feat-desc">Frontend &amp; behavioral, fully curated</span>
+              </div>
+            </li>
+            <li className="pm-feat-item">
+              <div className="pm-feat-check">{CHECK_ICON}</div>
+              <div className="pm-feat-info">
+                <span className="pm-feat-name">Tags &amp; Frequency Data</span>
+                <span className="pm-feat-desc">Real interview occurrence data per problem</span>
+              </div>
+            </li>
+          </ul>
+
+          {/* Company marquee */}
+          <div className="pm-left-marquee">
+            <div className="pmh-marquee">
+              <div className="pmh-marquee-track">
+                {marqueeItems.map((name, i) => (
+                  <div key={i} className="pmh-chip">{name}</div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Scrollable content */}
-        <div className="premium-modal-scroll">
-          <div className="premium-modal-body">
-            <h2 className="premium-modal-title">Upgrade to Premium</h2>
-            <p className="premium-modal-sub">
-              Unlock company-wise question sheets and topic tags across all companies — curated from real interview reports.
-            </p>
+        {/* ── RIGHT — Plan + checkout ── */}
+        <div className="pm-right">
+          <div className="pm-right-head">
+            <div className="pm-right-title">Choose your plan</div>
+            <div className="pm-right-sub">Cancel anytime. No questions asked.</div>
+          </div>
 
-            {/* Plan toggle */}
-            <div className="plan-toggle">
-              {(["monthly", "yearly"] as PlanType[]).map((p) => (
+          {/* Plan cards */}
+          <div className="pm-plans">
+            {/* Monthly */}
+            <button
+              type="button"
+              className={`pm-plan-card${selectedPlan === "monthly" ? " pm-plan-card--active" : ""}`}
+              onClick={() => setSelectedPlan("monthly")}
+            >
+              <div className="pm-plan-row">
+                <div className="pm-plan-info">
+                  <div className="pm-plan-name">Monthly</div>
+                  <div className="pm-plan-billing">Billed every month</div>
+                </div>
+                <div className="pm-plan-price-wrap">
+                  <span className="pm-plan-price">₹299</span>
+                  <span className="pm-plan-period">/mo</span>
+                </div>
+                <div className={`pm-plan-radio${selectedPlan === "monthly" ? " pm-plan-radio--on" : ""}`}>
+                  {selectedPlan === "monthly" && CHECK_ICON}
+                </div>
+              </div>
+            </button>
+
+            {/* Yearly */}
+            <button
+              type="button"
+              className={`pm-plan-card pm-plan-card--featured${selectedPlan === "yearly" ? " pm-plan-card--active" : ""}`}
+              onClick={() => setSelectedPlan("yearly")}
+            >
+              <div className="pm-plan-best-badge">Best Value · Save 44%</div>
+              <div className="pm-plan-row">
+                <div className="pm-plan-info">
+                  <div className="pm-plan-name">Yearly</div>
+                  <div className="pm-plan-billing">~₹167/mo · Billed once a year</div>
+                </div>
+                <div className="pm-plan-price-wrap">
+                  <span className="pm-plan-price">₹1,999</span>
+                  <span className="pm-plan-period">/yr</span>
+                </div>
+                <div className={`pm-plan-radio${selectedPlan === "yearly" ? " pm-plan-radio--on" : ""}`}>
+                  {selectedPlan === "yearly" && CHECK_ICON}
+                </div>
+              </div>
+            </button>
+          </div>
+
+          {/* Order summary */}
+          <div className="pm-summary">
+            <div className="pm-summary-label">Order summary</div>
+            <div className="pm-summary-row">
+              <span>Plan</span>
+              <strong>{plan.label} Premium</strong>
+            </div>
+            <div className="pm-summary-row">
+              <span>Amount</span>
+              <strong>{plan.price}<span className="pm-summary-period">{plan.period}</span></strong>
+            </div>
+            <div className="pm-summary-row">
+              <span>Billing</span>
+              <strong>{plan.billing}</strong>
+            </div>
+            <div className="pm-summary-row">
+              <span>Payment</span>
+              <strong>UPI, Cards, Wallets</strong>
+            </div>
+          </div>
+
+          {error && (
+            <div className="premium-modal-error">
+              <div className="pm-error-msg">{error}</div>
+              {sessionExpired && onSignInRequired && (
                 <button
-                  key={p}
                   type="button"
-                  className={`plan-toggle-btn${selectedPlan === p ? " plan-toggle-btn--active" : ""}`}
-                  onClick={() => setSelectedPlan(p)}
+                  className="pm-error-signin-btn"
+                  onClick={() => { onClose(); onSignInRequired(); }}
                 >
-                  {PLANS[p].label}
-                  {PLANS[p].badge && (
-                    <span className="plan-toggle-badge">{PLANS[p].badge}</span>
-                  )}
+                  Sign in again →
                 </button>
-              ))}
+              )}
             </div>
+          )}
 
-            <ul className="premium-modal-features">
-              <li>
-                <span className="pmf-check">✓</span>
-                <span><strong>All Company Sheets</strong> — company-wise question sets sorted by interview frequency</span>
-              </li>
-              <li>
-                <span className="pmf-check">✓</span>
-                <span><strong>FAANG Sheets</strong> — Google, Meta, Amazon, Apple &amp; Netflix individually</span>
-              </li>
-              <li>
-                <span className="pmf-check">✓</span>
-                <span><strong>Question Tags</strong> — topic labels for every problem across all companies</span>
-              </li>
-              <li>
-                <span className="pmf-check">✓</span>
-                <span><strong>Frequency Data</strong> — know exactly how often each problem appears in real interviews</span>
-              </li>
-            </ul>
-
-            <div className="premium-checkout">
-              <div className="premium-checkout-label">Order Summary</div>
-              <div className="premium-checkout-row">
-                <span>Plan</span>
-                <strong>{plan.label} Premium</strong>
-              </div>
-              <div className="premium-checkout-row">
-                <span>Amount</span>
-                <strong>
-                  {plan.price}
-                  <span className="premium-checkout-period">{plan.period}</span>
-                </strong>
-              </div>
-              <div className="premium-checkout-row">
-                <span>Billing</span>
-                <strong>{plan.billing}</strong>
-              </div>
-              <div className="premium-checkout-row">
-                <span>Payment methods</span>
-                <strong>UPI, Cards, Wallets</strong>
-              </div>
-            </div>
-
-            {error && <div className="premium-modal-error">{error}</div>}
-          </div>
-        </div>
-
-        {/* Sticky footer — always visible */}
-        <div className="premium-modal-footer">
+          {/* CTA */}
           <button
             type="button"
             className="premium-modal-cta"
             onClick={handlePurchase}
             disabled={isProcessing}
           >
-            {isProcessing
-              ? "Opening Razorpay…"
-              : `Pay ${plan.price} with Razorpay`}
+            {isProcessing ? "Opening Razorpay…" : `Pay ${plan.price} with Razorpay`}
             {!isProcessing && (
               <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
                 <path d="M2 6h8M6 2l4 4-4 4" />
               </svg>
             )}
           </button>
+
+          <div className="premium-modal-trust">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Secured by Razorpay · Cancel anytime · Instant access
+          </div>
+
           <button type="button" className="premium-modal-dismiss" onClick={onClose}>
             Maybe later
           </button>
         </div>
+
       </div>
     </div>
   );

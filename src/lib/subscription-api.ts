@@ -1,5 +1,12 @@
 import { AUTH_API_BASE_URL } from "./auth-api";
 
+export class SubscriptionAuthError extends Error {
+  constructor(message?: string) {
+    super(message ?? "Your session has expired. Please sign in again to continue.");
+    this.name = "SubscriptionAuthError";
+  }
+}
+
 export type PlanType = "monthly" | "yearly";
 
 export interface SubscriptionData {
@@ -30,6 +37,16 @@ export async function createSubscription(
   );
 
   if (!response.ok) {
+    if (response.status === 401) {
+      let backendMsg: string | undefined;
+      try {
+        const data = (await response.json()) as Record<string, unknown>;
+        backendMsg = typeof data.message === "string" ? data.message
+          : typeof data.error === "string" ? data.error
+          : undefined;
+      } catch { /* ignore */ }
+      throw new SubscriptionAuthError(backendMsg);
+    }
     let message = "Unable to create subscription.";
     try {
       const data = (await response.json()) as Record<string, unknown>;
