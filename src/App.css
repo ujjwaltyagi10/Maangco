@@ -3204,8 +3204,8 @@ a.lbtn-lg {
   gap: 7px;
   width: 100%;
   padding: 12px 18px;
-  border-radius: 10px;
-  background: var(--green);
+  border-radius: 13px;
+  background: linear-gradient(135deg, #4a7c41 0%, #6ba860 100%);
   color: #fff;
   font-size: 13.5px;
   font-weight: 700;
@@ -3213,10 +3213,10 @@ a.lbtn-lg {
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
-  transition: opacity 0.15s, transform 0.15s;
+  transition: box-shadow 0.2s, transform 0.2s, opacity 0.15s;
 }
 .lfa-cta-btn:hover {
-  opacity: 0.88;
+  box-shadow: 0 8px 28px rgba(74, 124, 65, 0.45);
   transform: translateY(-1px);
 }
 
