@@ -113,7 +113,16 @@ function App() {
 
   useEffect(() => {
     setAuthStatus("ready");
-  }, []);
+    // Background refresh on startup — picks up subscription changes after a page reload
+    if (authSession?.token) {
+      const token = authSession.token;
+      const user = authSession.user;
+      void tryHydrateSessionFromBackend(token, user)
+        .then((session) => setAuthSession(session))
+        .catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // runs once on mount; intentionally captures initial localStorage session
 
   const dsaQuestionCount = useMemo(
     () => dsaCompanies.reduce((total, company) => total + company.questions.length, 0),
@@ -313,10 +322,21 @@ function App() {
 
   const handlePaymentSuccess = async () => {
     setPremiumAccess(true);
-    if (authToken) {
+    const token = authToken;
+    const fallbackUser = authSession?.user;
+    if (token) {
       try {
-        const session = await tryHydrateSessionFromBackend(authToken, authSession?.user);
+        const session = await tryHydrateSessionFromBackend(token, fallbackUser);
         setAuthSession(session);
+        // Webhook may not have fired yet — retry after 3s to catch late activation
+        if (!session.user?.subscription?.isActive) {
+          setTimeout(async () => {
+            try {
+              const retried = await tryHydrateSessionFromBackend(token, fallbackUser);
+              setAuthSession(retried);
+            } catch { /* ignore */ }
+          }, 3000);
+        }
       } catch {
         // keep local premium flag if refresh fails
       }
