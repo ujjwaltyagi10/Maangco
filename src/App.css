@@ -2691,6 +2691,9 @@ a.lbtn-lg {
   gap: 28px;
   width: 100%;
   box-sizing: border-box;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* ── Hero ── */
@@ -3053,9 +3056,15 @@ a.lbtn-lg {
   }
 }
 
+@media (max-width: 768px) {
+  .dp-root {
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px) + 0.5rem);
+  }
+}
+
 @media (max-width: 600px) {
   .dp-root {
-    padding: 16px 16px 40px;
+    padding: 16px 16px calc(62px + env(safe-area-inset-bottom, 0px) + 0.5rem);
     gap: 20px;
   }
   .dp-hero {
