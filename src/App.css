@@ -1410,7 +1410,7 @@ a.lbtn-lg {
 ───────────────────────────────────────── */
 .lfooter {
   border-top: 1px solid var(--border);
-  padding: 28px 0;
+  padding: 28px 0 calc(28px + env(safe-area-inset-bottom, 0px));
   background: var(--surface);
 }
 .lfooter-copy {
@@ -2433,7 +2433,7 @@ a.lbtn-lg {
 
 @media (max-width: 640px) {
   .auth-form-body {
-    padding: 28px 20px 40px;
+    padding: 28px 20px calc(40px + env(safe-area-inset-bottom, 12px));
   }
   .auth-name-row {
     grid-template-columns: 1fr;

@@ -2667,7 +2667,8 @@ body {
   .dsa-panel {
     flex-direction: column;
     overflow-y: auto;
-    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    min-height: 0;
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px) + 0.5rem);
   }
 
   .dsa-main {
@@ -3761,6 +3762,10 @@ body {
 
   .sd-header {
     flex-direction: column;
+  }
+
+  .sd-main {
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px) + 0.5rem);
   }
 }
 
