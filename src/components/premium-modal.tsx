@@ -8,6 +8,7 @@ interface PremiumModalProps {
   userEmail: string | undefined;
   onPaymentSuccess: () => void;
   onSignInRequired?: () => void;
+  defaultPlan?: PlanType;
 }
 
 const ALL_COMPANIES = [
@@ -38,19 +39,21 @@ const CHECK_ICON = (
   </svg>
 );
 
-export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuccess, onSignInRequired }: PremiumModalProps) {
-  const [selectedPlan, setSelectedPlan] = useState<PlanType>("monthly");
+export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuccess, onSignInRequired, defaultPlan }: PremiumModalProps) {
+  const [selectedPlan, setSelectedPlan] = useState<PlanType>(defaultPlan ?? "monthly");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      setSelectedPlan(defaultPlan ?? "monthly");
+    } else {
       setIsProcessing(false);
       setError(null);
       setSessionExpired(false);
     }
-  }, [open]);
+  }, [open, defaultPlan]);
 
   const handlePurchase = async () => {
     if (isProcessing) return;
@@ -290,7 +293,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
             onClick={handlePurchase}
             disabled={isProcessing}
           >
-            {isProcessing ? "Opening Razorpay…" : `Pay ${plan.price} with Razorpay`}
+            {isProcessing ? "Opening Razorpay…" : "Pay Now"}
             {!isProcessing && (
               <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
                 <path d="M2 6h8M6 2l4 4-4 4" />

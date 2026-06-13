@@ -17,6 +17,7 @@ interface LandingPageProps {
   onGoToDashboard?: () => void;
   onLogout?: () => void;
   onOpenChangePassword?: () => void;
+  onBuyPremium?: (plan?: "monthly" | "yearly") => void;
 }
 
 const companies = [
@@ -98,7 +99,7 @@ const testimonials = [
     initials: "DG",
     name: "Divya Gupta",
     role: "SDE @ Adobe",
-    text: "Best ₹249 I've spent. System Design coverage + DSA lists are unmatched. Daily updates meant I was always solving fresh, interview-relevant content.",
+    text: "Best ₹299 I've spent. System Design coverage + DSA lists are unmatched. Daily updates meant I was always solving fresh, interview-relevant content.",
   },
 ];
 
@@ -121,7 +122,7 @@ const faqs = [
   },
   {
     q: "Is there a yearly discount?",
-    a: "Yes — the yearly plan at ₹1,999 saves you ₹989 vs monthly (₹249 × 12 = ₹2,988). You get 12 months of full access including all daily updates.",
+    a: "Yes — the yearly plan at ₹1,999 saves you ₹1,589 vs monthly (₹299 × 12 = ₹3,588). You get 12 months of full access including all daily updates.",
   },
   {
     q: "Can I cancel anytime?",
@@ -198,6 +199,7 @@ export function LandingPage({
   onGoToDashboard,
   onLogout,
   onOpenChangePassword,
+  onBuyPremium,
 }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
@@ -951,7 +953,7 @@ export function LandingPage({
               <div className="lprice-plan-name">Monthly</div>
               <div className="lprice-amount">
                 <span className="lprice-currency">₹</span>
-                <span className="lprice-num">249</span>
+                <span className="lprice-num">299</span>
                 <span className="lprice-period">/month</span>
               </div>
               <p className="lprice-tagline">Great to start. Cancel anytime.</p>
@@ -966,7 +968,7 @@ export function LandingPage({
               <button
                 type="button"
                 className="lbtn-outline lprice-btn"
-                onClick={onGetStarted}
+                onClick={isAuthenticated && onBuyPremium ? () => onBuyPremium("monthly") : onGetStarted}
               >
                 Start monthly →
               </button>
@@ -984,7 +986,7 @@ export function LandingPage({
                 <span className="lprice-period">/year</span>
               </div>
               <p className="lprice-tagline">
-                ₹167/month · Save ₹989 vs monthly
+                ₹167/month · Save ₹1,589 vs monthly
               </p>
               <ul className="lprice-features">
                 {PLAN_FEATURES.map((f) => (
@@ -1001,7 +1003,7 @@ export function LandingPage({
               <button
                 type="button"
                 className="lbtn-primary lprice-btn lbtn-glow"
-                onClick={onGetStarted}
+                onClick={isAuthenticated && onBuyPremium ? () => onBuyPremium("yearly") : onGetStarted}
               >
                 Get yearly access →
               </button>

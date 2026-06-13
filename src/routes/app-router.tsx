@@ -9,7 +9,7 @@ import { PublicRoutes } from "./public-routes";
 
 export interface AppRouterProps {
   isPremium: boolean;
-  onBuyPremium: () => void;
+  onBuyPremium: (plan?: "monthly" | "yearly") => void;
   authSession: AuthSession | null;
   authStatus: "loading" | "ready";
   authError: string | null;
@@ -129,6 +129,7 @@ function AppRouterContent(props: AppRouterProps) {
           onGoogleCallback={props.onGoogleCallback}
           onLogout={props.onLogout}
           onOpenChangePassword={props.onOpenChangePassword}
+          onBuyPremium={props.onBuyPremium}
           authError={props.authError}
           authInfo={props.authInfo}
           isSubmitting={props.authSubmitting}

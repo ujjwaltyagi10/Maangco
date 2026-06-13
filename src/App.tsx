@@ -98,6 +98,7 @@ function App() {
   const [changePasswordError, setChangePasswordError] = useState<string | null>(null);
   const [changePasswordInfo, setChangePasswordInfo] = useState<string | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumModalDefaultPlan, setPremiumModalDefaultPlan] = useState<"monthly" | "yearly">("monthly");
 
   const authToken = authSession?.token;
 
@@ -304,7 +305,8 @@ function App() {
   // premiumAccess is only an optimistic flag set right after payment (cleared on refresh)
   const isPremium = currentUser?.subscription?.isActive === true || premiumAccess;
 
-  const handleBuyPremium = () => {
+  const handleBuyPremium = (plan?: "monthly" | "yearly") => {
+    setPremiumModalDefaultPlan(plan ?? "monthly");
     setShowPremiumModal(true);
   };
 
@@ -379,6 +381,7 @@ function App() {
         authToken={authToken}
         userEmail={currentUser?.email}
         onPaymentSuccess={handlePaymentSuccess}
+        defaultPlan={premiumModalDefaultPlan}
         onSignInRequired={() => {
           setShowPremiumModal(false);
           void handleLogout();

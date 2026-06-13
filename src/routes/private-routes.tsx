@@ -15,7 +15,7 @@ import { panelFromPath, panelPath, ROUTES } from "./route-paths";
 
 interface PrivateRoutesProps {
   isPremium: boolean;
-  onBuyPremium: () => void;
+  onBuyPremium: (plan?: "monthly" | "yearly") => void;
   authSession: AuthSession | null;
   theme: "light" | "dark";
   onThemeChange: () => void;

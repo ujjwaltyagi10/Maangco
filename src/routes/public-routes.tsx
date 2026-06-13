@@ -23,6 +23,7 @@ interface PublicRoutesProps {
   onGoogleCallback: (session: AuthSession) => Promise<void> | void;
   onLogout: () => void | Promise<void>;
   onOpenChangePassword: () => void;
+  onBuyPremium?: (plan?: "monthly" | "yearly") => void;
   authError: string | null;
   authInfo: string | null;
   isSubmitting: boolean;
@@ -194,6 +195,7 @@ export function PublicRoutes({
   onGoogleCallback,
   onLogout,
   onOpenChangePassword,
+  onBuyPremium,
   authError,
   authInfo,
   isSubmitting,
@@ -227,6 +229,7 @@ export function PublicRoutes({
             onGoToDashboard={() => navigate(ROUTES.dashboard)}
             onLogout={onLogout}
             onOpenChangePassword={onOpenChangePassword}
+            onBuyPremium={onBuyPremium}
           />
         }
       />
