@@ -2946,7 +2946,7 @@ body {
     padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
   }
 
-  /* ── DSA panel: stack vertically on mobile ── */
+  /* ── DSA panel: stack vertically ── */
   .dsa-panel {
     flex-direction: column;
     overflow-y: auto;
@@ -2957,32 +2957,129 @@ body {
     overflow-y: visible;
   }
 
+  /* ── Sidebar → horizontal company chip strip ── */
+  .dsa-sidebar,
+  .dsa-sidebar.dsa-sidebar--collapsed {
+    width: 100%;
+    height: auto;
+    border-left: none;
+    border-bottom: 1px solid var(--border);
+    order: -1;
+    flex-shrink: 0;
+    transition: none;
+  }
+
+  /* Hide all sidebar chrome; only the chips show */
+  .dsa-sidebar-head,
+  .dsa-sidebar-footer,
+  .dsa-sidebar-collapse-toggle,
+  .dsa-sidebar-collapsed-footer {
+    display: none;
+  }
+
+  /* Collapsed state: logo strip → horizontal */
+  .dsa-collapsed-logo-wrap {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .dsa-sidebar-logo-strip {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 8px 12px !important;
+    gap: 6px !important;
+    align-items: center !important;
+    scrollbar-width: none;
+  }
+
+  .dsa-sidebar-logo-strip::-webkit-scrollbar { display: none; }
+
+  .dsa-logo-pill {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  /* Expanded state: companies grid → horizontal scroll */
+  .dsa-sidebar-companies {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    max-height: none !important;
+    padding: 8px 12px !important;
+    gap: 5px !important;
+    align-items: center !important;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dsa-sidebar-companies::-webkit-scrollbar { display: none; }
+
+  /* Company items: compact pill chips */
+  .co-item--sidebar {
+    flex-shrink: 0 !important;
+    width: auto !important;
+    padding: 4px 9px 4px 4px !important;
+    border-radius: 20px !important;
+    border: 1.5px solid var(--border) !important;
+    border-left: 1.5px solid var(--border) !important;
+    gap: 5px !important;
+    background: var(--surface2) !important;
+    white-space: nowrap !important;
+  }
+
+  .co-item--sidebar.active {
+    border-color: var(--accent) !important;
+    background: var(--easy-bg) !important;
+  }
+
+  .co-item--sidebar .co-logo {
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 50% !important;
+  }
+
+  .co-item--sidebar .co-logo img {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .co-item--sidebar .co-info {
+    flex: none !important;
+  }
+
+  .co-item--sidebar .co-prog {
+    display: none !important;
+  }
+
+  /* ── Header: hide identity card (title in top navbar) ── */
+  .dsa-header-identity {
+    display: none;
+  }
+
   .dsa-progress-header {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
+    padding: 0.6rem 0.85rem;
+    gap: 6px;
   }
 
   .dsa-progress-card {
     grid-column: 1;
-    grid-row: 2;
-    padding: 10px 14px;
+    grid-row: 1;
+    padding: 8px 12px;
+  }
+
+  .dsa-diff-stats {
+    gap: 8px;
   }
 
   .dsa-header-bottom {
     grid-column: 1;
-    grid-row: 3;
-  }
-
-  .dsa-sidebar {
-    width: 100%;
-    border-left: none;
-    border-top: 1px solid var(--border);
-    order: -1;
-  }
-
-  .dsa-sidebar-companies {
-    max-height: 280px;
-    overflow-y: auto;
+    grid-row: 2;
   }
 
   /* ── Questions layout: single column ── */
