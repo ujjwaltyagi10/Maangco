@@ -1,5 +1,12 @@
 import type { Dispatch, SetStateAction } from "react";
-import { startTransition, useDeferredValue, useMemo, useState } from "react";
+import {
+  startTransition,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import type {
   SystemDesignCategory,
@@ -63,9 +70,21 @@ export function SystemDesignPanel({
   const [levelFilter, setLevelFilter] = useState<"All" | "HLD" | "LLD" | "Both">("All");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersRef = useRef<HTMLDivElement>(null);
   const pageSize = 50;
 
   const deferredSearch = useDeferredValue(search);
+
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
+        setFiltersOpen(false);
+      }
+    }
+    if (filtersOpen) document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [filtersOpen]);
 
   const filtered = useMemo(() => {
     let result = questions;
@@ -89,10 +108,37 @@ export function SystemDesignPanel({
   const safePage = Math.min(currentPage, totalPages);
   const paginated = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
-  const highCount = questions.filter((q) => q.frequency === "High").length;
-  const completedHighCount = questions.filter(
-    (q) => q.frequency === "High" && completedIds.includes(q.id),
-  ).length;
+  // Frequency breakdown counts
+  const freqCounts = useMemo(() => {
+    return questions.reduce(
+      (acc, q) => {
+        const done = completedIds.includes(q.id);
+        if (q.frequency === "High") { acc.high++; if (done) acc.highDone++; }
+        if (q.frequency === "Medium") { acc.med++; if (done) acc.medDone++; }
+        if (q.frequency === "Low") { acc.low++; if (done) acc.lowDone++; }
+        return acc;
+      },
+      { high: 0, med: 0, low: 0, highDone: 0, medDone: 0, lowDone: 0 },
+    );
+  }, [questions, completedIds]);
+
+  // Filtered progress (respects all active filters)
+  const visibleDoneCount = filtered.filter((q) => completedIds.includes(q.id)).length;
+  const visibleTotal = filtered.length;
+  const visiblePct = visibleTotal > 0 ? Math.round((visibleDoneCount / visibleTotal) * 100) : 0;
+
+  const activeFilterCount = [
+    freqFilter !== "All",
+    selectedCat !== ALL_CAT,
+    levelFilter !== "All",
+  ].filter(Boolean).length;
+
+  // Mini arc ring (56×56 viewBox, r=22)
+  const sdArcR = 22;
+  const sdArcCirc = 2 * Math.PI * sdArcR;
+  const sdArcLen = sdArcCirc * 0.75;
+  const sdArcGap = sdArcCirc - sdArcLen;
+  const sdArcFill = sdArcLen * (visibleDoneCount / Math.max(1, visibleTotal));
 
   function toggleComplete(id: SystemDesignQuestionId) {
     startTransition(() => {
@@ -108,98 +154,131 @@ export function SystemDesignPanel({
 
   return (
     <div className="sd-panel">
-      {/* ── TOP: Filters (non-scrolling) ── */}
-      <div className="sd-top">
-        {/* Header row */}
-        <div className="sd-header">
-          <div className="sd-header-text">
-            <h1 className="sd-title">System Design</h1>
-            <p className="sd-subtitle">
-              150 questions with company tags sourced from Glassdoor, Blind &amp; Exponent (2021–2026)
-            </p>
+
+      {/* ── HEADER — same grid layout as DSA panel ── */}
+      <div className="dsa-progress-header">
+
+        {/* Cell 1: Identity */}
+        <div className="dsa-header-identity">
+          <div className="dsa-header-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" />
+              <path d="M8 21h8M12 17v4" />
+            </svg>
           </div>
-          <div className="sd-stats-row">
-            <div className="stat-chip s">
-              <div className="n">{completedIds.length}</div>
-              <div className="l">Studied</div>
+          <div className="dsa-header-title-group">
+            <h2 className="dsa-header-title">System Design</h2>
+            <span className="dsa-header-sub">150 questions sourced from Glassdoor, Blind &amp; Exponent (2021–2026)</span>
+          </div>
+        </div>
+
+        {/* Cell 2: Progress strip */}
+        <div className="dsa-progress-card">
+          <div className="dsa-mini-ring">
+            <svg viewBox="0 0 56 56" className="dsa-mini-ring-svg">
+              <circle cx="28" cy="28" r={sdArcR} fill="none" stroke="var(--border2)" strokeWidth="3"
+                strokeDasharray={`${sdArcLen} ${sdArcGap}`} strokeLinecap="round"
+                transform="rotate(135, 28, 28)" />
+              <circle cx="28" cy="28" r={sdArcR} fill="none" stroke="var(--accent)" strokeWidth="3"
+                strokeDasharray={`${sdArcFill} ${sdArcCirc - sdArcFill}`} strokeLinecap="round"
+                transform="rotate(135, 28, 28)"
+                style={{ transition: "stroke-dasharray 0.5s ease" }} />
+            </svg>
+            <div className="dsa-mini-ring-label">{visiblePct}%</div>
+          </div>
+          <div className="dsa-progress-info">
+            <span className="dsa-progress-count">
+              {visibleDoneCount}<span className="dsa-progress-total">/{visibleTotal}</span>
+            </span>
+            <span className="dsa-progress-label">✓ Studied</span>
+          </div>
+          <div className="dsa-progress-sep" />
+          <div className="dsa-diff-stats">
+            <div className="dsa-diff-stat">
+              <span className="dsa-diff-stat-label" style={{ color: "var(--easy)" }}>High</span>
+              <span className="dsa-diff-stat-val">{freqCounts.highDone}/{freqCounts.high}</span>
             </div>
-            <div className="stat-chip e">
-              <div className="n">{completedHighCount}</div>
-              <div className="l">High done</div>
+            <div className="dsa-diff-stat">
+              <span className="dsa-diff-stat-label" style={{ color: "var(--med)" }}>Med.</span>
+              <span className="dsa-diff-stat-val">{freqCounts.medDone}/{freqCounts.med}</span>
             </div>
-            <div className="stat-chip m">
-              <div className="n">{highCount}</div>
-              <div className="l">High freq</div>
+            <div className="dsa-diff-stat">
+              <span className="dsa-diff-stat-label" style={{ color: "var(--muted)" }}>Low</span>
+              <span className="dsa-diff-stat-val">{freqCounts.lowDone}/{freqCounts.low}</span>
             </div>
           </div>
         </div>
 
-        {/* Filter bar */}
-        <div className="sd-filter-bar">
-          <input
-            className="sd-filter-search"
-            type="text"
-            placeholder="Search questions or companies..."
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-          />
-          <div className="sd-filter-selects">
-            <div className="sd-select-wrap">
-              <label className="sd-select-label">Frequency</label>
-              <select
-                className="sort-select sd-select"
-                value={freqFilter}
-                onChange={(e) => {
-                  startTransition(() => {
-                    setFreqFilter(e.target.value as "All" | SystemDesignFrequency);
-                    setCurrentPage(1);
-                  });
-                }}
-              >
-                <option value="All">All frequencies</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-            </div>
-            <div className="sd-select-wrap">
-              <label className="sd-select-label">Category</label>
-              <select
-                className="sort-select sd-select"
-                value={selectedCat}
-                onChange={(e) => {
-                  startTransition(() => {
-                    setSelectedCat(e.target.value as typeof ALL_CAT | SystemDesignCategory);
-                    setCurrentPage(1);
-                  });
-                }}
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            <div className="sd-select-wrap">
-              <label className="sd-select-label">Design Level</label>
-              <select
-                className="sort-select sd-select"
-                value={levelFilter}
-                onChange={(e) => {
-                  startTransition(() => {
-                    setLevelFilter(e.target.value as "All" | "HLD" | "LLD" | "Both");
-                    setCurrentPage(1);
-                  });
-                }}
-              >
-                <option value="All">All levels</option>
-                <option value="HLD">HLD only</option>
-                <option value="LLD">LLD only</option>
-                <option value="Both">Both (HLD + LLD)</option>
-              </select>
-            </div>
+        {/* Cell 3: Search + Filters */}
+        <div className="dsa-header-bottom">
+          <div className="dsa-search-wrap">
+            <svg className="dsa-search-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              <circle cx="6.5" cy="6.5" r="5" />
+              <path d="M10.5 10.5L14 14" />
+            </svg>
+            <input
+              className="dsa-search-input"
+              type="text"
+              placeholder="Search questions or companies..."
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+            />
+          </div>
+          <div className="dsa-filter-wrap" ref={filtersRef}>
+            <button
+              type="button"
+              className={`dsa-filter-btn${filtersOpen ? " open" : ""}${activeFilterCount > 0 ? " has-active" : ""}`}
+              onClick={() => setFiltersOpen((o) => !o)}
+            >
+              <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <path d="M2 4h12M4 8h8M6 12h4" />
+              </svg>
+              Filters
+              {activeFilterCount > 0 && (
+                <span className="dsa-filter-badge">{activeFilterCount}</span>
+              )}
+              <svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+                <path d="M2 4l4 4 4-4H2z" />
+              </svg>
+            </button>
+            {filtersOpen && (
+              <div className="dsa-filter-panel">
+                <div className="dsa-filter-row">
+                  <span className="dsa-filter-label">Frequency</span>
+                  <select className="sort-select dsa-filter-select" value={freqFilter}
+                    onChange={(e) => { startTransition(() => { setFreqFilter(e.target.value as "All" | SystemDesignFrequency); setCurrentPage(1); }); }}>
+                    <option value="All">All</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                <div className="dsa-filter-row">
+                  <span className="dsa-filter-label">Category</span>
+                  <select className="sort-select dsa-filter-select" value={selectedCat}
+                    onChange={(e) => { startTransition(() => { setSelectedCat(e.target.value as typeof ALL_CAT | SystemDesignCategory); setCurrentPage(1); }); }}>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="dsa-filter-row">
+                  <span className="dsa-filter-label">Level</span>
+                  <select className="sort-select dsa-filter-select" value={levelFilter}
+                    onChange={(e) => { startTransition(() => { setLevelFilter(e.target.value as "All" | "HLD" | "LLD" | "Both"); setCurrentPage(1); }); }}>
+                    <option value="All">All levels</option>
+                    <option value="HLD">HLD only</option>
+                    <option value="LLD">LLD only</option>
+                    <option value="Both">Both (HLD + LLD)</option>
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
       </div>
+      {/* end header */}
 
       {/* ── MAIN: Scrollable table ── */}
       <div className="sd-main">
@@ -243,18 +322,12 @@ export function SystemDesignPanel({
                     <td className="q-num">{q.number}</td>
                     <td className="q-title">{q.title}</td>
                     <td>
-                      <span
-                        className="diff-badge"
-                        style={{ background: fc.bg, color: fc.text }}
-                      >
+                      <span className="diff-badge" style={{ background: fc.bg, color: fc.text }}>
                         {q.frequency}
                       </span>
                     </td>
                     <td>
-                      <span
-                        className="diff-badge"
-                        style={{ background: lc.bg, color: lc.text }}
-                      >
+                      <span className="diff-badge" style={{ background: lc.bg, color: lc.text }}>
                         {q.designLevel}
                       </span>
                     </td>
@@ -286,11 +359,7 @@ export function SystemDesignPanel({
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        style={{
-                          color: "var(--text2)",
-                          textDecoration: "none",
-                          fontSize: 13,
-                        }}
+                        style={{ color: "var(--text2)", textDecoration: "none", fontSize: 13 }}
                         onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.textDecoration = "underline"; }}
                         onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.textDecoration = "none"; }}
                       >
