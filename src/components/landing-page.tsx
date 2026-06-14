@@ -225,7 +225,7 @@ export function LandingPage({
         <div className="landing-container">
           <div className="landing-nav-row">
             <div className="landing-nav-left">
-              <a href="/" className="landing-logo flex-shrink-0">
+              <a href="/" className="landing-logo shrink-0">
                 <div className="landing-logo-mark">
                   <svg viewBox="0 0 20 20" width="16" height="16">
                     <path
@@ -240,18 +240,10 @@ export function LandingPage({
               </a>
 
               <div className="hidden lg:flex items-center gap-1 flex-1">
-                <a href="#features" className="landing-nav-link">
-                  Features
-                </a>
-                <a href="#pricing" className="landing-nav-link">
-                  Pricing
-                </a>
-                <a href="#testimonials" className="landing-nav-link">
-                  Reviews
-                </a>
-                <a href="#faq" className="landing-nav-link">
-                  FAQ
-                </a>
+                <a href="#features" className="landing-nav-link">Features</a>
+                {!isPremium && <a href="#pricing" className="landing-nav-link">Pricing</a>}
+                <a href="#testimonials" className="landing-nav-link">Reviews</a>
+                <a href="#faq" className="landing-nav-link">FAQ</a>
               </div>
             </div>
 
