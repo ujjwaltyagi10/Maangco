@@ -2,7 +2,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { BrowserRouter, useLocation } from "react-router-dom";
 
 import type { AuthSession } from "@/lib/auth-api";
-import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/prepdoc";
+import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/maangco";
 import type { AuthSubmitResult } from "./route-paths";
 import { PrivateRoutes } from "./private-routes";
 import { PublicRoutes } from "./public-routes";
@@ -80,7 +80,7 @@ function AppRouterContent(props: AppRouterProps) {
               <path d="M10 1L2 6v8l8 5 8-5V6L10 1zm0 2.3L16 7v6l-6 3.7L4 13V7l6-3.7z" fill="white" />
             </svg>
           </div>
-          <div className="app-loading-text">PrepDoc</div>
+          <div className="app-loading-text">MAANGco</div>
         </div>
       ) : isAppRoute ? (
         <PrivateRoutes

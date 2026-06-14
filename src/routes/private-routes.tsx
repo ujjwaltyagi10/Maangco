@@ -10,7 +10,7 @@ import { FrontendPanel } from "@/components/frontend-panel";
 import { PublicDashboardPreview } from "@/components/public-dashboard-preview";
 import { SystemDesignPanel } from "@/components/system-design-panel";
 import type { AuthSession } from "@/lib/auth-api";
-import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/prepdoc";
+import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/maangco";
 import { panelFromPath, panelPath, ROUTES } from "./route-paths";
 
 interface PrivateRoutesProps {

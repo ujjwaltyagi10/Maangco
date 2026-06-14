@@ -6,7 +6,7 @@ import type {
   SystemDesignFrequency,
   SystemDesignQuestion,
   SystemDesignQuestionId,
-} from "@/types/prepdoc";
+} from "@/types/maangco";
 
 interface SystemDesignPanelProps {
   questions: SystemDesignQuestion[];

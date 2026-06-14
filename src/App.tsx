@@ -8,7 +8,7 @@ import { useLocalStorage } from "./hooks/use-local-storage";
 import { dsaCompanies } from "./data/dsa";
 import { systemDesignQuestions } from "./data/system-design";
 import { frontendQuestions, roadmapWeeks } from "./data/frontend";
-import type { FrontendQuestionId, QuestionId, SystemDesignQuestionId } from "./types/prepdoc";
+import type { FrontendQuestionId, QuestionId, SystemDesignQuestionId } from "./types/maangco";
 import { ROUTES, type AuthSubmitResult } from "./routes/route-paths";
 import "./App.css";
 
@@ -58,35 +58,35 @@ async function tryHydrateSessionFromBackend(
 
 function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage(
-    "prepdoc.sidebar-collapsed",
+    "maangco.sidebar-collapsed",
     false,
   );
   const [theme, setTheme] = useLocalStorage<"light" | "dark">(
-    "prepdoc.theme",
+    "maangco.theme",
     "light",
   );
   const [solvedDsaIds, setSolvedDsaIds] = useLocalStorage<QuestionId[]>(
-    "prepdoc.dsa.solved",
+    "maangco.dsa.solved",
     [],
   );
   const [bookmarkedDsaIds, setBookmarkedDsaIds] = useLocalStorage<QuestionId[]>(
-    "prepdoc.dsa.bookmarked",
+    "maangco.dsa.bookmarked",
     [],
   );
   const [completedSystemDesignIds, setCompletedSystemDesignIds] = useLocalStorage<
     SystemDesignQuestionId[]
-  >("prepdoc.sd.completed", []);
+  >("maangco.sd.completed", []);
   const [completedFrontendIds, setCompletedFrontendIds] = useLocalStorage<
     FrontendQuestionId[]
-  >("prepdoc.frontend.completed", []);
+  >("maangco.frontend.completed", []);
   const [completedRoadmapDays, setCompletedRoadmapDays] = useLocalStorage<
     number[]
-  >("prepdoc.frontend.roadmap-days", []);
+  >("maangco.frontend.roadmap-days", []);
   // Optimistic in-memory flag — resets on refresh so localStorage tampering has no effect.
   // Source of truth is currentUser.subscription.isActive from the backend.
   const [premiumAccess, setPremiumAccess] = useState(false);
   const [authSession, setAuthSession] = useLocalStorage<AuthSession | null>(
-    "prepdoc.auth-session",
+    "maangco.auth-session",
     null,
   );
   const [authStatus, setAuthStatus] = useState<"loading" | "ready">("loading");
@@ -108,7 +108,7 @@ function App() {
 
   useEffect(() => {
     // Remove legacy localStorage premium flag — backend subscription is now the source of truth
-    localStorage.removeItem("prepdoc.premium-access");
+    localStorage.removeItem("maangco.premium-access");
   }, []);
 
   useEffect(() => {

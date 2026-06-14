@@ -74,7 +74,7 @@ export function PublicDashboardPreview({
                   <path d="M2 8l4 6 6-9 6 9 4-6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8Z" />
                 </svg>
               </div>
-              <span className="pd-premium-eyebrow">PrepDoc Premium</span>
+              <span className="pd-premium-eyebrow">MAANGco Premium</span>
             </div>
             <h2 className="pd-premium-title">
               Unlock everything.{" "}

@@ -70,7 +70,7 @@ const testimonials = [
     initials: "AR",
     name: "Arjun Rao",
     role: "SDE @ Amazon",
-    text: "PrepDoc's company-filtered DSA list is a game-changer. Focused on Amazon-tagged problems for 6 weeks, cleared my loop. No noise — just the problems that showed up in my actual rounds.",
+    text: "MAANGco's company-filtered DSA list is a game-changer. Focused on Amazon-tagged problems for 6 weeks, cleared my loop. No noise — just the problems that showed up in my actual rounds.",
   },
   {
     initials: "PK",
@@ -82,7 +82,7 @@ const testimonials = [
     initials: "SN",
     name: "Sahil Nair",
     role: "SDE-2 @ Google",
-    text: "I've tried 4-5 prep platforms. PrepDoc is the sharpest and most focused. No bloat, no 2,000 random problems — cleared Google in my first attempt.",
+    text: "I've tried 4-5 prep platforms. MAANGco is the sharpest and most focused. No bloat, no 2,000 random problems — cleared Google in my first attempt.",
   },
   {
     initials: "MT",
@@ -106,7 +106,7 @@ const testimonials = [
 
 const faqs = [
   {
-    q: "What's included in a PrepDoc subscription?",
+    q: "What's included in a MAANGco subscription?",
     a: "Everything FAANG interviews actually test: 500+ company-wise DSA problems, a 90-day System Design roadmap (HLD + LLD), a unified dashboard, and daily question updates. Not a single extra topic you won't need.",
   },
   {
@@ -235,7 +235,7 @@ export function LandingPage({
                   </svg>
                 </div>
                 <span className="landing-logo-text">
-                  Prep<em>Doc</em>
+                  MAANG<em>co</em>
                 </span>
               </a>
 
@@ -914,7 +914,7 @@ export function LandingPage({
           <div className="lsection-header">
             <div className="lsection-tag">Reviews</div>
             <h2 className="lsection-title">
-              Engineers who cracked it with PrepDoc
+              Engineers who cracked it with MAANGco
             </h2>
             <p className="lsection-sub">
               Real results from engineers who got into Google, Meta, Amazon,
@@ -1151,11 +1151,11 @@ export function LandingPage({
                 </svg>
               </div>
               <span className="landing-logo-text" style={{ fontSize: 14 }}>
-                Prep<em>Doc</em>
+                MAANG<em>co</em>
               </span>
             </a>
             <p className="lfooter-copy">
-              © 2025 PrepDoc. Built for engineers, by engineers.
+              © 2025 MAANGco. Built for engineers, by engineers.
             </p>
             <div className="flex items-center gap-1">
               <button type="button" className="lfooter-link" onClick={onSignIn}>

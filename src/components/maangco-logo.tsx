@@ -2,11 +2,11 @@ import { Hexagon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-interface PrepDocLogoProps {
+interface MAANGcoLogoProps {
   collapsed?: boolean;
 }
 
-export function PrepDocLogo({ collapsed = false }: PrepDocLogoProps) {
+export function MAANGcoLogo({ collapsed = false }: MAANGcoLogoProps) {
   return (
     <div
       className={cn(
@@ -20,7 +20,7 @@ export function PrepDocLogo({ collapsed = false }: PrepDocLogoProps) {
       {!collapsed ? (
         <span>
           <span className="block text-[1.08rem] font-semibold tracking-tight text-foreground">
-            PrepDoc
+            MAANGco
           </span>
         </span>
       ) : null}

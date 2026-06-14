@@ -5,7 +5,7 @@ import type {
   FrontendQuestion,
   FrontendQuestionId,
   RoadmapWeek,
-} from "@/types/prepdoc";
+} from "@/types/maangco";
 
 interface FrontendPanelProps {
   questions: FrontendQuestion[];

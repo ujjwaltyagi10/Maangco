@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { BookOpen, Code2, ExternalLink, LayoutDashboard, Layers, Server } from "lucide-react";
 
-import type { AppPanel } from "@/types/prepdoc";
+import type { AppPanel } from "@/types/maangco";
 
 interface AppShellProps {
   activePanel: AppPanel;
@@ -97,7 +97,7 @@ export function AppShell({
             </svg>
           </div>
           <div className="logo-text">
-            Prep<span>Doc</span>
+            MAANG<span>co</span>
           </div>
         </div>
 
@@ -148,7 +148,7 @@ export function AppShell({
         {/* Top Nav */}
         <div className="topnav">
           <div className="breadcrumb">
-            <span className="breadcrumb-home">PrepDoc</span>
+            <span className="breadcrumb-home">MAANGco</span>
             <span className="breadcrumb-sep">›</span>
             <span className="breadcrumb-current">{panelLabels[activePanel]}</span>
           </div>

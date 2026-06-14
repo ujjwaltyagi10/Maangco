@@ -22,7 +22,7 @@ import uberLogo from "@/assets/uber.png";
 import visaLogo from "@/assets/visa.png";
 import walmartLogo from "@/assets/Walmart.png";
 
-import type { DsaCompany, DsaQuestion } from "@/types/prepdoc";
+import type { DsaCompany, DsaQuestion } from "@/types/maangco";
 
 type RawQuestion = {
   id: number;

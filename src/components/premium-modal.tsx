@@ -80,7 +80,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
       const rzp = new window.Razorpay({
         key: data.keyId,
         subscription_id: data.subscriptionId,
-        name: "PrepDoc",
+        name: "MAANGco",
         description: `${PLANS[selectedPlan].label} Premium`,
         prefill: {
           email: data.prefill.email || userEmail || "",
@@ -138,7 +138,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
               <circle cx="20" cy="10" r="1.5" fill="#d4a04a" stroke="none" />
               <circle cx="12" cy="6" r="1.5" fill="#d4a04a" stroke="none" />
             </svg>
-            <span>PrepDoc Premium</span>
+            <span>MAANGco Premium</span>
           </div>
 
           <div className="pm-left-heading">

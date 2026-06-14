@@ -1,4 +1,4 @@
-import type { FrontendQuestion, RoadmapWeek } from "@/types/prepdoc";
+import type { FrontendQuestion, RoadmapWeek } from "@/types/maangco";
 
 type RawRoadmapWeek = {
   num: string;

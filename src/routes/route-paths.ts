@@ -1,4 +1,4 @@
-import type { AppPanel } from "@/types/prepdoc";
+import type { AppPanel } from "@/types/maangco";
 
 export type AuthMode = "login" | "register" | "forgot" | "reset" | "verify";
 

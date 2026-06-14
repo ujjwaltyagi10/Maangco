@@ -236,11 +236,11 @@ export function FinancialAidModal({ open, onClose }: FinancialAidModalProps) {
                   <div className="fa-fields">
                     <div className="fa-field">
                       <label className="fa-label">
-                        Why would PrepDoc help you? <span className="fa-label-note">(min. 30 characters)</span>
+                        Why would MAANGco help you? <span className="fa-label-note">(min. 30 characters)</span>
                       </label>
                       <textarea
                         className={`fa-textarea${errors.story ? " fa-input--error" : ""}`}
-                        placeholder="Tell us a bit about your situation — your goals, what you're working towards, and why access to PrepDoc would make a difference..."
+                        placeholder="Tell us a bit about your situation — your goals, what you're working towards, and why access to MAANGco would make a difference..."
                         value={formData.story}
                         onChange={(e) => set("story", e.target.value)}
                         rows={4}

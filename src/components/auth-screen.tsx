@@ -99,7 +99,7 @@ export function AuthScreen({
     isForgot ? "Enter your email and we'll send you a reset link." :
     isReset ? "Enter the token from your email and choose a new password." :
     isVerify ? "Enter your email to receive a fresh verification link." :
-    "Sign in to your PrepDoc account.";
+    "Sign in to your MAANGco account.";
 
   const submitLabel = isLoading ? "Working..." :
     isRegister ? "Create account" :
@@ -121,7 +121,7 @@ export function AuthScreen({
                 <path d="M10 1L2 6v8l8 5 8-5V6L10 1zm0 2.3L16 7v6l-6 3.7L4 13V7l6-3.7z" fill="white" />
               </svg>
             </div>
-            <span className="auth-form-logo-text">PrepDoc</span>
+            <span className="auth-form-logo-text">MAANGco</span>
           </a>
           <button type="button" className="auth-theme-toggle" onClick={onThemeChange} aria-label="Toggle theme">
             {theme === "light" ? (

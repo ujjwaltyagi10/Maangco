@@ -15,7 +15,7 @@ export function AuthGateModal({
 
   return (
     <div className="auth-gate-overlay" role="presentation">
-      <div className="auth-gate-card" role="dialog" aria-modal="true" aria-label="Sign in to unlock PrepDoc">
+      <div className="auth-gate-card" role="dialog" aria-modal="true" aria-label="Sign in to unlock MAANGco">
         <div className="auth-gate-mini">
           <div className="auth-gate-mini-top">
             <button
@@ -43,7 +43,7 @@ export function AuthGateModal({
             </svg>
           </div>
 
-          <div className="auth-gate-mini-title">Login/Sign up to access PrepDoc Plus</div>
+          <div className="auth-gate-mini-title">Login/Sign up to access MAANGco Plus</div>
           <div className="auth-gate-mini-subtitle">
             Unlock the dashboard, DSA, and system design sections. Frontend Prep stays free.
           </div>

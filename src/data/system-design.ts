@@ -1,4 +1,4 @@
-import type { SystemDesignQuestion } from "@/types/prepdoc";
+import type { SystemDesignQuestion } from "@/types/maangco";
 
 export const systemDesignQuestions: SystemDesignQuestion[] = [
   { id: "sd-1", number: 1, title: 'Design an API Rate Limiter', companies: ["Amazon", "Uber", "Microsoft", "Stripe", "Atlassian", "Pinterest", "Patreon"], frequency: "High", category: "Infrastructure", timeframe: "2022-26" },

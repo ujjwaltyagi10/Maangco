@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import type { DsaCompany, DsaQuestion, QuestionId } from "@/types/prepdoc";
+import type { DsaCompany, DsaQuestion, QuestionId } from "@/types/maangco";
 
 const ALL_ID = "all";
 
