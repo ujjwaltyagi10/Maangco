@@ -617,7 +617,7 @@ export function DsaPanel({
               <div className="dsa-sidebar-head-row">
                 <div>
                   <div className="company-browser-title">Companies</div>
-                  <div className="logo-sub">Select to filter questions</div>
+                  <div className="logo-sub">{companies.length} companies</div>
                 </div>
                 <button
                   type="button"

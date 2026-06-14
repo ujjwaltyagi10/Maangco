@@ -3414,18 +3414,17 @@ body {
    COMPANY LIST — "All" entry + locked states
 ───────────────────────────────────────── */
 .co-item--all {
-  border-color: rgba(108, 99, 255, 0.35) !important;
   grid-column: 1 / -1;
 }
 
 .co-item--all.active {
-  border-color: rgba(108, 99, 255, 0.7) !important;
-  background: rgba(108, 99, 255, 0.1) !important;
+  background: var(--surface2) !important;
+  border-left-color: var(--accent) !important;
 }
 
 .co-logo--all {
-  background: linear-gradient(135deg, #6c63ff 0%, #9b93ff 100%) !important;
-  color: #fff;
+  background: var(--surface3) !important;
+  color: var(--text2);
 }
 
 .co-logo-all-icon {

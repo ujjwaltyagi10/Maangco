@@ -599,8 +599,9 @@ export function SystemDesignPanel({
                   style={{ width: `${questions.length ? Math.round((totalDone / questions.length) * 100) : 0}%` }}
                 />
               </div>
-              <div className="gs-pct">
-                {questions.length ? Math.round((totalDone / questions.length) * 100) : 0}% studied
+              <div className="gs-nums">
+                <span>{totalDone} solved</span>
+                <span>{questions.length} total</span>
               </div>
             </div>
           </>
