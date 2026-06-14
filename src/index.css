@@ -47,46 +47,51 @@
 }
 
 [data-theme="dark"] {
-  --bg: #0e0d0b;
-  --surface: #161512;
-  --surface2: #1c1a16;
-  --surface3: #242118;
-  --border: #2c2920;
-  --border2: #3a362c;
-  --text1: #ede9e0;
-  --text2: #9e9888;
-  --text3: #5c5848;
-  --muted: #9e9888;
-  --sidebar-bg: #0a0908;
-  --sidebar-border: #1e1c18;
-  --sidebar-text: #a09888;
-  --sidebar-muted: #4a4840;
-  --sidebar-active-bg: #2a2720;
-  --sidebar-active-text: #ede9e0;
-  --sidebar-hover-bg: #161410;
+  /* Neutral — from color system */
+  --bg: #0b0f14;
+  --surface: #11161c;
+  --surface2: #1a1f26;
+  --surface3: #232a33;
+  --border: #2d3440;
+  --border2: #3b4250;
+  --text1: #e5e7eb;
+  --text2: #9ca3af;
+  --text3: #6b7280;
+  --muted: #9ca3af;
+  --sidebar-bg: #090d11;
+  --sidebar-border: #1a1f26;
+  --sidebar-text: #9ca3af;
+  --sidebar-muted: #4b5563;
+  --sidebar-active-bg: #1e2530;
+  --sidebar-active-text: #e5e7eb;
+  --sidebar-hover-bg: #111820;
 
+  /* Theme accent — UNCHANGED (logo + button gradient) */
   --green: #5a9c50;
   --green-bg: #0e1f0c;
   --green-light: #1e4018;
   --accent: #5a9c50;
   --accent2: #7cb870;
-  --amber: #c07830;
-  --amber-bg: #1f1408;
-  --blue: #4a7ac8;
-  --blue-bg: #080f1f;
-  --purple: #6a60cc;
-  --purple-bg: #0e0c1f;
 
+  /* Semantic — from color system */
+  --amber: #f59e0b;
+  --amber-bg: rgba(245, 158, 11, 0.1);
+  --blue: #3b82f6;
+  --blue-bg: rgba(59, 130, 246, 0.1);
+  --purple: #8b5cf6;
+  --purple-bg: rgba(139, 92, 246, 0.1);
+
+  /* Difficulty — easy keeps theme green; med/hard use new semantic colors */
   --easy: #5a9c50;
   --easy-bg: rgba(90, 156, 80, 0.12);
-  --med: #c07830;
-  --med-bg: rgba(192, 120, 48, 0.12);
-  --hard: #d05b5b;
-  --hard-bg: rgba(208, 91, 91, 0.12);
+  --med: #f59e0b;
+  --med-bg: rgba(245, 158, 11, 0.12);
+  --hard: #ef4444;
+  --hard-bg: rgba(239, 68, 68, 0.12);
   --solved-bg: rgba(90, 156, 80, 0.1);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 *,
