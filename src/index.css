@@ -1725,6 +1725,293 @@ body {
   outline: none;
 }
 
+/* ── DSA PROGRESS HEADER ── */
+/* ── DSA PANEL HEADER ── */
+.dsa-progress-header {
+  padding: 0.85rem 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+/* Cell 1: identity card — col 1, row 1 */
+.dsa-header-identity {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+}
+
+.dsa-header-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1.5px solid var(--accent);
+  background: var(--easy-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.dsa-header-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dsa-header-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text1);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.dsa-header-sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Cell 2: progress strip — col 2, row 1 only */
+.dsa-progress-card {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 14px;
+}
+
+.dsa-mini-ring {
+  position: relative;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+}
+
+.dsa-mini-ring-svg {
+  width: 56px;
+  height: 56px;
+  display: block;
+}
+
+.dsa-mini-ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: "DM Mono", monospace;
+  color: var(--text1);
+  pointer-events: none;
+}
+
+.dsa-progress-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dsa-progress-count {
+  font-size: 15px;
+  font-weight: 700;
+  font-family: "DM Mono", monospace;
+  color: var(--text1);
+  line-height: 1;
+}
+
+.dsa-progress-total {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.dsa-progress-label {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.dsa-progress-sep {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.dsa-diff-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.dsa-diff-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 44px;
+}
+
+.dsa-diff-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.dsa-diff-stat-val {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: "DM Mono", monospace;
+  color: var(--text1);
+}
+
+.dsa-diff-stat--easy .dsa-diff-stat-label { color: var(--easy); }
+.dsa-diff-stat--medium .dsa-diff-stat-label { color: var(--med); }
+.dsa-diff-stat--hard .dsa-diff-stat-label { color: var(--hard); }
+
+/* Cell 3: search + filters — full width, row 2 */
+.dsa-header-bottom {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.dsa-search-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dsa-search-icon {
+  position: absolute;
+  left: 13px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.dsa-search-input {
+  width: 100%;
+  height: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 0.75rem 0.7rem 38px;
+  color: var(--text1);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.dsa-search-input:focus {
+  border-color: var(--border2);
+}
+
+.dsa-search-input::placeholder {
+  color: var(--muted);
+}
+
+.dsa-filter-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.dsa-filter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 1.1rem;
+  color: var(--text2);
+  font-size: 12px;
+  font-family: "DM Mono", monospace;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  height: 100%;
+}
+
+.dsa-filter-btn:hover,
+.dsa-filter-btn.open {
+  background: var(--surface3);
+  border-color: var(--border2);
+  color: var(--text1);
+}
+
+.dsa-filter-btn.has-active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.dsa-filter-badge {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 99px;
+  font-size: 10px;
+  padding: 1px 6px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.dsa-filter-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-width: 210px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dsa-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dsa-filter-label {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  min-width: 56px;
+}
+
+.dsa-filter-select {
+  flex: 1;
+  font-size: 12px;
+}
+
 /* ── DSA TABLE ── */
 .table-wrap {
   flex: 1;
@@ -2668,6 +2955,22 @@ body {
 
   .dsa-main {
     overflow-y: visible;
+  }
+
+  .dsa-progress-header {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .dsa-progress-card {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 10px 14px;
+  }
+
+  .dsa-header-bottom {
+    grid-column: 1;
+    grid-row: 3;
   }
 
   .dsa-sidebar {
