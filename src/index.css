@@ -1250,7 +1250,7 @@ body {
 
 /* ── DSA SIDEBAR (Company Browser) ── */
 .dsa-sidebar {
-  width: 340px;
+  width: 260px;
   flex-shrink: 0;
   border-left: 1px solid var(--border);
   background: var(--surface);
@@ -1404,12 +1404,12 @@ body {
 
 .dsa-sidebar-companies {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 0.4rem 0.55rem;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 3px;
-  align-content: start;
+  padding: 0.3rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .dsa-sidebar-footer {
@@ -1418,27 +1418,52 @@ body {
   flex-shrink: 0;
 }
 
-/* Company item inside sidebar: 2-column grid card */
+/* Company item — single row, matches SD sidebar style */
 .co-item--sidebar {
   width: 100%;
+  display: flex;
   flex-direction: row;
   align-items: center;
-  border-left: 2px solid transparent !important;
+  gap: 8px;
+  padding: 5px 6px !important;
   border-radius: 8px !important;
-  padding: 0.35rem 0.5rem !important;
-  gap: 6px;
-  min-height: 0;
+  border: none !important;
+  border-left: 2px solid transparent !important;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text2);
+  transition: all 0.12s;
+}
+
+.co-item--sidebar:hover {
+  background: var(--surface2);
+  color: var(--text1);
 }
 
 .co-item--sidebar.active {
+  background: var(--surface2) !important;
   border-left-color: var(--accent) !important;
+  color: var(--text1) !important;
 }
 
 .co-item--sidebar .co-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface3);
+  overflow: hidden;
+}
+
+.co-item--sidebar .co-logo img {
   width: 22px;
   height: 22px;
-  border-radius: 6px;
-  flex-shrink: 0;
+  object-fit: contain;
+  border-radius: 4px;
 }
 
 .co-item--sidebar .co-info {
@@ -1447,7 +1472,8 @@ body {
 }
 
 .co-item--sidebar .co-name {
-  font-size: 11px;
+  font-size: 11.5px;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1455,14 +1481,18 @@ body {
 }
 
 .co-item--sidebar .co-count {
-  font-size: 9.5px;
+  font-size: 10px;
+  font-family: "DM Mono", monospace;
+  color: var(--accent2);
+  flex-shrink: 0;
 }
 
 .co-item--sidebar .co-prog {
-  font-size: 9.5px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: "DM Mono", monospace;
   color: var(--accent2);
   flex-shrink: 0;
-  margin-left: auto;
 }
 
 /* Legacy company-browser styles (kept for possible reuse) */
@@ -4154,6 +4184,19 @@ body {
   border-color: var(--accent);
 }
 
+.sd-cosb-initial-pill--logo {
+  padding: 4px;
+  background: var(--surface2);
+  color: transparent;
+}
+
+.sd-cosb-initial-pill--logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
 .sd-cosb-collapsed-footer {
   flex-shrink: 0;
   border-top: 1px solid var(--border);
@@ -4243,6 +4286,18 @@ body {
 .sd-cosb-avatar--all {
   background: var(--surface3);
   color: var(--text2);
+}
+
+.sd-cosb-avatar--logo {
+  background: var(--surface3);
+  padding: 3px;
+}
+
+.sd-cosb-avatar--logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
 }
 
 .sd-cosb-info {

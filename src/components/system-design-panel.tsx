@@ -8,6 +8,30 @@ import {
   useState,
 } from "react";
 
+import adobeLogo from "@/assets/adobe.png";
+import airbnbLogo from "@/assets/airbnb.png";
+import amazonLogo from "@/assets/Amazon.png";
+import appleLogo from "@/assets/apple.png";
+import atlassianLogo from "@/assets/atlassian.png";
+import bloombergLogo from "@/assets/bloomberg.png";
+import citadelLogo from "@/assets/Citadel.png";
+import flipkartLogo from "@/assets/flipkart.png";
+import goldmanLogo from "@/assets/goldman.png";
+import googleLogo from "@/assets/google.png";
+import metaLogo from "@/assets/meta.png";
+import microsoftLogo from "@/assets/microsoft.png";
+import netflixLogo from "@/assets/netflix.png";
+import nvidiaLogo from "@/assets/nvidia.png";
+import oracleLogo from "@/assets/Oracle.png";
+import pinterestLogo from "@/assets/pinterest.png";
+import salesforceLogo from "@/assets/Salesforce.png";
+import snowflakeLogo from "@/assets/Snowflake.png";
+import tcsLogo from "@/assets/TCS.png";
+import tiktokLogo from "@/assets/tiktok.png";
+import uberLogo from "@/assets/uber.png";
+import visaLogo from "@/assets/visa.png";
+import walmartLogo from "@/assets/Walmart.png";
+
 import type {
   SystemDesignCategory,
   SystemDesignFrequency,
@@ -72,6 +96,32 @@ function initialColor(name: string): string {
   for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
   return INITIAL_PALETTE[Math.abs(h) % INITIAL_PALETTE.length];
 }
+
+const COMPANY_LOGOS: Record<string, string> = {
+  Adobe: adobeLogo,
+  Airbnb: airbnbLogo,
+  Amazon: amazonLogo,
+  Apple: appleLogo,
+  Atlassian: atlassianLogo,
+  Bloomberg: bloombergLogo,
+  Citadel: citadelLogo,
+  Flipkart: flipkartLogo,
+  "Goldman Sachs": goldmanLogo,
+  Google: googleLogo,
+  Meta: metaLogo,
+  Microsoft: microsoftLogo,
+  Netflix: netflixLogo,
+  Nvidia: nvidiaLogo,
+  Oracle: oracleLogo,
+  Pinterest: pinterestLogo,
+  Salesforce: salesforceLogo,
+  Snowflake: snowflakeLogo,
+  TCS: tcsLogo,
+  TikTok: tiktokLogo,
+  Uber: uberLogo,
+  Visa: visaLogo,
+  Walmart: walmartLogo,
+};
 
 export function SystemDesignPanel({
   questions,
@@ -445,18 +495,21 @@ export function SystemDesignPanel({
                   <rect x="9" y="9" width="6" height="6" rx="1.5" />
                 </svg>
               </button>
-              {allCompanyNames.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className={`sd-cosb-initial-pill${selectedCompany === c ? " active" : ""}`}
-                  title={c}
-                  onClick={() => setSelectedCompany(c)}
-                  style={{ background: selectedCompany === c ? initialColor(c) : undefined, color: selectedCompany === c ? "#fff" : initialColor(c) }}
-                >
-                  {c[0].toUpperCase()}
-                </button>
-              ))}
+              {allCompanyNames.map((c) => {
+                const logo = COMPANY_LOGOS[c];
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`sd-cosb-initial-pill${selectedCompany === c ? " active" : ""}${logo ? " sd-cosb-initial-pill--logo" : ""}`}
+                    title={c}
+                    onClick={() => setSelectedCompany(c)}
+                    style={logo ? undefined : { background: selectedCompany === c ? initialColor(c) : undefined, color: selectedCompany === c ? "#fff" : initialColor(c) }}
+                  >
+                    {logo ? <img src={logo} alt={c} /> : c[0].toUpperCase()}
+                  </button>
+                );
+              })}
             </div>
             <div className="sd-cosb-collapsed-footer">
               <div className="dsa-collapsed-ratio">
@@ -512,6 +565,7 @@ export function SystemDesignPanel({
               {visibleCompanyNames.map((c) => {
                 const cnt = companyCounts[c];
                 const color = initialColor(c);
+                const logo = COMPANY_LOGOS[c];
                 return (
                   <button
                     key={c}
@@ -519,12 +573,15 @@ export function SystemDesignPanel({
                     className={`sd-cosb-item${selectedCompany === c ? " active" : ""}`}
                     onClick={() => { setSelectedCompany(c); setCurrentPage(1); }}
                   >
-                    <div
-                      className="sd-cosb-avatar"
-                      style={{ background: color + "22", color }}
-                    >
-                      {c[0].toUpperCase()}
-                    </div>
+                    {logo ? (
+                      <div className="sd-cosb-avatar sd-cosb-avatar--logo">
+                        <img src={logo} alt={c} />
+                      </div>
+                    ) : (
+                      <div className="sd-cosb-avatar" style={{ background: color + "22", color }}>
+                        {c[0].toUpperCase()}
+                      </div>
+                    )}
                     <div className="sd-cosb-info">
                       <div className="sd-cosb-name">{c}</div>
                     </div>
