@@ -533,6 +533,41 @@ body {
   color: var(--text1);
 }
 
+/* Mobile logo button — hidden on desktop */
+.topnav-logo-btn {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.topnav-logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.topnav-logo-text {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text1);
+  letter-spacing: -0.02em;
+}
+
+.topnav-logo-text span {
+  color: var(--accent);
+}
+
 .topnav-actions {
   display: flex;
   align-items: center;
@@ -2916,14 +2951,15 @@ body {
     display: none;
   }
 
+  /* Hide full breadcrumb trail; show logo button instead */
   .breadcrumb-home,
-  .breadcrumb-sep {
+  .breadcrumb-sep,
+  .breadcrumb-current {
     display: none;
   }
 
-  .breadcrumb-current {
-    font-size: 16px;
-    font-weight: 700;
+  .topnav-logo-btn {
+    display: flex;
   }
 
   .pd-hero-card {
