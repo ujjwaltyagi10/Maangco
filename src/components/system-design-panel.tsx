@@ -4,6 +4,7 @@ import { startTransition, useDeferredValue, useMemo, useState } from "react";
 import type {
   SystemDesignCategory,
   SystemDesignFrequency,
+  SystemDesignLevel,
   SystemDesignQuestion,
   SystemDesignQuestionId,
 } from "@/types/maangco";
@@ -29,6 +30,12 @@ const CATEGORIES: (typeof ALL_CAT | SystemDesignCategory)[] = [
 
 const FREQ_ORDER: Record<SystemDesignFrequency, number> = { High: 0, Medium: 1, Low: 2 };
 
+const LEVEL_COLORS: Record<SystemDesignLevel, { bg: string; text: string }> = {
+  HLD: { bg: "rgba(59,130,246,0.12)", text: "#3b82f6" },
+  LLD: { bg: "rgba(168,85,247,0.12)", text: "#a855f7" },
+  Both: { bg: "rgba(20,184,166,0.12)", text: "#14b8a6" },
+};
+
 const FREQ_COLORS: Record<SystemDesignFrequency, { bg: string; text: string }> = {
   High: { bg: "rgba(22,163,74,0.12)", text: "#16a34a" },
   Medium: { bg: "rgba(217,119,6,0.12)", text: "#d97706" },
@@ -53,7 +60,7 @@ export function SystemDesignPanel({
 }: SystemDesignPanelProps) {
   const [selectedCat, setSelectedCat] = useState<typeof ALL_CAT | SystemDesignCategory>(ALL_CAT);
   const [freqFilter, setFreqFilter] = useState<"All" | SystemDesignFrequency>("All");
-  const [showStudiedOnly, setShowStudiedOnly] = useState(false);
+  const [levelFilter, setLevelFilter] = useState<"All" | "HLD" | "LLD" | "Both">("All");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 50;
@@ -64,7 +71,7 @@ export function SystemDesignPanel({
     let result = questions;
     if (selectedCat !== ALL_CAT) result = result.filter((q) => q.category === selectedCat);
     if (freqFilter !== "All") result = result.filter((q) => q.frequency === freqFilter);
-    if (showStudiedOnly) result = result.filter((q) => completedIds.includes(q.id));
+    if (levelFilter !== "All") result = result.filter((q) => q.designLevel === levelFilter || q.designLevel === "Both");
     if (deferredSearch.trim()) {
       const term = deferredSearch.trim().toLowerCase();
       result = result.filter(
@@ -76,7 +83,7 @@ export function SystemDesignPanel({
     return [...result].sort(
       (a, b) => FREQ_ORDER[a.frequency] - FREQ_ORDER[b.frequency] || a.number - b.number,
     );
-  }, [questions, selectedCat, freqFilter, showStudiedOnly, deferredSearch, completedIds]);
+  }, [questions, selectedCat, freqFilter, levelFilter, deferredSearch, completedIds]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
@@ -172,13 +179,24 @@ export function SystemDesignPanel({
                 ))}
               </select>
             </div>
-            <button
-              type="button"
-              className={`sd-studied-btn${showStudiedOnly ? " active" : ""}`}
-              onClick={() => { setShowStudiedOnly((v) => !v); setCurrentPage(1); }}
-            >
-              {showStudiedOnly ? "★" : "☆"} Studied only
-            </button>
+            <div className="sd-select-wrap">
+              <label className="sd-select-label">Design Level</label>
+              <select
+                className="sort-select sd-select"
+                value={levelFilter}
+                onChange={(e) => {
+                  startTransition(() => {
+                    setLevelFilter(e.target.value as "All" | "HLD" | "LLD" | "Both");
+                    setCurrentPage(1);
+                  });
+                }}
+              >
+                <option value="All">All levels</option>
+                <option value="HLD">HLD only</option>
+                <option value="LLD">LLD only</option>
+                <option value="Both">Both (HLD + LLD)</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -193,18 +211,26 @@ export function SystemDesignPanel({
                 <th>#</th>
                 <th>Title</th>
                 <th>Frequency</th>
+                <th>Design Level</th>
                 <th>Category</th>
                 <th>Companies</th>
                 <th>Timeframe</th>
+                <th>Resource</th>
               </tr>
             </thead>
             <tbody>
               {paginated.map((q) => {
                 const done = completedIds.includes(q.id);
                 const fc = FREQ_COLORS[q.frequency];
+                const lc = LEVEL_COLORS[q.designLevel];
                 return (
-                  <tr key={q.id} className={`q-row${done ? " solved" : ""}`}>
-                    <td>
+                  <tr
+                    key={q.id}
+                    className={`q-row${done ? " solved" : ""}`}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => window.open(q.articleUrl, "_blank", "noopener,noreferrer")}
+                  >
+                    <td onClick={(e) => e.stopPropagation()}>
                       <div
                         className={`q-cb${done ? " checked" : ""}`}
                         role="checkbox"
@@ -222,6 +248,14 @@ export function SystemDesignPanel({
                         style={{ background: fc.bg, color: fc.text }}
                       >
                         {q.frequency}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className="diff-badge"
+                        style={{ background: lc.bg, color: lc.text }}
+                      >
+                        {q.designLevel}
                       </span>
                     </td>
                     <td style={{ whiteSpace: "nowrap" }}>
@@ -246,13 +280,30 @@ export function SystemDesignPanel({
                     <td>
                       <span className="q-num">{q.timeframe}</span>
                     </td>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <a
+                        href={q.articleUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          color: "var(--text2)",
+                          textDecoration: "none",
+                          fontSize: 13,
+                        }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.textDecoration = "underline"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.textDecoration = "none"; }}
+                      >
+                        📖 Read
+                      </a>
+                    </td>
                   </tr>
                 );
               })}
               {paginated.length === 0 && (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={9}
                     style={{ textAlign: "center", padding: "3rem", color: "var(--muted)", fontSize: 14 }}
                   >
                     No questions match the current filters.

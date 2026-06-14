@@ -2,6 +2,8 @@ export type AppPanel = "dashboard" | "dsa" | "system-design" | "frontend";
 
 export type SystemDesignFrequency = "High" | "Medium" | "Low";
 
+export type SystemDesignLevel = "HLD" | "LLD" | "Both";
+
 export type SystemDesignCategory =
   | "Infrastructure"
   | "Messaging & Streaming"
@@ -18,8 +20,10 @@ export interface SystemDesignQuestion {
   title: string;
   companies: string[];
   frequency: SystemDesignFrequency;
+  designLevel: SystemDesignLevel;
   category: SystemDesignCategory;
   timeframe: string;
+  articleUrl: string;
 }
 
 export type SystemDesignQuestionId = SystemDesignQuestion["id"];
