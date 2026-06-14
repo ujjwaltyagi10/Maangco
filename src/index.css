@@ -4044,12 +4044,21 @@ body {
 .sd-panel {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   overflow: hidden;
   background: var(--bg);
   min-height: 0;
 }
 
+/* Left: header + scrollable table */
+.sd-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
 
 .sd-main {
   flex: 1;
@@ -4058,6 +4067,279 @@ body {
   overflow-y: auto;
   min-width: 0;
   min-height: 0;
+}
+
+/* ── SD Company Sidebar ── */
+.sd-cosb {
+  width: 260px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.2s ease;
+}
+
+.sd-cosb--collapsed {
+  width: 52px;
+}
+
+.sd-cosb-collapse-toggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.sd-cosb-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.sd-cosb-toggle-btn:hover {
+  background: var(--surface3);
+  border-color: var(--border2);
+  color: var(--text1);
+}
+
+/* Collapsed: initial avatars strip */
+.sd-cosb-initials-strip {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 0;
+  scrollbar-width: none;
+}
+
+.sd-cosb-initials-strip::-webkit-scrollbar { display: none; }
+
+.sd-cosb-initial-pill {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: 1.5px solid transparent;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.sd-cosb-initial-pill:hover {
+  border-color: var(--border2);
+  background: var(--surface3);
+}
+
+.sd-cosb-initial-pill.active {
+  border-color: var(--accent);
+}
+
+.sd-cosb-collapsed-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Expanded sidebar */
+.sd-cosb-head {
+  padding: 0.9rem 0.85rem 0.65rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sd-cosb-head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+}
+
+.sd-cosb-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text1);
+  letter-spacing: -0.01em;
+  margin-bottom: 2px;
+}
+
+.sd-cosb-sub {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+}
+
+/* Company list */
+.sd-cosb-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sd-cosb-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text2);
+  transition: all 0.12s;
+  border-left: 2px solid transparent;
+}
+
+.sd-cosb-item:hover {
+  background: var(--surface2);
+  color: var(--text1);
+}
+
+.sd-cosb-item.active {
+  background: var(--surface2);
+  border-left-color: var(--accent);
+  color: var(--text1);
+}
+
+.sd-cosb-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sd-cosb-avatar--all {
+  background: var(--surface3);
+  color: var(--text2);
+}
+
+.sd-cosb-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sd-cosb-name {
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.sd-cosb-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent2);
+  flex-shrink: 0;
+  font-family: "DM Mono", monospace;
+}
+
+/* Footer */
+.sd-cosb-footer {
+  padding: 0.65rem 0.85rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Mobile: SD sidebar → horizontal chip strip ── */
+@media (max-width: 768px) {
+  .sd-panel {
+    flex-direction: column;
+  }
+
+  .sd-cosb,
+  .sd-cosb.sd-cosb--collapsed {
+    width: 100%;
+    height: auto;
+    border-left: none;
+    border-bottom: 1px solid var(--border);
+    order: -1;
+    flex-shrink: 0;
+    transition: none;
+  }
+
+  .sd-cosb-head,
+  .sd-cosb-footer,
+  .sd-cosb-collapse-toggle,
+  .sd-cosb-collapsed-footer {
+    display: none;
+  }
+
+  .sd-cosb-initials-strip {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 8px 12px;
+    gap: 6px;
+    align-items: center;
+    flex: unset;
+    scrollbar-width: none;
+  }
+
+  .sd-cosb-list {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 8px 12px;
+    gap: 5px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sd-cosb-list::-webkit-scrollbar { display: none; }
+
+  .sd-cosb-item {
+    flex-shrink: 0;
+    width: auto;
+    padding: 4px 9px 4px 5px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    border-left: 1.5px solid var(--border);
+    gap: 5px;
+    background: var(--surface2);
+    white-space: nowrap;
+  }
+
+  .sd-cosb-item.active {
+    border-color: var(--accent);
+    background: var(--easy-bg);
+  }
+
+  .sd-cosb-count { display: none; }
 }
 
 
