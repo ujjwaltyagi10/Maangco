@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import { startTransition, useDeferredValue, useMemo, useState } from "react";
+import { startTransition, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 
 import type {
   FrontendQuestion,
@@ -48,18 +48,6 @@ function weekTrackColor(label: string): string {
   return chip?.color ?? "#6b7280";
 }
 
-function formatWeeks(dayCount: number) {
-  return Math.ceil((dayCount / 7) * 2) / 2;
-}
-
-function normalizeTopicTokens(parts: string[]) {
-  return parts
-    .join(" ")
-    .toLowerCase()
-    .split(/[^a-z0-9]+/g)
-    .filter(Boolean);
-}
-
 export function FrontendPanel({
   questions,
   roadmapWeeks,
@@ -75,6 +63,18 @@ export function FrontendPanel({
   const [difficultyFilter, setDifficultyFilter] = useState<QuestionDifficulty>("All");
   const [selectedCategory, setSelectedCategory] = useState<FrontendQuestion["category"]>("JavaScript");
   const [expandedWeekId, setExpandedWeekId] = useState(roadmapWeeks[0]?.id ?? "");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
+        setFiltersOpen(false);
+      }
+    }
+    if (filtersOpen) document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [filtersOpen]);
 
   const categories = useMemo(
     () => [...new Set(questions.map((q) => q.category))] as FrontendQuestion["category"][],
@@ -83,9 +83,7 @@ export function FrontendPanel({
 
   const categoryCounts = useMemo(() => {
     const map: Record<string, number> = {};
-    for (const q of questions) {
-      map[q.category] = (map[q.category] ?? 0) + 1;
-    }
+    for (const q of questions) map[q.category] = (map[q.category] ?? 0) + 1;
     return map;
   }, [questions]);
 
@@ -117,20 +115,6 @@ export function FrontendPanel({
     advanced: selectedCategoryQuestions.filter((q) => q.difficulty === "Advanced").length,
   }), [selectedCategoryQuestions]);
 
-  const roadmapOverlapCount = useMemo(() => {
-    const roadmapTokens = new Set(
-      roadmapWeeks.flatMap((w) =>
-        w.days.flatMap((d) =>
-          normalizeTopicTokens([d.title, d.topic, d.summary ?? ""]),
-        ),
-      ),
-    );
-    return selectedCategoryQuestions.filter((q) => {
-      const tokens = normalizeTopicTokens([q.prompt, q.topic]);
-      return tokens.some((t) => roadmapTokens.has(t));
-    }).length;
-  }, [roadmapWeeks, selectedCategoryQuestions]);
-
   const toggleQuestionDone = (id: FrontendQuestionId) => {
     onCompletedQuestionIdsChange((cur) =>
       cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id],
@@ -143,191 +127,260 @@ export function FrontendPanel({
     );
   };
 
+  // Mini arc ring — roadmap progress
+  const doneDays = completedRoadmapDays.length;
+  const roadmapPct = roadmapDayCount > 0 ? Math.round((doneDays / roadmapDayCount) * 100) : 0;
+  const feArcR = 22;
+  const feArcCirc = 2 * Math.PI * feArcR;
+  const feArcLen = feArcCirc * 0.75;
+  const feArcGap = feArcCirc - feArcLen;
+  const feArcFill = feArcLen * (doneDays / Math.max(1, roadmapDayCount));
+
+  const doneQuestions = completedQuestionIds.length;
+  const questionsPct = questions.length > 0 ? Math.round((doneQuestions / questions.length) * 100) : 0;
+  const qArcFill = feArcLen * (doneQuestions / Math.max(1, questions.length));
+
+  const arcFill = activeTab === "questions" ? qArcFill : feArcFill;
+  const arcPct = activeTab === "questions" ? questionsPct : roadmapPct;
+  const arcDone = activeTab === "questions" ? doneQuestions : doneDays;
+  const arcTotal = activeTab === "questions" ? questions.length : roadmapDayCount;
+  const arcLabel = activeTab === "questions" ? "✓ Studied" : "✓ Days";
+
   return (
     <div className="frontend-panel">
-      {/* Header */}
-      <div className="frontend-header">
-        <div className="frontend-header-top">
-          <div className="frontend-header-left">
-            <div className="frontend-icon">🏠</div>
-            <div>
-              <div className="frontend-title">Frontend Interview Prep</div>
-              <div className="frontend-subtitle">45-Day Roadmap</div>
-            </div>
+
+      {/* ── Header (same pattern as DSA/SD) ── */}
+      <div className="dsa-progress-header">
+        <div className="dsa-header-identity">
+          <div className="dsa-header-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 12 17 22 12" />
+            </svg>
           </div>
-          <div className="frontend-pills">
-            <span className="info-pill">45 days</span>
-            <span className="info-pill">{formatWeeks(roadmapDayCount)} weeks</span>
-            <span className="info-pill">{roadmapWeeks.length} tracks</span>
-            <span className="info-pill">{questions.length} questions</span>
+          <div className="dsa-header-title-group">
+            <h2 className="dsa-header-title">Frontend Prep</h2>
+            <span className="dsa-header-sub">45-day roadmap · {roadmapWeeks.length} tracks · {questions.length} interview questions</span>
           </div>
         </div>
 
-        <div className="frontend-tabs">
-          <button
-            type="button"
-            className={`fe-tab${activeTab === "roadmap" ? " active" : ""}`}
-            onClick={() => setActiveTab("roadmap")}
-          >
-            🗺 Roadmap
-          </button>
-          <button
-            type="button"
-            className={`fe-tab${activeTab === "questions" ? " active" : ""}`}
-            onClick={() => setActiveTab("questions")}
-          >
-            💬 Interview Questions
-            {isPremium ? (
-              <span className="fe-tab-count">{questions.length}</span>
-            ) : (
-              <span className="fe-tab-lock">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
-                  <rect x="2.5" y="7" width="11" height="8" rx="1.5" />
-                  <path d="M5 7V5a3 3 0 0 1 6 0v2" />
+        <div className="dsa-progress-card">
+          <div className="dsa-mini-ring">
+            <svg viewBox="0 0 56 56" className="dsa-mini-ring-svg">
+              <circle cx="28" cy="28" r={feArcR} fill="none" stroke="var(--border2)" strokeWidth="3"
+                strokeDasharray={`${feArcLen} ${feArcGap}`} strokeLinecap="round"
+                transform="rotate(135, 28, 28)" />
+              <circle cx="28" cy="28" r={feArcR} fill="none" stroke="var(--accent)" strokeWidth="3"
+                strokeDasharray={`${arcFill} ${feArcCirc - arcFill}`} strokeLinecap="round"
+                transform="rotate(135, 28, 28)"
+                style={{ transition: "stroke-dasharray 0.5s ease" }} />
+            </svg>
+            <div className="dsa-mini-ring-label">{arcPct}%</div>
+          </div>
+          <div className="dsa-progress-info">
+            <span className="dsa-progress-count">
+              {arcDone}<span className="dsa-progress-total">/{arcTotal}</span>
+            </span>
+            <span className="dsa-progress-label">{arcLabel}</span>
+          </div>
+          <div className="dsa-progress-sep" />
+          <div className="dsa-diff-stats">
+            <div className="dsa-diff-stat">
+              <span className="dsa-diff-stat-label" style={{ color: "var(--text3)" }}>Tracks</span>
+              <span className="dsa-diff-stat-val">{roadmapWeeks.length}</span>
+            </div>
+            <div className="dsa-diff-stat">
+              <span className="dsa-diff-stat-label" style={{ color: "var(--text3)" }}>Days</span>
+              <span className="dsa-diff-stat-val">{roadmapDayCount}</span>
+            </div>
+            <div className="dsa-diff-stat">
+              <span className="dsa-diff-stat-label" style={{ color: "var(--text3)" }}>Qs</span>
+              <span className="dsa-diff-stat-val">{questions.length}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="dsa-header-bottom">
+          {/* Tab strip */}
+          <div className="fe-tab-strip">
+            <button
+              type="button"
+              className={`fe-tab${activeTab === "roadmap" ? " active" : ""}`}
+              onClick={() => setActiveTab("roadmap")}
+            >
+              <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="1" y="2" width="14" height="12" rx="2" />
+                <path d="M1 6h14" />
+                <path d="M5 10h6" />
+              </svg>
+              Roadmap
+            </button>
+            <button
+              type="button"
+              className={`fe-tab${activeTab === "questions" ? " active" : ""}`}
+              onClick={() => setActiveTab("questions")}
+            >
+              <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z" />
+                <path d="M4 6h8M4 9h5" />
+              </svg>
+              Interview Questions
+              {isPremium ? (
+                <span className="fe-tab-count">{questions.length}</span>
+              ) : (
+                <span className="fe-tab-lock">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="11" height="11">
+                    <rect x="2.5" y="7" width="11" height="8" rx="1.5" />
+                    <path d="M5 7V5a3 3 0 0 1 6 0v2" />
+                  </svg>
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Search + filter dropdown — questions tab only */}
+          {activeTab === "questions" && isPremium && (
+            <>
+              <div className="dsa-search-wrap">
+                <svg className="dsa-search-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                  <circle cx="6.5" cy="6.5" r="5" />
+                  <path d="M10.5 10.5L14 14" />
                 </svg>
-              </span>
-            )}
-          </button>
+                <input
+                  className="dsa-search-input"
+                  type="text"
+                  placeholder="Search questions..."
+                  value={searchValue}
+                  onChange={(e) => { startTransition(() => setSearchValue(e.target.value)); }}
+                />
+              </div>
+              <div className="dsa-filter-wrap" ref={filtersRef}>
+                <button
+                  type="button"
+                  className={`dsa-filter-btn${filtersOpen ? " open" : ""}${difficultyFilter !== "All" ? " has-active" : ""}`}
+                  onClick={() => setFiltersOpen((o) => !o)}
+                >
+                  <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                    <path d="M2 4h12M4 8h8M6 12h4" />
+                  </svg>
+                  Filters
+                  {difficultyFilter !== "All" && <span className="dsa-filter-badge">1</span>}
+                  <svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+                    <path d="M2 4l4 4 4-4H2z" />
+                  </svg>
+                </button>
+                {filtersOpen && (
+                  <div className="dsa-filter-panel">
+                    <div className="dsa-filter-row">
+                      <span className="dsa-filter-label">Difficulty</span>
+                      <select
+                        className="sort-select dsa-filter-select"
+                        value={difficultyFilter}
+                        onChange={(e) => {
+                          startTransition(() => setDifficultyFilter(e.target.value as QuestionDifficulty));
+                        }}
+                      >
+                        <option value="All">All</option>
+                        <option value="Basic">Basic</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Content */}
+      {/* ── Content ── */}
       <div className="frontend-content">
+
         {/* ROADMAP TAB */}
-        {activeTab === "roadmap" ? (
-          <>
-            <div className="track-chips">
-              {trackChips.map((chip) => (
-                <button key={chip.label} type="button" className="track-chip">
-                  <span className="tc-dot" style={{ background: chip.color }} />
-                  {chip.label}
-                </button>
-              ))}
-            </div>
+        {activeTab === "roadmap" && (
+          <div className="fe-roadmap">
+            {roadmapWeeks.map((week) => {
+              const expanded = week.id === expandedWeekId;
+              const completedInWeek = week.days.filter((d) => completedRoadmapDays.includes(d.day)).length;
+              const weekProgress = Math.round((completedInWeek / week.days.length) * 100);
+              const trackLabel = weekTrackLabel(week);
+              const trackColor = weekTrackColor(trackLabel);
 
-            <div>
-              {roadmapWeeks.map((week) => {
-                const expanded = week.id === expandedWeekId;
-                const completedInWeek = week.days.filter((d) =>
-                  completedRoadmapDays.includes(d.day),
-                ).length;
-                const weekProgress = Math.round(
-                  (completedInWeek / week.days.length) * 100,
-                );
-                const trackLabel = weekTrackLabel(week);
-                const trackColor = weekTrackColor(trackLabel);
-
-                return (
-                  <div key={week.id} className="week-card">
-                    <button
-                      type="button"
-                      className="week-card-header"
-                      onClick={() =>
-                        setExpandedWeekId((cur) => (cur === week.id ? "" : week.id))
-                      }
+              return (
+                <div key={week.id} className="week-card">
+                  <button
+                    type="button"
+                    className="week-card-header"
+                    onClick={() => setExpandedWeekId((cur) => (cur === week.id ? "" : week.id))}
+                  >
+                    <div
+                      className="week-label-badge"
+                      style={{ background: `${trackColor}18`, color: trackColor }}
                     >
-                      <div
-                        className="week-label-badge"
-                        style={{ background: `${trackColor}18`, color: trackColor }}
+                      {week.label}
+                    </div>
+                    <div className="week-card-info">
+                      <div className="week-card-title">{week.title}</div>
+                      {week.subtitle && <div className="week-card-subtitle">{week.subtitle}</div>}
+                    </div>
+                    <div className="week-card-actions">
+                      <span className="week-prog-count">{completedInWeek}/{week.days.length}</span>
+                      <span
+                        className="week-track-tag"
+                        style={{ color: trackColor, borderColor: `${trackColor}40`, background: `${trackColor}10` }}
                       >
-                        {week.label}
-                      </div>
-                      <div className="week-card-info">
-                        <div className="week-card-title">{week.title}</div>
-                        {week.subtitle ? (
-                          <div className="week-card-subtitle">{week.subtitle}</div>
-                        ) : null}
-                      </div>
-                      <div className="week-card-actions">
-                        <span
-                          className="week-track-tag"
-                          style={{ color: trackColor, borderColor: `${trackColor}40`, background: `${trackColor}10` }}
-                        >
-                          {trackLabel}
-                        </span>
-                        <svg
-                          viewBox="0 0 20 20"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          style={{
-                            width: 16,
-                            height: 16,
-                            color: "var(--text3)",
-                            transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
-                            transition: "transform 0.2s",
-                          }}
-                        >
-                          <path d="M5 8l5 5 5-5" />
-                        </svg>
-                      </div>
-                    </button>
+                        {trackLabel}
+                      </span>
+                      <svg
+                        viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8"
+                        style={{ width: 15, height: 15, color: "var(--text3)", transform: expanded ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}
+                      >
+                        <path d="M5 8l5 5 5-5" />
+                      </svg>
+                    </div>
+                  </button>
 
-                    {expanded ? (
-                      <div className="week-card-body">
-                        <div
-                          style={{
-                            height: 4,
-                            borderRadius: 2,
-                            background: "var(--border)",
-                            overflow: "hidden",
-                            marginBottom: "0.75rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              height: "100%",
-                              borderRadius: 2,
-                              background: trackColor,
-                              width: `${weekProgress}%`,
-                              transition: "width 0.4s",
-                            }}
-                          />
-                        </div>
-                        <div className="day-grid">
-                          {week.days.map((day) => {
-                            const isDone = completedRoadmapDays.includes(day.day);
-                            return (
-                              <button
-                                key={day.day}
-                                type="button"
-                                className={`day-card${isDone ? " done" : ""}`}
-                                onClick={() => toggleRoadmapDay(day.day)}
-                              >
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "flex-start",
-                                    justifyContent: "space-between",
-                                    gap: 8,
-                                  }}
-                                >
-                                  <span className="day-num">Day {day.day}</span>
-                                  <div className={`day-check${isDone ? " done" : ""}`}>
-                                    {isDone ? "✓" : ""}
-                                  </div>
-                                </div>
-                                <div className="day-title">{day.title}</div>
-                                {day.summary ? (
-                                  <div className="day-summary">{day.summary}</div>
-                                ) : null}
-                              </button>
-                            );
-                          })}
-                        </div>
+                  {expanded && (
+                    <div className="week-card-body">
+                      <div className="week-prog-bar">
+                        <div className="week-prog-fill" style={{ width: `${weekProgress}%`, background: trackColor }} />
                       </div>
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        ) : null}
+                      <div className="fe-day-list">
+                        {week.days.map((day) => {
+                          const isDone = completedRoadmapDays.includes(day.day);
+                          return (
+                            <button
+                              key={day.day}
+                              type="button"
+                              className={`fe-day-row${isDone ? " done" : ""}`}
+                              onClick={() => toggleRoadmapDay(day.day)}
+                            >
+                              <div className={`q-cb${isDone ? " checked" : ""}`} />
+                              <span className="fe-day-num">Day {day.day}</span>
+                              <div className="fe-day-info">
+                                <span className="fe-day-title">{day.title}</span>
+                                {day.summary && <span className="fe-day-summary">{day.summary}</span>}
+                              </div>
+                              {day.topic && (
+                                <span className="fe-day-topic">{day.topic}</span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
-        {/* INTERVIEW QUESTIONS TAB */}
-        {activeTab === "questions" ? (
-          <>
-          {!isPremium ? (
+        {/* QUESTIONS TAB */}
+        {activeTab === "questions" && (
+          !isPremium ? (
             <div className="fe-questions-gate">
               <div className="dsa-gate-icon">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -341,68 +394,8 @@ export function FrontendPanel({
               </button>
             </div>
           ) : (
-          <>
-            {/* Progress bar */}
-            <div
-              style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
-                borderRadius: 12,
-                padding: "0.9rem 1rem",
-                marginBottom: "1rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "1.5rem",
-                flexWrap: "wrap",
-              }}
-            >
-              <div>
-                <span style={{ fontSize: 24, fontWeight: 700, color: "var(--text1)", fontFamily: '"DM Mono", monospace' }}>
-                  {completedQuestionIds.length}
-                </span>
-                <span style={{ fontSize: 11, color: "var(--muted)", marginLeft: 6 }}>Done</span>
-              </div>
-              <div>
-                <span style={{ fontSize: 24, fontWeight: 700, color: "var(--text1)", fontFamily: '"DM Mono", monospace' }}>
-                  {questions.length}
-                </span>
-                <span style={{ fontSize: 11, color: "var(--muted)", marginLeft: 6 }}>Total</span>
-              </div>
-              <div style={{ flex: 1, minWidth: 120 }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: 11,
-                    color: "var(--muted)",
-                    marginBottom: 4,
-                    fontFamily: '"DM Mono", monospace',
-                  }}
-                >
-                  <span>Progress</span>
-                  <span>
-                    {questions.length
-                      ? Math.round((completedQuestionIds.length / questions.length) * 100)
-                      : 0}
-                    %
-                  </span>
-                </div>
-                <div style={{ height: 4, borderRadius: 2, background: "var(--border)", overflow: "hidden" }}>
-                  <div
-                    style={{
-                      height: "100%",
-                      borderRadius: 2,
-                      background: "var(--accent)",
-                      width: `${questions.length ? Math.round((completedQuestionIds.length / questions.length) * 100) : 0}%`,
-                      transition: "width 0.4s",
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
             <div className="questions-layout">
-              {/* Categories Sidebar */}
+              {/* Category sidebar */}
               <aside className="categories-sidebar">
                 <div className="categories-label">Categories</div>
                 {categories.map((cat) => (
@@ -412,90 +405,29 @@ export function FrontendPanel({
                     className={`cat-item${selectedCategory === cat ? " active" : ""}`}
                     onClick={() => setSelectedCategory(cat)}
                   >
-                    <span>{cat}</span>
+                    <span className="cat-name">{cat}</span>
                     <span className="cat-count">{categoryCounts[cat] ?? 0}</span>
                   </button>
                 ))}
               </aside>
 
-              {/* Questions Main */}
+              {/* Questions main */}
               <div className="questions-main">
-                {/* Category Header */}
-                <div className="questions-header">
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "flex-start",
-                      justifyContent: "space-between",
-                      gap: "1rem",
-                      flexWrap: "wrap",
-                      marginBottom: "0.75rem",
-                    }}
-                  >
-                    <div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span className="q-cat-dot" />
-                        <span className="q-cat-title">{selectedCategory}</span>
-                      </div>
-                      <div className="q-cat-subtitle" style={{ marginLeft: 18, marginTop: 2 }}>
-                        {selectedCategory === "JavaScript"
-                          ? "Core JS: closures, async, event loop, prototypes, patterns"
-                          : selectedCategory === "React"
-                            ? "Component model, hooks, state, and rendering patterns"
-                            : selectedCategory === "TypeScript"
-                              ? "Type system, generics, utility types"
-                              : `${selectedCategory} interview questions`}
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <input
-                        className="qs-search"
-                        placeholder="Search questions..."
-                        value={searchValue}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          startTransition(() => setSearchValue(v));
-                        }}
-                      />
-                      {(["All", "Basic", "Mid", "Adv"] as const).map((d) => (
-                        <button
-                          key={d}
-                          type="button"
-                          className={`qs-filter-btn${
-                            (d === "Mid"
-                              ? difficultyFilter === "Intermediate"
-                              : d === "Adv"
-                                ? difficultyFilter === "Advanced"
-                                : difficultyFilter === d)
-                              ? " active"
-                              : ""
-                          }`}
-                          onClick={() =>
-                            setDifficultyFilter(
-                              d === "Mid"
-                                ? "Intermediate"
-                                : d === "Adv"
-                                  ? "Advanced"
-                                  : (d as QuestionDifficulty),
-                            )
-                          }
-                        >
-                          {d}
-                        </button>
-                      ))}
-                    </div>
+                {/* Category header */}
+                <div className="questions-cat-header">
+                  <div className="qch-left">
+                    <span className="qch-dot" />
+                    <span className="qch-title">{selectedCategory}</span>
+                    <span className="qch-sub">{selectedCategoryQuestions.length} questions</span>
                   </div>
-
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    <span className="q-stat-tag">{questionStats.total} shown</span>
+                  <div className="qch-tags">
                     <span className="q-stat-tag">{questionStats.basic} basic</span>
-                    <span className="q-stat-tag">{questionStats.intermediate} intermediate</span>
-                    <span className="q-stat-tag">{questionStats.advanced} advanced</span>
-                    <span className="q-stat-tag">{roadmapOverlapCount} in roadmap</span>
+                    <span className="q-stat-tag" style={{ color: "var(--med)" }}>{questionStats.intermediate} intermediate</span>
+                    <span className="q-stat-tag" style={{ color: "var(--hard)" }}>{questionStats.advanced} advanced</span>
                   </div>
                 </div>
 
-                {/* Questions List */}
+                {/* Questions list */}
                 <div className="questions-list">
                   {visibleQuestions.map((q, idx) => {
                     const isDone = completedQuestionIds.includes(q.id);
@@ -505,46 +437,28 @@ export function FrontendPanel({
                         className={`q-list-item${isDone ? " done" : ""}`}
                         onClick={() => toggleQuestionDone(q.id)}
                       >
-                        <div className={`q-list-num${isDone ? " done" : ""}`}>{idx + 1}</div>
+                        <div className={`q-cb${isDone ? " checked" : ""}`} style={{ marginTop: 2 }} />
+                        <div className="q-list-num-sm">{idx + 1}</div>
                         <div className="q-list-content">
                           <div className="q-list-text">{q.prompt}</div>
                           <div className="q-list-tags">
-                            <span
-                              className={`q-tag ${q.difficulty.toLowerCase()}`}
-                            >
-                              {q.difficulty.toLowerCase()}
-                            </span>
+                            <span className={`q-tag ${q.difficulty.toLowerCase()}`}>{q.difficulty.toLowerCase()}</span>
                             <span className="q-tag topic">{q.topic}</span>
                           </div>
                         </div>
-                        <div
-                          className={`q-list-check${isDone ? " done" : ""}`}
-                          role="checkbox"
-                          aria-checked={isDone}
-                          onClick={(e) => { e.stopPropagation(); toggleQuestionDone(q.id); }}
-                        />
                       </div>
                     );
                   })}
                   {visibleQuestions.length === 0 && (
-                    <div
-                      style={{
-                        textAlign: "center",
-                        padding: "3rem 1rem",
-                        color: "var(--muted)",
-                        fontSize: 14,
-                      }}
-                    >
+                    <div style={{ textAlign: "center", padding: "3rem 1rem", color: "var(--muted)", fontSize: 14 }}>
                       No questions match the current filters.
                     </div>
                   )}
                 </div>
               </div>
             </div>
-          </>
-          )}
-          </>
-        ) : null}
+          )
+        )}
       </div>
     </div>
   );
