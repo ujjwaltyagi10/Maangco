@@ -148,6 +148,21 @@ export function AppShell({
         {/* Top Nav */}
         <div className="topnav">
           <div className="breadcrumb">
+            {/* Mobile: logo mark that navigates to landing */}
+            <button
+              type="button"
+              className="topnav-logo-btn"
+              onClick={onLogoClick}
+              aria-label="Go to home"
+            >
+              <div className="topnav-logo-icon">
+                <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="10,2 18,6 18,14 10,18 2,14 2,6" />
+                </svg>
+              </div>
+              <span className="topnav-logo-text">MAANG<span>co</span></span>
+            </button>
+            {/* Desktop: breadcrumb trail */}
             <span className="breadcrumb-home">MAANGco</span>
             <span className="breadcrumb-sep">›</span>
             <span className="breadcrumb-current">{panelLabels[activePanel]}</span>

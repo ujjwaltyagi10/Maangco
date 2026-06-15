@@ -2510,10 +2510,9 @@ a.lbtn-lg {
 
 .dsa-companies-gate-wrap {
   position: relative;
-  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
 }
 
@@ -2524,10 +2523,9 @@ a.lbtn-lg {
 }
 
 .dsa-companies-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 3px;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .dsa-companies-list--blurred {
@@ -3659,4 +3657,37 @@ a.lbtn-lg {
   .fa-step { padding: 20px 20px 4px; }
   .fa-footer { padding: 14px 20px 20px; }
   .fa-success { padding: 36px 20px 32px; }
+}
+
+@media (max-width: 768px) {
+  /* DSA company chip strip: gate wrap transparent to flex layout */
+  .dsa-companies-gate-wrap {
+    display: contents;
+  }
+
+  /* Hide gate overlay on mobile — blur alone communicates lock */
+  .dsa-companies-gate,
+  .dsa-collapsed-gate {
+    display: none !important;
+  }
+
+  /* Companies list → horizontal flex row */
+  .dsa-companies-list,
+  .dsa-companies-list--blurred {
+    display: flex !important;
+    flex-direction: row !important;
+    grid-template-columns: unset !important;
+    gap: 5px !important;
+    flex-shrink: 0 !important;
+    /* keep blur for locked state but remove the fade mask */
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+
+  /* Collapsed logo strip: remove blur lock on mobile (gate is hidden) */
+  .dsa-sidebar-logo-strip--blurred {
+    filter: none !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
 }
