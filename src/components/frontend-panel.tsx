@@ -76,13 +76,18 @@ export function FrontendPanel({
   const [selectedCategory, setSelectedCategory] = useState<FrontendQuestion["category"]>("JavaScript");
   const [expandedWeekId, setExpandedWeekId] = useState(roadmapWeeks[0]?.id ?? "");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [tabMenuOpen, setTabMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const filtersRef = useRef<HTMLDivElement>(null);
+  const tabMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleOutside(e: MouseEvent) {
       if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
         setFiltersOpen(false);
+      }
+      if (tabMenuRef.current && !tabMenuRef.current.contains(e.target as Node)) {
+        setTabMenuOpen(false);
       }
     }
     if (filtersOpen) document.addEventListener("mousedown", handleOutside);
@@ -227,7 +232,7 @@ export function FrontendPanel({
         </div>
 
         <div className="dsa-header-bottom">
-          {/* Tab strip */}
+          {/* Desktop tab strip — hidden on mobile, replaced by fe-tab-menu */}
           <div className="fe-tab-strip">
             <button
               type="button"
@@ -239,7 +244,7 @@ export function FrontendPanel({
                 <path d="M1 6h14" />
                 <path d="M5 10h6" />
               </svg>
-              Roadmap
+              <span className="fe-tab-label">Roadmap</span>
             </button>
             <button
               type="button"
@@ -250,17 +255,8 @@ export function FrontendPanel({
                 <path d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z" />
                 <path d="M4 6h8M4 9h5" />
               </svg>
-              Interview Questions
-              {isPremium ? (
-                <span className="fe-tab-count">{questions.length}</span>
-              ) : (
-                <span className="fe-tab-lock">
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="11" height="11">
-                    <rect x="2.5" y="7" width="11" height="8" rx="1.5" />
-                    <path d="M5 7V5a3 3 0 0 1 6 0v2" />
-                  </svg>
-                </span>
-              )}
+              <span className="fe-tab-label">Interview Questions</span>
+              {isPremium && <span className="fe-tab-count">{questions.length}</span>}
             </button>
           </div>
 
@@ -289,9 +285,9 @@ export function FrontendPanel({
                   <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                     <path d="M2 4h12M4 8h8M6 12h4" />
                   </svg>
-                  Filters
+                  <span className="filter-btn-label">Filters</span>
                   {difficultyFilter !== "All" && <span className="dsa-filter-badge">1</span>}
-                  <svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+                  <svg className="filter-btn-chevron" viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
                     <path d="M2 4l4 4 4-4H2z" />
                   </svg>
                 </button>
@@ -317,6 +313,48 @@ export function FrontendPanel({
               </div>
             </>
           )}
+
+          {/* Mobile tab menu — shows after search/filter, rightmost */}
+          <div className="fe-tab-menu" ref={tabMenuRef}>
+            <button
+              type="button"
+              className={`fe-tab-menu-btn${tabMenuOpen ? " open" : ""}`}
+              onClick={() => setTabMenuOpen((o) => !o)}
+              aria-label="Switch view"
+            >
+              <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <path d="M2 4h12M2 8h12M2 12h12" />
+              </svg>
+            </button>
+            {tabMenuOpen && (
+              <div className="fe-tab-dropdown">
+                <button
+                  type="button"
+                  className={`fe-tab-option${activeTab === "roadmap" ? " active" : ""}`}
+                  onClick={() => { setActiveTab("roadmap"); setTabMenuOpen(false); }}
+                >
+                  <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="2" width="14" height="12" rx="2" />
+                    <path d="M1 6h14" />
+                    <path d="M5 10h6" />
+                  </svg>
+                  Roadmap
+                </button>
+                <button
+                  type="button"
+                  className={`fe-tab-option${activeTab === "questions" ? " active" : ""}`}
+                  onClick={() => { setActiveTab("questions"); setTabMenuOpen(false); }}
+                >
+                  <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z" />
+                    <path d="M4 6h8M4 9h5" />
+                  </svg>
+                  Interview Questions
+                  {isPremium && <span className="fe-tab-count">{questions.length}</span>}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
