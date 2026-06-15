@@ -304,11 +304,11 @@ export function DsaPanel({
                 <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                   <path d="M2 4h12M4 8h8M6 12h4" />
                 </svg>
-                Filters
+                <span className="filter-btn-label">Filters</span>
                 {activeFilterCount > 0 && (
                   <span className="dsa-filter-badge">{activeFilterCount}</span>
                 )}
-                <svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+                <svg className="filter-btn-chevron" viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
                   <path d="M2 4l4 4 4-4H2z" />
                 </svg>
               </button>

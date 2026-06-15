@@ -233,7 +233,7 @@ export function FrontendPanel({
 
         <div className="dsa-header-bottom">
           {/* Desktop tab strip — hidden on mobile, replaced by fe-tab-menu */}
-          <div className="fe-tab-strip">
+          <div className={`fe-tab-strip${activeTab === "questions" ? " fe-tab-strip--hide-mobile" : ""}`}>
             <button
               type="button"
               className={`fe-tab${activeTab === "roadmap" ? " active" : ""}`}
@@ -314,8 +314,8 @@ export function FrontendPanel({
             </>
           )}
 
-          {/* Mobile tab menu — shows after search/filter, rightmost */}
-          <div className="fe-tab-menu" ref={tabMenuRef}>
+          {/* Mobile tab menu — questions tab only, shows after search/filter */}
+          {activeTab === "questions" && <div className="fe-tab-menu" ref={tabMenuRef}>
             <button
               type="button"
               className={`fe-tab-menu-btn${tabMenuOpen ? " open" : ""}`}
@@ -354,7 +354,7 @@ export function FrontendPanel({
                 </button>
               </div>
             )}
-          </div>
+          </div>}
         </div>
       </div>
 

@@ -3153,14 +3153,24 @@ body {
     height: 42px;
   }
 
-  /* Desktop tab strip: hide on mobile */
-  .fe-tab-strip {
+  /* On questions tab: hide the full tab strip, show hamburger menu instead */
+  .fe-tab-strip--hide-mobile {
     display: none !important;
   }
 
-  /* Mobile tab menu: show on mobile */
+  /* On roadmap tab: tab strip fills full width, buttons share equally */
+  .fe-tab-strip:not(.fe-tab-strip--hide-mobile) {
+    flex: 1;
+  }
+
+  .fe-tab-strip:not(.fe-tab-strip--hide-mobile) .fe-tab {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Mobile tab menu always visible when rendered */
   .fe-tab-menu {
-    display: block !important;
+    display: block;
   }
 }
 
