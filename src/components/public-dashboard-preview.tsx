@@ -20,8 +20,8 @@ const features = [
     desc: "A 150-question roadmap with HLD + LLD depth, categories, and study tracking.",
     statA: "150",
     labelA: "Questions",
-    statB: "9",
-    labelB: "Categories",
+    statB: "40+",
+    labelB: "Companies",
     accent: "var(--amber)",
   },
   {

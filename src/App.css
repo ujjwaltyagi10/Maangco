@@ -593,8 +593,13 @@ a.lbtn-lg {
 }
 .lhero-v2-stat-item {
   flex: 1;
-  padding: 14px 18px;
+  min-height: 80px;
+  padding: 16px 18px 14px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .lhero-v2-stat-val {
   font-size: 20px;
@@ -602,7 +607,7 @@ a.lbtn-lg {
   letter-spacing: -0.04em;
   color: var(--text1);
   line-height: 1;
-  margin-bottom: 3px;
+  margin-bottom: 6px;
 }
 .lhero-v2-stat-lbl {
   font-size: 10px;
@@ -610,6 +615,9 @@ a.lbtn-lg {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  line-height: 1.4;
+  min-height: 28px;
+  white-space: pre-line;
 }
 
 /* Right: floating cards */

@@ -25,6 +25,14 @@ function formatUserLabel(user: AuthUser | null) {
   return "Unknown user";
 }
 
+function getDeviceDefaultTheme(): "light" | "dark" {
+  if (typeof window === "undefined") {
+    return "light";
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
 async function hydrateSessionFromBackend(
   token: string,
   fallbackUser?: AuthUser,
@@ -63,7 +71,7 @@ function App() {
   );
   const [theme, setTheme] = useLocalStorage<"light" | "dark">(
     "maangco.theme",
-    "light",
+    getDeviceDefaultTheme(),
   );
   const [solvedDsaIds, setSolvedDsaIds] = useLocalStorage<QuestionId[]>(
     "maangco.dsa.solved",

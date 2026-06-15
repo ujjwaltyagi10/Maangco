@@ -48,12 +48,12 @@ const companies = [
 ];
 
 const PLAN_FEATURES = [
-  "500+ company-wise DSA questions",
+  "840+ company-wise DSA questions",
   "System Design roadmap — 90 days, HLD + LLD",
   "Unified progress dashboard",
   "Questions refreshed every single day",
   "Bookmark & revisit any problem",
-  "10+ FAANG company curated lists",
+  "25+ company-curated DSA lists",
   "Progress sync across all devices",
 ];
 
@@ -554,10 +554,10 @@ export function LandingPage({
 
             <div className="lhero-v2-stats">
               {[
-                { v: "500+", l: "DSA Questions" },
-                { v: "10+", l: "FAANG Companies" },
-                { v: "Daily", l: "Fresh Questions" },
-                { v: "90-Day", l: "System Design" },
+                { v: "840+", l: "Company-wise\nDSA" },
+                { v: "25+", l: "DSA\nCompanies" },
+                { v: "150+", l: "System\nDesign" },
+                { v: "40+", l: "Design\nCompanies" },
               ].map((s, i, arr) => (
                 <div
                   key={s.l}
@@ -746,7 +746,7 @@ export function LandingPage({
                   Only what they ask.
                 </h3>
                 <p className="lbento-desc">
-                  500+ curated problems organised by company. No filler — just
+                  840+ curated problems organised by company. No filler — just
                   the exact patterns FAANG tests. New problems added every
                   single day.
                 </p>
