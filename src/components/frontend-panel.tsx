@@ -48,6 +48,18 @@ function weekTrackColor(label: string): string {
   return chip?.color ?? "#6b7280";
 }
 
+const CAT_PALETTE = [
+  "#3b82f6","#7c3aed","#0891b2","#16a34a","#f59e0b",
+  "#ec4899","#10b981","#6366f1","#dc2626","#ea580c",
+  "#0e7490","#7e22ce","#059669","#b45309","#be185d",
+];
+
+function catColor(name: string): string {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+  return CAT_PALETTE[Math.abs(h) % CAT_PALETTE.length];
+}
+
 export function FrontendPanel({
   questions,
   roadmapWeeks,
@@ -64,6 +76,7 @@ export function FrontendPanel({
   const [selectedCategory, setSelectedCategory] = useState<FrontendQuestion["category"]>("JavaScript");
   const [expandedWeekId, setExpandedWeekId] = useState(roadmapWeeks[0]?.id ?? "");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const filtersRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -86,6 +99,15 @@ export function FrontendPanel({
     for (const q of questions) map[q.category] = (map[q.category] ?? 0) + 1;
     return map;
   }, [questions]);
+
+  const categoryDoneCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const q of questions) {
+      if (completedQuestionIds.includes(q.id))
+        map[q.category] = (map[q.category] ?? 0) + 1;
+    }
+    return map;
+  }, [questions, completedQuestionIds]);
 
   const deferredSearch = useDeferredValue(searchValue);
 
@@ -149,7 +171,10 @@ export function FrontendPanel({
   return (
     <div className="frontend-panel">
 
-      {/* ── Header (same pattern as DSA/SD) ── */}
+      {/* ── Left: header + content ── */}
+      <div className="fe-main">
+
+      {/* Header (same pattern as DSA/SD) */}
       <div className="dsa-progress-header">
         <div className="dsa-header-identity">
           <div className="dsa-header-icon">
@@ -394,72 +419,167 @@ export function FrontendPanel({
               </button>
             </div>
           ) : (
-            <div className="questions-layout">
-              {/* Category sidebar */}
-              <aside className="categories-sidebar">
-                <div className="categories-label">Categories</div>
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    className={`cat-item${selectedCategory === cat ? " active" : ""}`}
-                    onClick={() => setSelectedCategory(cat)}
-                  >
-                    <span className="cat-name">{cat}</span>
-                    <span className="cat-count">{categoryCounts[cat] ?? 0}</span>
-                  </button>
-                ))}
-              </aside>
-
-              {/* Questions main */}
-              <div className="questions-main">
-                {/* Category header */}
-                <div className="questions-cat-header">
-                  <div className="qch-left">
-                    <span className="qch-dot" />
-                    <span className="qch-title">{selectedCategory}</span>
-                    <span className="qch-sub">{selectedCategoryQuestions.length} questions</span>
-                  </div>
-                  <div className="qch-tags">
-                    <span className="q-stat-tag">{questionStats.basic} basic</span>
-                    <span className="q-stat-tag" style={{ color: "var(--med)" }}>{questionStats.intermediate} intermediate</span>
-                    <span className="q-stat-tag" style={{ color: "var(--hard)" }}>{questionStats.advanced} advanced</span>
-                  </div>
-                </div>
-
-                {/* Questions list */}
-                <div className="questions-list">
+            <div className="table-wrap">
+              <table className="q-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: 36 }} />
+                    <th>#</th>
+                    <th>Question</th>
+                    <th>Difficulty</th>
+                    <th>Topic</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {visibleQuestions.map((q, idx) => {
                     const isDone = completedQuestionIds.includes(q.id);
+                    const diffBg =
+                      q.difficulty === "Basic" ? "var(--easy-bg)" :
+                      q.difficulty === "Intermediate" ? "rgba(217,119,6,0.12)" :
+                      "var(--hard-bg)";
+                    const diffText =
+                      q.difficulty === "Basic" ? "var(--easy)" :
+                      q.difficulty === "Intermediate" ? "#d97706" :
+                      "var(--hard)";
                     return (
-                      <div
+                      <tr
                         key={q.id}
-                        className={`q-list-item${isDone ? " done" : ""}`}
+                        className={`q-row${isDone ? " solved" : ""}`}
                         onClick={() => toggleQuestionDone(q.id)}
                       >
-                        <div className={`q-cb${isDone ? " checked" : ""}`} style={{ marginTop: 2 }} />
-                        <div className="q-list-num-sm">{idx + 1}</div>
-                        <div className="q-list-content">
-                          <div className="q-list-text">{q.prompt}</div>
-                          <div className="q-list-tags">
-                            <span className={`q-tag ${q.difficulty.toLowerCase()}`}>{q.difficulty.toLowerCase()}</span>
-                            <span className="q-tag topic">{q.topic}</span>
-                          </div>
-                        </div>
-                      </div>
+                        <td onClick={(e) => e.stopPropagation()}>
+                          <div
+                            className={`q-cb${isDone ? " checked" : ""}`}
+                            role="checkbox"
+                            aria-checked={isDone}
+                            tabIndex={0}
+                            onClick={() => toggleQuestionDone(q.id)}
+                            onKeyDown={(e) => e.key === " " && toggleQuestionDone(q.id)}
+                          />
+                        </td>
+                        <td className="q-num">{idx + 1}</td>
+                        <td className="q-title">{q.prompt}</td>
+                        <td>
+                          <span className="diff-badge" style={{ background: diffBg, color: diffText }}>
+                            {q.difficulty}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="diff-badge" style={{ background: "var(--surface3)", color: "var(--text3)", border: "1px solid var(--border)" }}>
+                            {q.topic}
+                          </span>
+                        </td>
+                      </tr>
                     );
                   })}
                   {visibleQuestions.length === 0 && (
-                    <div style={{ textAlign: "center", padding: "3rem 1rem", color: "var(--muted)", fontSize: 14 }}>
-                      No questions match the current filters.
-                    </div>
+                    <tr>
+                      <td colSpan={5} style={{ textAlign: "center", padding: "3rem", color: "var(--muted)", fontSize: 14 }}>
+                        No questions match the current filters.
+                      </td>
+                    </tr>
                   )}
-                </div>
-              </div>
+                </tbody>
+              </table>
             </div>
           )
         )}
       </div>
+      {/* end .fe-main */}
+      </div>
+
+      {/* ── Right: Category sidebar (panel-level, same as SD/DSA) ── */}
+      {activeTab === "questions" && isPremium && (
+        <aside className={`fe-cat-sidebar${sidebarCollapsed ? " fe-cat-sidebar--collapsed" : ""}`}>
+          {sidebarCollapsed ? (
+            /* Collapsed: icon pills strip */
+            <>
+              <div className="sd-cosb-collapse-toggle">
+                <button type="button" className="sd-cosb-toggle-btn" onClick={() => setSidebarCollapsed(false)} aria-label="Expand categories">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="14" height="14">
+                    <path d="M6 3l-4 5 4 5M10 3l4 5-4 5" />
+                  </svg>
+                </button>
+              </div>
+              <div className="sd-cosb-initials-strip">
+                {categories.map((cat) => {
+                  const color = catColor(cat);
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`sd-cosb-initial-pill${selectedCategory === cat ? " active" : ""}`}
+                      title={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      style={{ background: selectedCategory === cat ? color : undefined, color: selectedCategory === cat ? "#fff" : color }}
+                    >
+                      {cat[0].toUpperCase()}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="sd-cosb-collapsed-footer">
+                <div className="dsa-collapsed-ratio">
+                  {doneQuestions}<span>/{questions.length}</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            /* Expanded */
+            <>
+              <div className="sd-cosb-head">
+                <div className="sd-cosb-head-row">
+                  <div>
+                    <div className="sd-cosb-title">Categories</div>
+                    <div className="sd-cosb-sub">{categories.length} categories</div>
+                  </div>
+                  <button type="button" className="sd-cosb-toggle-btn" onClick={() => setSidebarCollapsed(true)} aria-label="Collapse categories">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="14" height="14">
+                      <path d="M10 3l4 5-4 5M6 3L2 8l4 5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div className="sd-cosb-list">
+                {categories.map((cat) => {
+                  const color = catColor(cat);
+                  const total = categoryCounts[cat] ?? 0;
+                  const done = categoryDoneCounts[cat] ?? 0;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`sd-cosb-item${selectedCategory === cat ? " active" : ""}`}
+                      onClick={() => setSelectedCategory(cat)}
+                    >
+                      <div className="sd-cosb-avatar" style={{ background: color + "22", color }}>
+                        {cat[0].toUpperCase()}
+                      </div>
+                      <div className="sd-cosb-info">
+                        <div className="sd-cosb-name">{cat}</div>
+                      </div>
+                      <div className="sd-cosb-count">{done}/{total}</div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="sd-cosb-footer">
+                <div className="gs-label">Overall progress</div>
+                <div className="gs-bar">
+                  <div className="gs-fill" style={{ width: `${questions.length ? Math.round((doneQuestions / questions.length) * 100) : 0}%` }} />
+                </div>
+                <div className="gs-nums">
+                  <span>{doneQuestions} solved</span>
+                  <span>{questions.length} total</span>
+                </div>
+              </div>
+            </>
+          )}
+        </aside>
+      )}
+
     </div>
   );
 }
