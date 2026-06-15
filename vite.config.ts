@@ -14,7 +14,14 @@ export default defineConfig({
       devOptions: {
         enabled: true,
       },
-      includeAssets: ["favicon.svg", "apple-touch-icon.png", "pwa-192.png", "pwa-512.png", "pwa-maskable-512.png"],
+      includeAssets: [
+        "favicon.ico",
+        "favicon.svg",
+        "favicon-96x96.png",
+        "apple-touch-icon.png",
+        "web-app-manifest-192x192.png",
+        "web-app-manifest-512x512.png",
+      ],
       manifest: {
         name: "MAANGco",
         short_name: "MAANGco",
@@ -26,20 +33,14 @@ export default defineConfig({
         theme_color: "#0f141b",
         icons: [
           {
-            src: "/pwa-192.png",
+            src: "/web-app-manifest-192x192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/pwa-512.png",
+            src: "/web-app-manifest-512x512.png",
             sizes: "512x512",
             type: "image/png",
-          },
-          {
-            src: "/pwa-maskable-512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable",
           },
         ],
       },
