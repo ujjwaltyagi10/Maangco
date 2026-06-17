@@ -40,10 +40,13 @@ import type {
   SystemDesignQuestionId,
 } from "@/types/maangco";
 
+import { Skeleton } from "./ui/shimmer";
+
 interface SystemDesignPanelProps {
   questions: SystemDesignQuestion[];
   completedIds: SystemDesignQuestionId[];
   onCompletedIdsChange: Dispatch<SetStateAction<SystemDesignQuestionId[]>>;
+  isLoading?: boolean;
 }
 
 const ALL_CO = "All";
@@ -127,6 +130,7 @@ export function SystemDesignPanel({
   questions,
   completedIds,
   onCompletedIdsChange,
+  isLoading,
 }: SystemDesignPanelProps) {
   const [selectedCat, setSelectedCat] = useState<typeof ALL_CAT | SystemDesignCategory>(ALL_CAT);
   const [freqFilter, setFreqFilter] = useState<"All" | SystemDesignFrequency>("All");
@@ -245,6 +249,55 @@ export function SystemDesignPanel({
   }
 
   const totalDone = completedIds.length;
+
+  if (isLoading) {
+    return (
+      <div className="sd-panel">
+        <div className="sd-sidebar">
+          <div style={{ padding: "12px 10px", display: "flex", flexDirection: "column", gap: 8 }}>
+            <Skeleton w="80%" h={13} style={{ marginBottom: 4 }} />
+            <Skeleton w="100%" h={32} radius={6} style={{ marginBottom: 8 }} />
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 8px" }}>
+                <Skeleton w={20} h={20} radius={4} />
+                <Skeleton w={`${50 + (i % 4) * 12}%`} h={13} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="sd-main">
+          <div className="sd-header">
+            <Skeleton w="100%" h={38} radius={8} />
+          </div>
+          <div className="sd-table-wrap">
+            <table className="sd-table" style={{ width: "100%" }}>
+              <thead>
+                <tr>
+                  {["5%","30%","12%","15%","18%","10%"].map((w, i) => (
+                    <th key={i} style={{ padding: "10px 12px" }}>
+                      <Skeleton w={w} h={12} />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 15 }).map((_, i) => (
+                  <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
+                    <td style={{ padding: "12px 12px" }}><Skeleton w={24} h={12} /></td>
+                    <td style={{ padding: "12px 12px" }}><Skeleton w={`${45 + (i % 5) * 10}%`} h={13} /></td>
+                    <td style={{ padding: "12px 12px" }}><Skeleton w={52} h={22} radius={20} /></td>
+                    <td style={{ padding: "12px 12px" }}><Skeleton w={52} h={22} radius={20} /></td>
+                    <td style={{ padding: "12px 12px" }}><Skeleton w={70} h={13} /></td>
+                    <td style={{ padding: "12px 12px" }}><Skeleton w={40} h={22} radius={6} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="sd-panel">

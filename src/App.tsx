@@ -110,6 +110,7 @@ function App() {
   const [systemDesignQuestions, setSystemDesignQuestions] = useState<SystemDesignQuestion[]>([]);
   const [frontendQuestions, setFrontendQuestions] = useState<FrontendQuestion[]>([]);
   const [roadmapWeeks, setRoadmapWeeks] = useState<RoadmapWeek[]>([]);
+  const [isQuestionsLoading, setIsQuestionsLoading] = useState(true);
 
   const authToken = authSession?.token;
 
@@ -143,19 +144,15 @@ function App() {
         .then(applyProgress)
         .catch(() => {});
     }
-    // Load question data from API
-    void fetchDsaGrouped()
-      .then((companies) => setDsaCompanies(companies as DsaCompany[]))
-      .catch(() => {});
-    void fetchSystemDesignQuestions({})
-      .then(({ data }) => setSystemDesignQuestions(data))
-      .catch(() => {});
-    void Promise.all([fetchFrontendQuestions({}), fetchRoadmap()])
-      .then(([feRes, weeks]) => {
+    // Load question data from API — track loading state for skeleton UIs
+    void Promise.allSettled([
+      fetchDsaGrouped().then((companies) => setDsaCompanies(companies as DsaCompany[])),
+      fetchSystemDesignQuestions({}).then(({ data }) => setSystemDesignQuestions(data)),
+      Promise.all([fetchFrontendQuestions({}), fetchRoadmap()]).then(([feRes, weeks]) => {
         setFrontendQuestions(feRes.data);
         setRoadmapWeeks(weeks);
-      })
-      .catch(() => {});
+      }),
+    ]).finally(() => setIsQuestionsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // runs once on mount
 
@@ -507,6 +504,7 @@ function App() {
         completedRoadmapCount={completedRoadmapDays.length}
         totalRoadmapCount={roadmapDayCount}
         companyCount={dsaCompanies.length}
+        isQuestionsLoading={isQuestionsLoading}
         onAuthSubmit={handleAuthSubmit}
         onResendVerification={async (email) => {
           await resendVerificationEmail(email);

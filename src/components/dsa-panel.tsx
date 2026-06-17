@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import type { DsaCompany, DsaQuestion, QuestionId } from "@/types/maangco";
+import { Skeleton } from "./ui/shimmer";
 
 const ALL_ID = "all";
 
@@ -20,6 +21,7 @@ interface DsaPanelProps {
   bookmarkedIds: QuestionId[];
   onSolvedIdsChange: Dispatch<SetStateAction<QuestionId[]>>;
   onBookmarkedIdsChange: Dispatch<SetStateAction<QuestionId[]>>;
+  isLoading?: boolean;
 }
 
 type DifficultyFilter = "all" | "Easy" | "Medium" | "Hard";
@@ -42,6 +44,7 @@ export function DsaPanel({
   bookmarkedIds,
   onSolvedIdsChange,
   onBookmarkedIdsChange,
+  isLoading,
 }: DsaPanelProps) {
   const [selectedCompanyId, setSelectedCompanyId] = useState(ALL_ID);
   const [companySearch, setCompanySearch] = useState("");
@@ -221,6 +224,59 @@ export function DsaPanel({
   const miniArcLen = miniArcCirc * 0.75;
   const miniArcGap = miniArcCirc - miniArcLen;
   const miniArcFill = miniArcLen * (visibleSolvedCount / Math.max(1, visibleTotal));
+
+  if (isLoading) {
+    return (
+      <div className="dsa-panel">
+        {/* Sidebar skeleton */}
+        <div className="dsa-sidebar">
+          <div style={{ padding: "12px 10px", display: "flex", flexDirection: "column", gap: 8 }}>
+            <Skeleton w="80%" h={13} style={{ marginBottom: 4 }} />
+            <Skeleton w="100%" h={32} radius={6} style={{ marginBottom: 8 }} />
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 8px" }}>
+                <Skeleton w={24} h={24} radius={999} />
+                <Skeleton w={`${55 + (i % 3) * 15}%`} h={13} />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Main skeleton */}
+        <div className="dsa-main">
+          <div className="dsa-header">
+            <Skeleton w="100%" h={38} radius={8} />
+          </div>
+          <div className="dsa-table-wrap">
+            <table className="dsa-table" style={{ width: "100%" }}>
+              <thead>
+                <tr>
+                  {["5%","30%","12%","12%","25%"].map((w, i) => (
+                    <th key={i} style={{ padding: "10px 12px" }}>
+                      <Skeleton w={w} h={12} />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 15 }).map((_, i) => (
+                  <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
+                    <td style={{ padding: "12px 12px" }}><Skeleton w={28} h={12} /></td>
+                    <td style={{ padding: "12px 12px" }}><Skeleton w={`${50 + (i % 4) * 12}%`} h={13} /></td>
+                    <td style={{ padding: "12px 12px" }}><Skeleton w={52} h={22} radius={20} /></td>
+                    <td style={{ padding: "12px 12px" }}><Skeleton w={60} h={12} /></td>
+                    <td style={{ padding: "12px 12px", display: "flex", gap: 6 }}>
+                      <Skeleton w={50} h={20} radius={20} />
+                      <Skeleton w={50} h={20} radius={20} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dsa-panel">

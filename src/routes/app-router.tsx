@@ -46,6 +46,7 @@ export interface AppRouterProps {
   completedRoadmapCount: number;
   totalRoadmapCount: number;
   companyCount: number;
+  isQuestionsLoading: boolean;
   onAuthSubmit: (input: {
     mode: "login" | "register" | "forgot" | "reset" | "verify";
     first_name: string;
@@ -119,6 +120,7 @@ function AppRouterContent(props: AppRouterProps) {
           completedRoadmapCount={props.completedRoadmapCount}
           totalRoadmapCount={props.totalRoadmapCount}
           companyCount={props.companyCount}
+          isQuestionsLoading={props.isQuestionsLoading}
         />
       ) : (
         <PublicRoutes

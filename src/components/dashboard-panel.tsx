@@ -1,6 +1,9 @@
+import { Skeleton } from "./ui/shimmer";
+
 interface DashboardPanelProps {
   isPremium: boolean;
   onBuyPremium: () => void;
+  isLoading?: boolean;
   dsaProgress: number;
   frontendProgress: number;
   systemDesignProgress: number;
@@ -62,7 +65,60 @@ export function DashboardPanel({
   onOpenDsa,
   onOpenFrontend,
   onOpenSystemDesign,
+  isLoading,
 }: DashboardPanelProps) {
+  if (isLoading) {
+    return (
+      <div className="dp-root">
+        <div className="dp-hero">
+          <div className="dp-hero-left" style={{ flex: 1 }}>
+            <Skeleton w={80} h={12} style={{ marginBottom: 12 }} />
+            <Skeleton w="70%" h={28} style={{ marginBottom: 10 }} />
+            <Skeleton w="50%" h={14} />
+          </div>
+          <div className="dp-hero-stats">
+            <Skeleton w={80} h={80} radius={999} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginLeft: 16 }}>
+              <Skeleton w={90} h={36} />
+              <Skeleton w={90} h={36} />
+            </div>
+          </div>
+        </div>
+        <div className="dp-modules">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="dp-module-card" style={{ pointerEvents: "none", gap: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Skeleton w={32} h={32} radius={8} />
+                <Skeleton w={70} h={14} />
+              </div>
+              <Skeleton w="60%" h={18} />
+              <Skeleton w="100%" h={12} />
+              <Skeleton w="100%" h={6} radius={3} />
+              <div style={{ display: "flex", gap: 16, marginTop: 4 }}>
+                <Skeleton w={50} h={30} />
+                <Skeleton w={50} h={30} />
+                <Skeleton w={50} h={30} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="dp-section-head">
+          <Skeleton w={120} h={14} />
+        </div>
+        <div className="dp-tips">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="dp-tip">
+              <Skeleton w={36} h={36} radius={8} />
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+                <Skeleton w="50%" h={13} />
+                <Skeleton w="85%" h={11} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   const totalSolved = solvedDsaCount + completedFrontendCount + completedSystemDesignCount;
 
   const modules = [

@@ -49,6 +49,7 @@ interface PrivateRoutesProps {
   completedRoadmapCount: number;
   totalRoadmapCount: number;
   companyCount: number;
+  isQuestionsLoading: boolean;
 }
 
 export function PrivateRoutes({
@@ -87,6 +88,7 @@ export function PrivateRoutes({
   completedRoadmapCount,
   totalRoadmapCount,
   companyCount,
+  isQuestionsLoading,
 }: PrivateRoutesProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -144,6 +146,7 @@ export function PrivateRoutes({
                   onOpenDsa={() => navigate(ROUTES.dsa)}
                   onOpenFrontend={() => navigate(ROUTES.frontend)}
                   onOpenSystemDesign={() => navigate(ROUTES.systemDesign)}
+                  isLoading={isQuestionsLoading}
                 />
               ) : (
                 <PublicDashboardPreview
@@ -168,6 +171,7 @@ export function PrivateRoutes({
                 bookmarkedIds={bookmarkedIds}
                 onSolvedIdsChange={onSolvedIdsChange}
                 onBookmarkedIdsChange={onBookmarkedIdsChange}
+                isLoading={isQuestionsLoading}
               />
             }
           />
@@ -186,6 +190,7 @@ export function PrivateRoutes({
                   questions={systemDesignQuestions}
                   completedIds={completedSystemDesignIds}
                   onCompletedIdsChange={onCompletedSystemDesignIdsChange}
+                  isLoading={isQuestionsLoading}
                 />
               )
             }
@@ -202,6 +207,7 @@ export function PrivateRoutes({
                 onCompletedRoadmapDaysChange={onCompletedRoadmapDaysChange}
                 isPremium={isPremium}
                 onBuyPremium={onBuyPremium}
+                isLoading={isQuestionsLoading}
               />
             }
           />

@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
+import { Skeleton } from "./ui/shimmer";
 import {
   startTransition,
   useDeferredValue,
@@ -23,6 +24,7 @@ interface FrontendPanelProps {
   onCompletedRoadmapDaysChange: Dispatch<SetStateAction<number[]>>;
   isPremium?: boolean;
   onBuyPremium?: () => void;
+  isLoading?: boolean;
 }
 
 type FrontendTab = "roadmap" | "questions";
@@ -88,6 +90,7 @@ export function FrontendPanel({
   onCompletedRoadmapDaysChange,
   isPremium = false,
   onBuyPremium,
+  isLoading,
 }: FrontendPanelProps) {
   const [activeTab, setActiveTab] = useState<FrontendTab>("roadmap");
   const [searchValue, setSearchValue] = useState("");
@@ -210,6 +213,51 @@ export function FrontendPanel({
   const arcTotal =
     activeTab === "questions" ? questions.length : roadmapDayCount;
   const arcLabel = activeTab === "questions" ? "✓ Studied" : "✓ Days";
+
+  if (isLoading) {
+    return (
+      <div className="frontend-panel">
+        <div style={{ flex: 1, padding: "24px 28px", overflow: "auto" }}>
+          {/* Header */}
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+            <Skeleton w={200} h={28} />
+            <Skeleton w={120} h={32} radius={20} style={{ marginLeft: "auto" }} />
+            <Skeleton w={120} h={32} radius={20} />
+          </div>
+          {/* Tab bar */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+            <Skeleton w={120} h={34} radius={8} />
+            <Skeleton w={150} h={34} radius={8} />
+          </div>
+          {/* Week cards */}
+          {Array.from({ length: 4 }).map((_, wi) => (
+            <div key={wi} style={{ marginBottom: 16, border: "1px solid var(--border)", borderRadius: 10, padding: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+                <Skeleton w={36} h={36} radius={8} />
+                <div style={{ flex: 1 }}>
+                  <Skeleton w="40%" h={14} style={{ marginBottom: 6 }} />
+                  <Skeleton w="60%" h={12} />
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
+                {Array.from({ length: 7 }).map((_, di) => (
+                  <Skeleton key={di} w="100%" h={52} radius={8} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Right sidebar skeleton */}
+        <div style={{ width: 220, borderLeft: "1px solid var(--border)", padding: "20px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
+          <Skeleton w="70%" h={14} />
+          <Skeleton w={80} h={80} radius={999} style={{ margin: "8px auto" }} />
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} w="100%" h={24} radius={6} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="frontend-panel">
