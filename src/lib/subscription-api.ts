@@ -60,3 +60,39 @@ export async function createSubscription(
 
   return response.json() as Promise<SubscriptionData>;
 }
+
+export interface VerifyPayload {
+  razorpay_payment_id: string;
+  razorpay_subscription_id: string;
+  razorpay_signature: string;
+}
+
+export async function verifySubscription(
+  token: string,
+  payload: VerifyPayload,
+): Promise<void> {
+  const response = await fetch(
+    new URL("/subscription/verify", AUTH_API_BASE_URL).toString(),
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (!response.ok) {
+    if (response.status === 401) throw new SubscriptionAuthError();
+    let message = "Payment verification failed.";
+    try {
+      const data = (await response.json()) as Record<string, unknown>;
+      if (typeof data.error === "string") message = data.error;
+      else if (typeof data.message === "string") message = data.message;
+    } catch { /* ignore */ }
+    throw new Error(message);
+  }
+}

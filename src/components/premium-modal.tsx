@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createSubscription, SubscriptionAuthError, type PlanType } from "../lib/subscription-api";
+import { createSubscription, verifySubscription, SubscriptionAuthError, type PlanType } from "../lib/subscription-api";
 
 interface PremiumModalProps {
   open: boolean;
@@ -87,9 +87,26 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
           contact: data.prefill.contact || "",
         },
         theme: { color: "#4a7c41" },
-        handler: () => {
-          onPaymentSuccess();
-          onClose();
+        handler: (response: {
+          razorpay_payment_id: string;
+          razorpay_subscription_id: string;
+          razorpay_signature: string;
+        }) => {
+          verifySubscription(authToken!, {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_subscription_id: response.razorpay_subscription_id,
+            razorpay_signature: response.razorpay_signature,
+          })
+            .then(() => {
+              onPaymentSuccess();
+              onClose();
+            })
+            .catch((err: Error) => {
+              setError(err instanceof SubscriptionAuthError
+                ? "Session expired. Please sign in again."
+                : (err.message || "Payment verification failed. Please contact support."));
+              setIsProcessing(false);
+            });
         },
         modal: {
           ondismiss: () => {

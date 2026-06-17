@@ -1,6 +1,6 @@
 export const AUTH_API_BASE_URL =
   (import.meta.env.VITE_AUTH_API_BASE_URL as string | undefined)?.trim() ||
-  "https://lcauth-backend.onrender.com";
+  "https://backend-maangco.vercel.app";
 
 export interface AuthSubscription {
   plan: string;
