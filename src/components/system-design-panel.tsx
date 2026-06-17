@@ -253,48 +253,91 @@ export function SystemDesignPanel({
   if (isLoading) {
     return (
       <div className="sd-panel">
-        <div className="sd-sidebar">
-          <div style={{ padding: "12px 10px", display: "flex", flexDirection: "column", gap: 8 }}>
-            <Skeleton w="80%" h={13} style={{ marginBottom: 4 }} />
-            <Skeleton w="100%" h={32} radius={6} style={{ marginBottom: 8 }} />
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 8px" }}>
-                <Skeleton w={20} h={20} radius={4} />
-                <Skeleton w={`${50 + (i % 4) * 12}%`} h={13} />
+        {/* ── LEFT: main content skeleton ── */}
+        <div className="sd-content">
+          <div className="dsa-progress-header">
+            <div className="dsa-header-identity">
+              <Skeleton w={36} h={36} radius={8} style={{ flexShrink: 0 }} />
+              <div className="dsa-header-title-group">
+                <Skeleton w={140} h={17} style={{ marginBottom: 6 }} />
+                <Skeleton w={260} h={12} />
               </div>
-            ))}
+            </div>
+            <div className="dsa-progress-card">
+              <Skeleton w={56} h={56} radius={999} style={{ flexShrink: 0 }} />
+              <div className="dsa-progress-info">
+                <Skeleton w={52} h={18} style={{ marginBottom: 5 }} />
+                <Skeleton w={50} h={11} />
+              </div>
+              <div className="dsa-progress-sep" />
+              <div className="dsa-diff-stats">
+                {["High","Med.","Low"].map((l) => (
+                  <div key={l} className="dsa-diff-stat">
+                    <Skeleton w={28} h={11} style={{ marginBottom: 4 }} />
+                    <Skeleton w={32} h={14} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="dsa-header-bottom">
+              <Skeleton w="100%" h={36} radius={7} style={{ flex: 1 }} />
+              <Skeleton w={90} h={36} radius={7} />
+            </div>
           </div>
-        </div>
-        <div className="sd-main">
-          <div className="sd-header">
-            <Skeleton w="100%" h={38} radius={8} />
-          </div>
-          <div className="sd-table-wrap">
-            <table className="sd-table" style={{ width: "100%" }}>
+
+          <div className="table-wrap">
+            <table className="q-table">
               <thead>
                 <tr>
-                  {["5%","30%","12%","15%","18%","10%"].map((w, i) => (
-                    <th key={i} style={{ padding: "10px 12px" }}>
-                      <Skeleton w={w} h={12} />
-                    </th>
-                  ))}
+                  <th style={{ width: 36 }} />
+                  <th><Skeleton w={16} h={11} /></th>
+                  <th><Skeleton w={36} h={11} /></th>
+                  <th><Skeleton w={60} h={11} /></th>
+                  <th><Skeleton w={70} h={11} /></th>
+                  <th><Skeleton w={60} h={11} /></th>
+                  <th><Skeleton w={60} h={11} /></th>
+                  <th><Skeleton w={55} h={11} /></th>
                 </tr>
               </thead>
               <tbody>
-                {Array.from({ length: 15 }).map((_, i) => (
-                  <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
-                    <td style={{ padding: "12px 12px" }}><Skeleton w={24} h={12} /></td>
-                    <td style={{ padding: "12px 12px" }}><Skeleton w={`${45 + (i % 5) * 10}%`} h={13} /></td>
-                    <td style={{ padding: "12px 12px" }}><Skeleton w={52} h={22} radius={20} /></td>
-                    <td style={{ padding: "12px 12px" }}><Skeleton w={52} h={22} radius={20} /></td>
-                    <td style={{ padding: "12px 12px" }}><Skeleton w={70} h={13} /></td>
-                    <td style={{ padding: "12px 12px" }}><Skeleton w={40} h={22} radius={6} /></td>
+                {Array.from({ length: 14 }).map((_, i) => (
+                  <tr key={i} className="q-row">
+                    <td><Skeleton w={16} h={16} radius={4} /></td>
+                    <td className="q-num"><Skeleton w={24} h={12} /></td>
+                    <td className="q-title"><Skeleton w={`${40 + (i % 5) * 10}%`} h={13} /></td>
+                    <td><Skeleton w={46} h={22} radius={20} /></td>
+                    <td><Skeleton w={38} h={22} radius={20} /></td>
+                    <td><Skeleton w={80} h={22} radius={20} /></td>
+                    <td><Skeleton w={52} h={12} /></td>
+                    <td><Skeleton w={48} h={13} /></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
+
+        {/* ── RIGHT: company sidebar skeleton ── */}
+        <aside className="sd-cosb">
+          <div className="sd-cosb-head">
+            <div className="sd-cosb-head-row">
+              <div>
+                <Skeleton w={80} h={14} style={{ marginBottom: 5 }} />
+                <Skeleton w={70} h={11} />
+              </div>
+            </div>
+            <Skeleton w="100%" h={32} radius={6} style={{ marginTop: 8 }} />
+          </div>
+          <div className="sd-cosb-list">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="sd-cosb-item" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Skeleton w={28} h={28} radius={999} style={{ flexShrink: 0 }} />
+                <Skeleton w={`${45 + (i % 4) * 12}%`} h={13} />
+                <Skeleton w={28} h={13} style={{ marginLeft: "auto" }} />
+              </div>
+            ))}
+          </div>
+        </aside>
       </div>
     );
   }

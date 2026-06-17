@@ -217,43 +217,59 @@ export function FrontendPanel({
   if (isLoading) {
     return (
       <div className="frontend-panel">
-        <div style={{ flex: 1, padding: "24px 28px", overflow: "auto" }}>
-          {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-            <Skeleton w={200} h={28} />
-            <Skeleton w={120} h={32} radius={20} style={{ marginLeft: "auto" }} />
-            <Skeleton w={120} h={32} radius={20} />
-          </div>
-          {/* Tab bar */}
-          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-            <Skeleton w={120} h={34} radius={8} />
-            <Skeleton w={150} h={34} radius={8} />
-          </div>
-          {/* Week cards */}
-          {Array.from({ length: 4 }).map((_, wi) => (
-            <div key={wi} style={{ marginBottom: 16, border: "1px solid var(--border)", borderRadius: 10, padding: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-                <Skeleton w={36} h={36} radius={8} />
-                <div style={{ flex: 1 }}>
-                  <Skeleton w="40%" h={14} style={{ marginBottom: 6 }} />
-                  <Skeleton w="60%" h={12} />
-                </div>
+        <div className="fe-main">
+          {/* Header — exact same grid as real header */}
+          <div className="dsa-progress-header">
+            <div className="dsa-header-identity">
+              <Skeleton w={36} h={36} radius={8} style={{ flexShrink: 0 }} />
+              <div className="dsa-header-title-group">
+                <Skeleton w={140} h={17} style={{ marginBottom: 6 }} />
+                <Skeleton w={240} h={12} />
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
-                {Array.from({ length: 7 }).map((_, di) => (
-                  <Skeleton key={di} w="100%" h={52} radius={8} />
+            </div>
+            <div className="dsa-progress-card">
+              <Skeleton w={56} h={56} radius={999} style={{ flexShrink: 0 }} />
+              <div className="dsa-progress-info">
+                <Skeleton w={52} h={18} style={{ marginBottom: 5 }} />
+                <Skeleton w={44} h={11} />
+              </div>
+              <div className="dsa-progress-sep" />
+              <div className="dsa-diff-stats">
+                {["Tracks","Days","Qs"].map((l) => (
+                  <div key={l} className="dsa-diff-stat">
+                    <Skeleton w={30} h={11} style={{ marginBottom: 4 }} />
+                    <Skeleton w={24} h={14} />
+                  </div>
                 ))}
               </div>
             </div>
-          ))}
-        </div>
-        {/* Right sidebar skeleton */}
-        <div style={{ width: 220, borderLeft: "1px solid var(--border)", padding: "20px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
-          <Skeleton w="70%" h={14} />
-          <Skeleton w={80} h={80} radius={999} style={{ margin: "8px auto" }} />
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} w="100%" h={24} radius={6} />
-          ))}
+            <div className="dsa-header-bottom">
+              {/* Tab strip skeleton */}
+              <div className="fe-tab-strip">
+                <Skeleton w={110} h={34} radius={7} />
+                <Skeleton w={140} h={34} radius={7} style={{ marginLeft: 8 }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Roadmap week cards */}
+          <div className="fe-roadmap-view" style={{ padding: "16px 20px", overflowY: "auto" }}>
+            {Array.from({ length: 5 }).map((_, wi) => (
+              <div key={wi} className="week-card" style={{ marginBottom: 10 }}>
+                <div className="week-card-header" style={{ pointerEvents: "none" }}>
+                  <Skeleton w={56} h={22} radius={6} style={{ flexShrink: 0 }} />
+                  <div className="week-card-info">
+                    <Skeleton w={`${140 + (wi % 3) * 40}px`} h={14} style={{ marginBottom: 5 }} />
+                    <Skeleton w={`${100 + (wi % 4) * 30}px`} h={11} />
+                  </div>
+                  <div className="week-card-actions">
+                    <Skeleton w={36} h={18} />
+                    <Skeleton w={64} h={20} radius={20} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

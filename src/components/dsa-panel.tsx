@@ -228,52 +228,102 @@ export function DsaPanel({
   if (isLoading) {
     return (
       <div className="dsa-panel">
-        {/* Sidebar skeleton */}
-        <div className="dsa-sidebar">
-          <div style={{ padding: "12px 10px", display: "flex", flexDirection: "column", gap: 8 }}>
-            <Skeleton w="80%" h={13} style={{ marginBottom: 4 }} />
-            <Skeleton w="100%" h={32} radius={6} style={{ marginBottom: 8 }} />
-            {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 8px" }}>
-                <Skeleton w={24} h={24} radius={999} />
-                <Skeleton w={`${55 + (i % 3) * 15}%`} h={13} />
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Main skeleton */}
+        {/* ── LEFT: main content skeleton ── */}
         <div className="dsa-main">
-          <div className="dsa-header">
-            <Skeleton w="100%" h={38} radius={8} />
+          {/* Header — same grid as real header */}
+          <div className="dsa-progress-header">
+            <div className="dsa-header-identity">
+              <Skeleton w={36} h={36} radius={8} style={{ flexShrink: 0 }} />
+              <div className="dsa-header-title-group">
+                <Skeleton w={130} h={17} style={{ marginBottom: 6 }} />
+                <Skeleton w={220} h={12} />
+              </div>
+            </div>
+            <div className="dsa-progress-card">
+              <Skeleton w={56} h={56} radius={999} style={{ flexShrink: 0 }} />
+              <div className="dsa-progress-info">
+                <Skeleton w={52} h={18} style={{ marginBottom: 5 }} />
+                <Skeleton w={44} h={11} />
+              </div>
+              <div className="dsa-progress-sep" />
+              <div className="dsa-diff-stats">
+                {["Easy","Med.","Hard"].map((l) => (
+                  <div key={l} className="dsa-diff-stat">
+                    <Skeleton w={28} h={11} style={{ marginBottom: 4 }} />
+                    <Skeleton w={32} h={14} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="dsa-header-bottom">
+              <Skeleton w="100%" h={36} radius={7} style={{ flex: 1 }} />
+              <Skeleton w={90} h={36} radius={7} />
+            </div>
           </div>
-          <div className="dsa-table-wrap">
-            <table className="dsa-table" style={{ width: "100%" }}>
+
+          {/* Table */}
+          <div className="table-wrap">
+            <table className="q-table">
               <thead>
                 <tr>
-                  {["5%","30%","12%","12%","25%"].map((w, i) => (
-                    <th key={i} style={{ padding: "10px 12px" }}>
-                      <Skeleton w={w} h={12} />
-                    </th>
-                  ))}
+                  <th style={{ width: 36 }} />
+                  <th><Skeleton w={16} h={11} /></th>
+                  <th><Skeleton w={36} h={11} /></th>
+                  <th><Skeleton w={54} h={11} /></th>
+                  <th><Skeleton w={60} h={11} /></th>
+                  <th><Skeleton w={30} h={11} /></th>
+                  <th />
                 </tr>
               </thead>
               <tbody>
-                {Array.from({ length: 15 }).map((_, i) => (
-                  <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
-                    <td style={{ padding: "12px 12px" }}><Skeleton w={28} h={12} /></td>
-                    <td style={{ padding: "12px 12px" }}><Skeleton w={`${50 + (i % 4) * 12}%`} h={13} /></td>
-                    <td style={{ padding: "12px 12px" }}><Skeleton w={52} h={22} radius={20} /></td>
-                    <td style={{ padding: "12px 12px" }}><Skeleton w={60} h={12} /></td>
-                    <td style={{ padding: "12px 12px", display: "flex", gap: 6 }}>
-                      <Skeleton w={50} h={20} radius={20} />
-                      <Skeleton w={50} h={20} radius={20} />
+                {Array.from({ length: 14 }).map((_, i) => (
+                  <tr key={i} className="q-row">
+                    <td><Skeleton w={16} h={16} radius={4} /></td>
+                    <td className="q-num"><Skeleton w={28} h={12} /></td>
+                    <td className="q-title"><Skeleton w={`${42 + (i % 5) * 9}%`} h={13} /></td>
+                    <td><Skeleton w={52} h={22} radius={20} /></td>
+                    <td>
+                      <div className="freq-bar">
+                        <div className="freq-dots" style={{ display: "flex", gap: 3 }}>
+                          {[1,2,3,4,5].map((d) => <Skeleton key={d} w={8} h={8} radius={999} />)}
+                        </div>
+                      </div>
                     </td>
+                    <td>
+                      <div className="tag-list">
+                        <Skeleton w={48} h={20} radius={20} />
+                        {i % 3 !== 0 && <Skeleton w={52} h={20} radius={20} />}
+                      </div>
+                    </td>
+                    <td />
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
+
+        {/* ── RIGHT: company sidebar skeleton ── */}
+        <aside className="dsa-sidebar">
+          <div className="dsa-sidebar-head">
+            <div>
+              <Skeleton w={80} h={14} style={{ marginBottom: 5 }} />
+              <Skeleton w={70} h={11} />
+            </div>
+          </div>
+          <div style={{ padding: "8px 10px" }}>
+            <Skeleton w="100%" h={32} radius={6} />
+          </div>
+          <div className="dsa-sidebar-list">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="dsa-co-item" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Skeleton w={28} h={28} radius={999} style={{ flexShrink: 0 }} />
+                <Skeleton w={`${50 + (i % 4) * 12}%`} h={13} />
+                <Skeleton w={30} h={13} style={{ marginLeft: "auto" }} />
+              </div>
+            ))}
+          </div>
+        </aside>
       </div>
     );
   }
