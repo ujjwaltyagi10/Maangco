@@ -55,7 +55,36 @@ export async function toggleProgress(
     active: boolean;
   },
 ): Promise<void> {
-  const res = await fetch(`${AUTH_API_BASE_URL}/api/progress/toggle`, {
+  queueBatch(token, item);
+}
+
+// ── Debounced batch sync ──────────────────────────────────────
+// Collects toggles fired within 600ms and sends them as one request.
+// localStorage is the immediate source of truth; this is background sync.
+
+interface BatchItem {
+  questionType: ProgressQuestionType;
+  questionId: string;
+  action: ProgressAction;
+  active: boolean;
+}
+
+let _batchToken = "";
+const _queue: BatchItem[] = [];
+let _timer: ReturnType<typeof setTimeout> | null = null;
+
+function queueBatch(token: string, item: BatchItem) {
+  _batchToken = token;
+  _queue.push(item);
+  if (_timer) clearTimeout(_timer);
+  _timer = setTimeout(flushBatch, 600);
+}
+
+function flushBatch() {
+  if (_queue.length === 0) return;
+  const items = _queue.splice(0);
+  const token = _batchToken;
+  fetch(`${AUTH_API_BASE_URL}/api/progress/batch`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -63,8 +92,6 @@ export async function toggleProgress(
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(item),
-  });
-
-  if (!res.ok) throw new Error("Failed to update progress");
+    body: JSON.stringify({ items }),
+  }).catch(() => {});
 }

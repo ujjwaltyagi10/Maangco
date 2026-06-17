@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createSubscription, verifySubscription, SubscriptionAuthError, type PlanType } from "../lib/subscription-api";
+import { fetchPlans, type Plan } from "../lib/plans-api";
 
 interface PremiumModalProps {
   open: boolean;
@@ -18,20 +19,10 @@ const ALL_COMPANIES = [
   "Snowflake", "TCS", "Airbnb", "Pinterest", "Oracle", "Visa",
 ];
 
-const PLANS: Record<PlanType, { label: string; price: string; period: string; billing: string }> = {
-  monthly: {
-    label: "Monthly",
-    price: "₹299",
-    period: "/mo",
-    billing: "Billed every month",
-  },
-  yearly: {
-    label: "Yearly",
-    price: "₹1,999",
-    period: "/yr",
-    billing: "~₹167/mo · Billed once a year",
-  },
-};
+const FALLBACK_PLANS: Plan[] = [
+  { id: "monthly", label: "Monthly", price: 299, priceDisplay: "₹299", period: "/mo", billing: "Billed every month", isPopular: false },
+  { id: "yearly", label: "Yearly", price: 1999, priceDisplay: "₹1,999", period: "/yr", billing: "~₹167/mo · Billed once a year", savingsLabel: "Save 44%", isPopular: true },
+];
 
 const CHECK_ICON = (
   <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -43,9 +34,14 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
   const [selectedPlan, setSelectedPlan] = useState<PlanType>(
     defaultPlan === "monthly" || defaultPlan === "yearly" ? defaultPlan : "monthly"
   );
+  const [plans, setPlans] = useState<Plan[]>(FALLBACK_PLANS);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
+
+  useEffect(() => {
+    fetchPlans().then(setPlans).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -129,7 +125,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
 
   if (!open) return null;
 
-  const plan = PLANS[selectedPlan];
+  const plan = plans.find((p) => p.id === selectedPlan) ?? FALLBACK_PLANS.find((p) => p.id === selectedPlan)!;
   const marqueeItems = [...ALL_COMPANIES, ...ALL_COMPANIES];
 
   return (
@@ -225,48 +221,31 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
 
           {/* Plan cards */}
           <div className="pm-plans">
-            {/* Monthly */}
-            <button
-              type="button"
-              className={`pm-plan-card${selectedPlan === "monthly" ? " pm-plan-card--active" : ""}`}
-              onClick={() => setSelectedPlan("monthly")}
-            >
-              <div className="pm-plan-row">
-                <div className="pm-plan-info">
-                  <div className="pm-plan-name">Monthly</div>
-                  <div className="pm-plan-billing">Billed every month</div>
+            {plans.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                className={`pm-plan-card${p.isPopular ? " pm-plan-card--featured" : ""}${selectedPlan === p.id ? " pm-plan-card--active" : ""}`}
+                onClick={() => setSelectedPlan(p.id as PlanType)}
+              >
+                {p.savingsLabel && (
+                  <div className="pm-plan-best-badge">Best Value · {p.savingsLabel}</div>
+                )}
+                <div className="pm-plan-row">
+                  <div className="pm-plan-info">
+                    <div className="pm-plan-name">{p.label}</div>
+                    <div className="pm-plan-billing">{p.billing}</div>
+                  </div>
+                  <div className="pm-plan-price-wrap">
+                    <span className="pm-plan-price">{p.priceDisplay}</span>
+                    <span className="pm-plan-period">{p.period}</span>
+                  </div>
+                  <div className={`pm-plan-radio${selectedPlan === p.id ? " pm-plan-radio--on" : ""}`}>
+                    {selectedPlan === p.id && CHECK_ICON}
+                  </div>
                 </div>
-                <div className="pm-plan-price-wrap">
-                  <span className="pm-plan-price">₹299</span>
-                  <span className="pm-plan-period">/mo</span>
-                </div>
-                <div className={`pm-plan-radio${selectedPlan === "monthly" ? " pm-plan-radio--on" : ""}`}>
-                  {selectedPlan === "monthly" && CHECK_ICON}
-                </div>
-              </div>
-            </button>
-
-            {/* Yearly */}
-            <button
-              type="button"
-              className={`pm-plan-card pm-plan-card--featured${selectedPlan === "yearly" ? " pm-plan-card--active" : ""}`}
-              onClick={() => setSelectedPlan("yearly")}
-            >
-              <div className="pm-plan-best-badge">Best Value · Save 44%</div>
-              <div className="pm-plan-row">
-                <div className="pm-plan-info">
-                  <div className="pm-plan-name">Yearly</div>
-                  <div className="pm-plan-billing">~₹167/mo · Billed once a year</div>
-                </div>
-                <div className="pm-plan-price-wrap">
-                  <span className="pm-plan-price">₹1,999</span>
-                  <span className="pm-plan-period">/yr</span>
-                </div>
-                <div className={`pm-plan-radio${selectedPlan === "yearly" ? " pm-plan-radio--on" : ""}`}>
-                  {selectedPlan === "yearly" && CHECK_ICON}
-                </div>
-              </div>
-            </button>
+              </button>
+            ))}
           </div>
 
           {/* Order summary */}
@@ -278,7 +257,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
             </div>
             <div className="pm-summary-row">
               <span>Amount</span>
-              <strong>{plan.price}<span className="pm-summary-period">{plan.period}</span></strong>
+              <strong>{plan.priceDisplay}<span className="pm-summary-period">{plan.period}</span></strong>
             </div>
             <div className="pm-summary-row">
               <span>Billing</span>
