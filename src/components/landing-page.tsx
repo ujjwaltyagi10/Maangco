@@ -1,9 +1,24 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  CalendarDays,
+  Clock3,
+  Gift,
+  MessageSquareText,
+  Star,
+  Target,
+  UsersRound,
+} from "lucide-react";
 import { FinancialAidModal } from "./financial-aid-modal";
+import amazonLogo from "@/assets/Amazon.png";
+import googleLogo from "@/assets/google.png";
+import metaLogo from "@/assets/meta.png";
 
-const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url).href;
-const DSADarkVid = new URL("../assets/Video/DSADark.webm", import.meta.url).href;
-const SDLightVid = new URL("../assets/Video/SDLight.webm", import.meta.url).href;
+const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url)
+  .href;
+const DSADarkVid = new URL("../assets/Video/DSADark.webm", import.meta.url)
+  .href;
+const SDLightVid = new URL("../assets/Video/SDLight.webm", import.meta.url)
+  .href;
 const SDDarkVid = new URL("../assets/Video/DSDark.webm", import.meta.url).href;
 
 interface LandingPageProps {
@@ -189,6 +204,112 @@ function getInitials(label: string) {
   return label.slice(0, 2).toUpperCase();
 }
 
+function pad2(value: number) {
+  return value.toString().padStart(2, "0");
+}
+
+function formatCalendarStamp(date: Date) {
+  return (
+    [date.getFullYear(), pad2(date.getMonth() + 1), pad2(date.getDate())].join(
+      "",
+    ) + `T${pad2(date.getHours())}${pad2(date.getMinutes())}00`
+  );
+}
+
+function getLastSaturdayOfMonth(year: number, monthIndex: number) {
+  const lastDay = new Date(year, monthIndex + 1, 0);
+  const offset = (lastDay.getDay() - 6 + 7) % 7;
+  return new Date(year, monthIndex + 1, 0 - offset);
+}
+
+function getUpcomingMentorshipSession(reference = new Date()) {
+  const thisMonthSession = getLastSaturdayOfMonth(
+    reference.getFullYear(),
+    reference.getMonth(),
+  );
+  thisMonthSession.setHours(19, 0, 0, 0);
+
+  if (reference <= thisMonthSession) {
+    return thisMonthSession;
+  }
+
+  const nextMonthSession = getLastSaturdayOfMonth(
+    reference.getFullYear(),
+    reference.getMonth() + 1,
+  );
+  nextMonthSession.setHours(19, 0, 0, 0);
+  return nextMonthSession;
+}
+
+function buildMentorshipCalendarUrl() {
+  const start = getUpcomingMentorshipSession();
+  const end = new Date(start.getTime() + 90 * 60 * 1000);
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: "MAANGco Monthly Mentorship",
+    details:
+      "Monthly Zoom mentorship for MAANGco premium users. Ask questions, get guidance, and learn from FAANG engineers.",
+    location: "Zoom",
+    ctz: "Asia/Kolkata",
+    dates: `${formatCalendarStamp(start)}/${formatCalendarStamp(end)}`,
+    recur: "RRULE:FREQ=MONTHLY;BYDAY=SA;BYSETPOS=-1",
+  });
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+const mentorshipCompanies = [
+  { name: "Google", logo: googleLogo },
+  { name: "Meta", logo: metaLogo },
+  { name: "Amazon", logo: amazonLogo },
+];
+
+const mentorshipHighlights = [
+  {
+    icon: MessageSquareText,
+    label: "Real conversations",
+    value: "Ask anything and get honest, practical answers.",
+  },
+  {
+    icon: Target,
+    label: "Actionable guidance",
+    value: "Leave with clarity and a clear next step.",
+  },
+  {
+    icon: UsersRound,
+    label: "Top engineers",
+    value: "Learn from people who've been there, done that.",
+  },
+  {
+    icon: Star,
+    label: "Community of builders",
+    value: "Connect with ambitious peers like you.",
+  },
+];
+
+const mentorshipStats = [
+  {
+    icon: UsersRound,
+    value: "5000+",
+    label: "Premium\nmembers",
+  },
+  {
+    icon: CalendarDays,
+    value: "24+",
+    label: "Sessions\nconducted",
+  },
+  {
+    icon: MessageSquareText,
+    value: "10K+",
+    label: "Questions\nanswered",
+  },
+  {
+    icon: Star,
+    value: "4.9/5",
+    label: "Session\nrating",
+  },
+];
+
 export function LandingPage({
   theme,
   onThemeChange,
@@ -207,14 +328,38 @@ export function LandingPage({
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const [aidModalOpen, setAidModalOpen] = useState(false);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
+  const mentorshipCalendarUrl = buildMentorshipCalendarUrl();
+  const mentorshipCtaLabel = isPremium ? "Add to calendar" : "Reserve My Spot";
+
+  const handleMentorshipCta = () => {
+    if (!isAuthenticated) {
+      onSignIn();
+      return;
+    }
+
+    if (!isPremium) {
+      if (onBuyPremium) {
+        onBuyPremium("monthly");
+      } else {
+        onSignIn();
+      }
+      return;
+    }
+
+    window.open(mentorshipCalendarUrl, "_blank", "noopener,noreferrer");
+  };
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target as Node)) {
+      if (
+        avatarMenuRef.current &&
+        !avatarMenuRef.current.contains(e.target as Node)
+      ) {
         setAvatarMenuOpen(false);
       }
     }
-    if (avatarMenuOpen) document.addEventListener("mousedown", handleClickOutside);
+    if (avatarMenuOpen)
+      document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [avatarMenuOpen]);
 
@@ -240,10 +385,20 @@ export function LandingPage({
               </a>
 
               <div className="hidden lg:flex items-center gap-1 flex-1">
-                <a href="#features" className="landing-nav-link">Features</a>
-                {!isPremium && <a href="#pricing" className="landing-nav-link">Pricing</a>}
-                <a href="#testimonials" className="landing-nav-link">Reviews</a>
-                <a href="#faq" className="landing-nav-link">FAQ</a>
+                <a href="#features" className="landing-nav-link">
+                  Features
+                </a>
+                {!isPremium && (
+                  <a href="#pricing" className="landing-nav-link">
+                    Pricing
+                  </a>
+                )}
+                <a href="#testimonials" className="landing-nav-link">
+                  Reviews
+                </a>
+                <a href="#faq" className="landing-nav-link">
+                  FAQ
+                </a>
               </div>
             </div>
 
@@ -289,18 +444,36 @@ export function LandingPage({
                     aria-label="Open user menu"
                     aria-expanded={avatarMenuOpen}
                   >
-                    <div className="profile-avatar">{getInitials(userLabel)}</div>
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="profile-chevron" style={{ width: 12, height: 12 }}>
+                    <div className="profile-avatar">
+                      {getInitials(userLabel)}
+                    </div>
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="profile-chevron"
+                      style={{ width: 12, height: 12 }}
+                    >
                       <path d="M5 8l5 5 5-5H5z" />
                     </svg>
                   </button>
 
                   {avatarMenuOpen ? (
-                    <div className="profile-dropdown" style={{ right: 0, left: "auto", top: "calc(100% + 8px)" }}>
+                    <div
+                      className="profile-dropdown"
+                      style={{
+                        right: 0,
+                        left: "auto",
+                        top: "calc(100% + 8px)",
+                      }}
+                    >
                       <div className="profile-dropdown-header">
-                        <div className="profile-avatar profile-avatar--lg">{getInitials(userLabel)}</div>
+                        <div className="profile-avatar profile-avatar--lg">
+                          {getInitials(userLabel)}
+                        </div>
                         <div style={{ minWidth: 0 }}>
-                          <div className="profile-dropdown-name">{userLabel}</div>
+                          <div className="profile-dropdown-name">
+                            {userLabel}
+                          </div>
                           <div className="profile-dropdown-sub">Signed in</div>
                         </div>
                       </div>
@@ -310,10 +483,21 @@ export function LandingPage({
                       <button
                         type="button"
                         className="profile-dropdown-item"
-                        onClick={() => { onGoToDashboard?.(); setAvatarMenuOpen(false); }}
+                        onClick={() => {
+                          onGoToDashboard?.();
+                          setAvatarMenuOpen(false);
+                        }}
                       >
                         <span className="profile-dropdown-item-icon">
-                          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                          <svg
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ width: 14, height: 14 }}
+                          >
                             <rect x="2" y="3" width="7" height="7" rx="1" />
                             <rect x="11" y="3" width="7" height="7" rx="1" />
                             <rect x="2" y="11" width="7" height="7" rx="1" />
@@ -326,15 +510,30 @@ export function LandingPage({
                       <button
                         type="button"
                         className="profile-dropdown-item"
-                        onClick={() => { onThemeChange(); setAvatarMenuOpen(false); }}
+                        onClick={() => {
+                          onThemeChange();
+                          setAvatarMenuOpen(false);
+                        }}
                       >
                         <span className="profile-dropdown-item-icon">
                           {theme === "light" ? (
-                            <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: 14, height: 14 }}>
+                            <svg
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              style={{ width: 14, height: 14 }}
+                            >
                               <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
                             </svg>
                           ) : (
-                            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                            <svg
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              style={{ width: 14, height: 14 }}
+                            >
                               <circle cx="10" cy="10" r="3.2" />
                               <path d="M10 1.8V4.1M10 15.9V18.2M1.8 10H4.1M15.9 10H18.2M4.2 4.2L5.8 5.8M14.2 14.2L15.8 15.8M4.2 15.8L5.8 14.2M14.2 5.8L15.8 4.2" />
                             </svg>
@@ -346,10 +545,21 @@ export function LandingPage({
                       <button
                         type="button"
                         className="profile-dropdown-item"
-                        onClick={() => { onOpenChangePassword?.(); setAvatarMenuOpen(false); }}
+                        onClick={() => {
+                          onOpenChangePassword?.();
+                          setAvatarMenuOpen(false);
+                        }}
                       >
                         <span className="profile-dropdown-item-icon">
-                          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                          <svg
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ width: 14, height: 14 }}
+                          >
                             <rect x="3" y="9" width="14" height="10" rx="2" />
                             <path d="M7 9V6a3 3 0 0 1 6 0v3" />
                           </svg>
@@ -362,10 +572,21 @@ export function LandingPage({
                       <button
                         type="button"
                         className="profile-dropdown-item profile-dropdown-item--danger"
-                        onClick={() => { onLogout?.(); setAvatarMenuOpen(false); }}
+                        onClick={() => {
+                          onLogout?.();
+                          setAvatarMenuOpen(false);
+                        }}
                       >
                         <span className="profile-dropdown-item-icon">
-                          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+                          <svg
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ width: 14, height: 14 }}
+                          >
                             <path d="M7 3H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3M13 14l4-4-4-4M17 10H7" />
                           </svg>
                         </span>
@@ -376,7 +597,11 @@ export function LandingPage({
                 </div>
               ) : (
                 <>
-                  <button type="button" className="lnav-sign-in" onClick={onSignIn}>
+                  <button
+                    type="button"
+                    className="lnav-sign-in"
+                    onClick={onSignIn}
+                  >
                     Sign In
                   </button>
                   <button
@@ -529,7 +754,12 @@ export function LandingPage({
                   onClick={onGoToDashboard}
                 >
                   Go to Dashboard
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    width="15"
+                    height="15"
+                  >
                     <path d="M7 5l6 5-6 5V5z" />
                   </svg>
                 </button>
@@ -541,7 +771,12 @@ export function LandingPage({
                     onClick={onStartFree}
                   >
                     Start Learning for Free
-                    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      width="15"
+                      height="15"
+                    >
                       <path d="M7 5l6 5-6 5V5z" />
                     </svg>
                   </button>
@@ -673,40 +908,250 @@ export function LandingPage({
         <div className="landing-container">
           <div className="lsection-header">
             <div className="lsection-tag">See it in action</div>
-            <h2 className="lsection-title">The exact tools you'll use every day.</h2>
+            <h2 className="lsection-title">
+              The exact tools you'll use every day.
+            </h2>
             <p className="lsection-sub">
-              Live previews of the DSA tracker and system design roadmap — exactly what you get after signing up.
+              Live previews of the DSA tracker and system design roadmap —
+              exactly what you get after signing up.
             </p>
           </div>
           <div className="lvideo-grid">
             <div className="lvideo-card">
               <div className="lvideo-header">
-                <div className="lvideo-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}>⚡</div>
+                <div
+                  className="lvideo-icon"
+                  style={{
+                    background: "var(--green-bg)",
+                    color: "var(--green)",
+                  }}
+                >
+                  ⚡
+                </div>
                 <div>
                   <div className="lvideo-name">DSA Practice</div>
-                  <div className="lvideo-hint">Company-wise sheets, frequency &amp; tags</div>
+                  <div className="lvideo-hint">
+                    Company-wise sheets, frequency &amp; tags
+                  </div>
                 </div>
                 <div className="lvideo-live-badge">Live</div>
               </div>
               <div className="lvideo-frame">
-                <video autoPlay loop muted playsInline preload="metadata" key={theme === "dark" ? DSADarkVid : DSALightVid}>
-                  <source src={theme === "dark" ? DSADarkVid : DSALightVid} type="video/webm" />
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  key={theme === "dark" ? DSADarkVid : DSALightVid}
+                >
+                  <source
+                    src={theme === "dark" ? DSADarkVid : DSALightVid}
+                    type="video/webm"
+                  />
                 </video>
               </div>
             </div>
             <div className="lvideo-card">
               <div className="lvideo-header">
-                <div className="lvideo-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}>🏗️</div>
+                <div
+                  className="lvideo-icon"
+                  style={{
+                    background: "var(--amber-bg)",
+                    color: "var(--amber)",
+                  }}
+                >
+                  🏗️
+                </div>
                 <div>
                   <div className="lvideo-name">System Design</div>
-                  <div className="lvideo-hint">150-question roadmap with depth &amp; tracking</div>
+                  <div className="lvideo-hint">
+                    150-question roadmap with depth &amp; tracking
+                  </div>
                 </div>
                 <div className="lvideo-live-badge">Live</div>
               </div>
               <div className="lvideo-frame">
-                <video autoPlay loop muted playsInline preload="metadata" key={theme === "dark" ? SDDarkVid : SDLightVid}>
-                  <source src={theme === "dark" ? SDDarkVid : SDLightVid} type="video/webm" />
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  key={theme === "dark" ? SDDarkVid : SDLightVid}
+                >
+                  <source
+                    src={theme === "dark" ? SDDarkVid : SDLightVid}
+                    type="video/webm"
+                  />
                 </video>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── MENTORSHIP ── */}
+      <section className="lsection lmentor-section">
+        <div className="landing-container">
+          <div className="lsection-header lsection-header--mentor">
+            <div className="lsection-tag lsection-tag--icon">
+              <UsersRound size={13} strokeWidth={2.2} />
+              Mentorship
+            </div>
+            <h2 className="lsection-title">
+              Monthly Zoom mentorship with{" "}
+              <span className="lmentor-title-accent">FAANG</span> engineers.
+            </h2>
+            <p className="lsection-sub">
+              Join a live 1.5 hour Zoom call on the last Saturday of every
+              month. Ask questions, get guidance, and learn directly from
+              engineers working at top tech companies.
+            </p>
+          </div>
+
+          <div className="lmentor-card">
+            <div className="lmentor-main">
+              <div className="lmentor-badge lmentor-badge--premium">
+                <Star size={14} strokeWidth={2.2} />
+                Free for premium users
+              </div>
+              <h3 className="lmentor-title">
+                Live Q&amp;A. Real guidance. No prerecorded fluff.
+              </h3>
+              <p className="lmentor-text">
+                Get clarity on interviews, system design, data structures,
+                career growth, and everything in between.
+              </p>
+              <div className="lmentor-list">
+                <div className="lmentor-item">
+                  <span className="lmentor-icon">
+                    <CalendarDays size={16} strokeWidth={2.1} />
+                  </span>
+                  <span>Last Saturday of every month</span>
+                </div>
+                <div className="lmentor-item">
+                  <span className="lmentor-icon">
+                    <Clock3 size={16} strokeWidth={2.1} />
+                  </span>
+                  <span>Around 1.5 hours on Zoom</span>
+                </div>
+                <div className="lmentor-item">
+                  <span className="lmentor-icon">
+                    <MessageSquareText size={16} strokeWidth={2.1} />
+                  </span>
+                  <span>Live Q&amp;A with FAANG engineers</span>
+                </div>
+                <div className="lmentor-item">
+                  <span className="lmentor-icon">
+                    <Gift size={16} strokeWidth={2.1} />
+                  </span>
+                  <span>Interactive small-group session</span>
+                </div>
+                <div className="lmentor-item">
+                  <span className="lmentor-icon">
+                    <Gift size={16} strokeWidth={2.1} />
+                  </span>
+                  <span>Free for premium users, paid access for others</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="lmentor-session">
+              <div className="lmentor-session-info">
+                <div className="lmentor-session-head">Upcoming session</div>
+                <div className="lmentor-session-date">
+                  <CalendarDays size={15} strokeWidth={2.1} />
+                  {getUpcomingMentorshipSession().toLocaleDateString("en-US", {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </div>
+                <div className="lmentor-session-time-row">
+                  <span className="lmentor-session-time-big">07:00</span>
+                  <span className="lmentor-session-time-unit">PM IST</span>
+                </div>
+                <div className="lmentor-session-live">
+                  <span className="lmentor-live-dot" />
+                  Live on Zoom
+                </div>
+              </div>
+              <div className="lmentor-session-action">
+                <button
+                  type="button"
+                  className="lmentor-cta"
+                  onClick={handleMentorshipCta}
+                >
+                  <CalendarDays size={16} strokeWidth={2.2} />
+                  {mentorshipCtaLabel}
+                </button>
+                <div className="lmentor-session-note">
+                  Spots are limited. Reserve early!
+                </div>
+              </div>
+            </div>
+
+            <div className="lmentor-side">
+              <div className="lmentor-side-block">
+                <div className="lmentor-side-label">
+                  Learn from engineers at
+                </div>
+                <div className="lmentor-company-row">
+                  {mentorshipCompanies.flatMap((company, i) => [
+                    ...(i > 0
+                      ? [
+                          <div
+                            key={`div-${i}`}
+                            className="lmentor-company-divider"
+                          />,
+                        ]
+                      : []),
+                    <div key={company.name} className="lmentor-company-item">
+                      <img
+                        className="lmentor-company-logo"
+                        src={company.logo}
+                        alt={company.name}
+                      />
+                      <span>{company.name}</span>
+                    </div>,
+                  ])}
+                </div>
+              </div>
+
+              <div className="lmentor-side-grid">
+                {mentorshipHighlights.map((item) => {
+                  const HIcon = item.icon;
+                  return (
+                    <div key={item.label} className="lmentor-side-card">
+                      <div className="lmentor-side-card-icon">
+                        <HIcon size={15} strokeWidth={2.1} />
+                      </div>
+                      <div className="lmentor-side-card-title">{item.label}</div>
+                      <div className="lmentor-side-card-desc">{item.value}</div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="lmentor-stats">
+                {mentorshipStats.map((stat) => {
+                  const StatIcon = stat.icon;
+                  return (
+                    <div key={stat.label} className="lmentor-stat-item">
+                      <div className="lmentor-stat-icon">
+                        <StatIcon size={16} strokeWidth={2.1} />
+                      </div>
+                      <div className="lmentor-stat-value">{stat.value}</div>
+                      <div className="lmentor-stat-label">
+                        {stat.label.split("\n").map((line) => (
+                          <span key={line}>{line}</span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -940,149 +1385,232 @@ export function LandingPage({
       </section>
 
       {/* ── PRICING ── */}
-      {!isPremium && <section className="lsection" id="pricing">
-        <div className="landing-container">
-          <div className="lsection-header">
-            <div className="lsection-tag">Pricing</div>
-            <h2 className="lsection-title">One plan. Everything unlocked.</h2>
-            <p className="lsection-sub">
-              No tiers, no upsells. Every feature from day one — DSA, System
-              Design, daily updates, full dashboard.
+      {!isPremium && (
+        <section className="lsection" id="pricing">
+          <div className="landing-container">
+            <div className="lsection-header">
+              <div className="lsection-tag">Pricing</div>
+              <h2 className="lsection-title">One plan. Everything unlocked.</h2>
+              <p className="lsection-sub">
+                No tiers, no upsells. Every feature from day one — DSA, System
+                Design, daily updates, full dashboard.
+              </p>
+            </div>
+
+            <div className="lprice-cards">
+              {/* Monthly */}
+              <div className="lprice-card">
+                <div className="lprice-plan-name">Monthly</div>
+                <div className="lprice-amount">
+                  <span className="lprice-currency">₹</span>
+                  <span className="lprice-num">299</span>
+                  <span className="lprice-period">/month</span>
+                </div>
+                <p className="lprice-tagline">
+                  Great to start. Cancel anytime.
+                </p>
+                <ul className="lprice-features">
+                  {PLAN_FEATURES.map((f) => (
+                    <li key={f} className="lprice-feature">
+                      <CheckIcon />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  className="lbtn-outline lprice-btn"
+                  onClick={
+                    isAuthenticated && onBuyPremium
+                      ? () => onBuyPremium("monthly")
+                      : onGetStarted
+                  }
+                >
+                  Start monthly →
+                </button>
+              </div>
+
+              {/* Yearly — highlighted */}
+              <div className="lprice-card lprice-card--highlight">
+                <div className="lprice-popular-badge">
+                  Most Popular · Save 33%
+                </div>
+                <div className="lprice-plan-name">Yearly</div>
+                <div className="lprice-amount">
+                  <span className="lprice-currency">₹</span>
+                  <span className="lprice-num">1,999</span>
+                  <span className="lprice-period">/year</span>
+                </div>
+                <p className="lprice-tagline">
+                  ₹167/month · Save ₹1,589 vs monthly
+                </p>
+                <ul className="lprice-features">
+                  {PLAN_FEATURES.map((f) => (
+                    <li key={f} className="lprice-feature">
+                      <CheckIcon />
+                      {f}
+                    </li>
+                  ))}
+                  <li className="lprice-feature lprice-feature--bonus">
+                    <CheckIcon />
+                    Priority support
+                  </li>
+                </ul>
+                <button
+                  type="button"
+                  className="lbtn-primary lprice-btn lbtn-glow"
+                  onClick={
+                    isAuthenticated && onBuyPremium
+                      ? () => onBuyPremium("yearly")
+                      : onGetStarted
+                  }
+                >
+                  Get yearly access →
+                </button>
+              </div>
+            </div>
+            <p className="lprice-note">
+              Secure payment · Cancel anytime · All major cards accepted
             </p>
           </div>
-
-          <div className="lprice-cards">
-            {/* Monthly */}
-            <div className="lprice-card">
-              <div className="lprice-plan-name">Monthly</div>
-              <div className="lprice-amount">
-                <span className="lprice-currency">₹</span>
-                <span className="lprice-num">299</span>
-                <span className="lprice-period">/month</span>
-              </div>
-              <p className="lprice-tagline">Great to start. Cancel anytime.</p>
-              <ul className="lprice-features">
-                {PLAN_FEATURES.map((f) => (
-                  <li key={f} className="lprice-feature">
-                    <CheckIcon />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                type="button"
-                className="lbtn-outline lprice-btn"
-                onClick={isAuthenticated && onBuyPremium ? () => onBuyPremium("monthly") : onGetStarted}
-              >
-                Start monthly →
-              </button>
-            </div>
-
-            {/* Yearly — highlighted */}
-            <div className="lprice-card lprice-card--highlight">
-              <div className="lprice-popular-badge">
-                Most Popular · Save 33%
-              </div>
-              <div className="lprice-plan-name">Yearly</div>
-              <div className="lprice-amount">
-                <span className="lprice-currency">₹</span>
-                <span className="lprice-num">1,999</span>
-                <span className="lprice-period">/year</span>
-              </div>
-              <p className="lprice-tagline">
-                ₹167/month · Save ₹1,589 vs monthly
-              </p>
-              <ul className="lprice-features">
-                {PLAN_FEATURES.map((f) => (
-                  <li key={f} className="lprice-feature">
-                    <CheckIcon />
-                    {f}
-                  </li>
-                ))}
-                <li className="lprice-feature lprice-feature--bonus">
-                  <CheckIcon />
-                  Priority support
-                </li>
-              </ul>
-              <button
-                type="button"
-                className="lbtn-primary lprice-btn lbtn-glow"
-                onClick={isAuthenticated && onBuyPremium ? () => onBuyPremium("yearly") : onGetStarted}
-              >
-                Get yearly access →
-              </button>
-            </div>
-          </div>
-          <p className="lprice-note">
-            Secure payment · Cancel anytime · All major cards accepted
-          </p>
-        </div>
-      </section>}
+        </section>
+      )}
 
       {/* ── FINANCIAL AID ── */}
-      {!isPremium && <section className="lsection lfa-section" id="financial-aid">
-        <div className="landing-container">
-          <div className="lfa-card">
-            {/* Left: text content */}
-            <div className="lfa-card-left">
-              <div className="lfa-tag">Financial Aid</div>
-              <h2 className="lfa-title">Can't afford it right now?</h2>
-              <p className="lfa-sub">
-                Financial barriers shouldn't stop anyone from cracking their dream job. If you
-                genuinely can't afford Premium, apply — every application is reviewed personally
-                and approved applicants get <strong>3 months free</strong>.
-              </p>
-              <ul className="lfa-checklist">
-                <li className="lfa-check-row">
-                  <svg className="lfa-check-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6l3 3 5-5" /></svg>
-                  <span className="lfa-check-text">3 months of full Premium access, completely free</span>
-                </li>
-                <li className="lfa-check-row">
-                  <svg className="lfa-check-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6l3 3 5-5" /></svg>
-                  <span className="lfa-check-text">Every application reviewed personally, not by bots</span>
-                </li>
-                <li className="lfa-check-row">
-                  <svg className="lfa-check-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6l3 3 5-5" /></svg>
-                  <span className="lfa-check-text">No credit card required, ever</span>
-                </li>
-                <li className="lfa-check-row">
-                  <svg className="lfa-check-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6l3 3 5-5" /></svg>
-                  <span className="lfa-check-text">Response within 2–3 business days</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Right: action panel */}
-            <div className="lfa-card-right">
-              <p className="lfa-card-right-title">Apply in 2 minutes</p>
-              <div className="lfa-stats">
-                <div className="lfa-stat">
-                  <div className="lfa-stat-num">3 mo</div>
-                  <div className="lfa-stat-lbl">Free access if approved</div>
-                </div>
-                <div className="lfa-stat-divider" />
-                <div className="lfa-stat">
-                  <div className="lfa-stat-num">2–3</div>
-                  <div className="lfa-stat-lbl">Days to review</div>
-                </div>
+      {!isPremium && (
+        <section className="lsection lfa-section" id="financial-aid">
+          <div className="landing-container">
+            <div className="lfa-card">
+              {/* Left: text content */}
+              <div className="lfa-card-left">
+                <div className="lfa-tag">Financial Aid</div>
+                <h2 className="lfa-title">Can't afford it right now?</h2>
+                <p className="lfa-sub">
+                  Financial barriers shouldn't stop anyone from cracking their
+                  dream job. If you genuinely can't afford Premium, apply —
+                  every application is reviewed personally and approved
+                  applicants get <strong>3 months free</strong>.
+                </p>
+                <ul className="lfa-checklist">
+                  <li className="lfa-check-row">
+                    <svg
+                      className="lfa-check-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M2 6l3 3 5-5" />
+                    </svg>
+                    <span className="lfa-check-text">
+                      3 months of full Premium access, completely free
+                    </span>
+                  </li>
+                  <li className="lfa-check-row">
+                    <svg
+                      className="lfa-check-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M2 6l3 3 5-5" />
+                    </svg>
+                    <span className="lfa-check-text">
+                      Every application reviewed personally, not by bots
+                    </span>
+                  </li>
+                  <li className="lfa-check-row">
+                    <svg
+                      className="lfa-check-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M2 6l3 3 5-5" />
+                    </svg>
+                    <span className="lfa-check-text">
+                      No credit card required, ever
+                    </span>
+                  </li>
+                  <li className="lfa-check-row">
+                    <svg
+                      className="lfa-check-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M2 6l3 3 5-5" />
+                    </svg>
+                    <span className="lfa-check-text">
+                      Response within 2–3 business days
+                    </span>
+                  </li>
+                </ul>
               </div>
-              <button
-                type="button"
-                className="lfa-cta-btn"
-                onClick={() => setAidModalOpen(true)}
-              >
-                Apply for Financial Aid
-                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11">
-                  <path d="M2 6h8M6 2l4 4-4 4" />
-                </svg>
-              </button>
-              <p className="lfa-cta-note">Reviewed Mon – Fri · No card required</p>
+
+              {/* Right: action panel */}
+              <div className="lfa-card-right">
+                <p className="lfa-card-right-title">Apply in 2 minutes</p>
+                <div className="lfa-stats">
+                  <div className="lfa-stat">
+                    <div className="lfa-stat-num">3 mo</div>
+                    <div className="lfa-stat-lbl">Free access if approved</div>
+                  </div>
+                  <div className="lfa-stat-divider" />
+                  <div className="lfa-stat">
+                    <div className="lfa-stat-num">2–3</div>
+                    <div className="lfa-stat-lbl">Days to review</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="lfa-cta-btn"
+                  onClick={() => setAidModalOpen(true)}
+                >
+                  Apply for Financial Aid
+                  <svg
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    width="11"
+                    height="11"
+                  >
+                    <path d="M2 6h8M6 2l4 4-4 4" />
+                  </svg>
+                </button>
+                <p className="lfa-cta-note">
+                  Reviewed Mon – Fri · No card required
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>}
+        </section>
+      )}
 
-      <FinancialAidModal open={aidModalOpen} onClose={() => setAidModalOpen(false)} />
+      <FinancialAidModal
+        open={aidModalOpen}
+        onClose={() => setAidModalOpen(false)}
+      />
 
       {/* ── FAQ ── */}
       <section className="lsection lsection--alt" id="faq">
