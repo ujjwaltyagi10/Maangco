@@ -13,6 +13,7 @@ interface AppShellProps {
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
   userLabel: string;
+  userEmail?: string;
   onSignIn: () => void;
   onSignUp: () => void;
   onLogout: () => void;
@@ -45,6 +46,7 @@ export function AppShell({
   isSidebarCollapsed,
   onToggleSidebar,
   userLabel,
+  userEmail,
   onSignIn,
   onSignUp,
   onLogout,
@@ -195,7 +197,7 @@ export function AppShell({
                       <div className="profile-avatar profile-avatar--lg">{userInitials}</div>
                       <div style={{ minWidth: 0 }}>
                         <div className="profile-dropdown-name">{userLabel}</div>
-                        <div className="profile-dropdown-sub">Signed in</div>
+                        <div className="profile-dropdown-sub">{userEmail ?? "Signed in"}</div>
                       </div>
                     </div>
 

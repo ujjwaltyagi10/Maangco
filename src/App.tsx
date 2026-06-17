@@ -480,6 +480,7 @@ function App() {
           setIsChangePasswordOpen(true);
         }}
         userLabel={userLabel}
+        userEmail={currentUser?.email}
         solvedIds={solvedDsaIds}
         bookmarkedIds={bookmarkedDsaIds}
         companies={dsaCompanies}

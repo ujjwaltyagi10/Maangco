@@ -24,6 +24,7 @@ interface PrivateRoutesProps {
   onLogout: () => void | Promise<void>;
   onOpenChangePassword: () => void;
   userLabel: string;
+  userEmail?: string;
 
   solvedIds: QuestionId[];
   bookmarkedIds: QuestionId[];
@@ -63,6 +64,7 @@ export function PrivateRoutes({
   onLogout,
   onOpenChangePassword,
   userLabel,
+  userEmail,
 
   solvedIds,
   bookmarkedIds,
@@ -117,6 +119,7 @@ export function PrivateRoutes({
         onToggleSidebar={onToggleSidebar}
 
         userLabel={userLabel}
+        userEmail={userEmail}
         onSignIn={onSignIn}
         onSignUp={onSignUp}
         onLogout={onLogout}

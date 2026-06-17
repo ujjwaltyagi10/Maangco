@@ -22,6 +22,7 @@ export interface AppRouterProps {
   onLogout: () => void | Promise<void>;
   onOpenChangePassword: () => void;
   userLabel: string;
+  userEmail?: string;
   solvedIds: QuestionId[];
   bookmarkedIds: QuestionId[];
   companies: DsaCompany[];
@@ -95,6 +96,7 @@ function AppRouterContent(props: AppRouterProps) {
           onLogout={props.onLogout}
           onOpenChangePassword={props.onOpenChangePassword}
           userLabel={props.userLabel}
+          userEmail={props.userEmail}
 
           solvedIds={props.solvedIds}
           bookmarkedIds={props.bookmarkedIds}
