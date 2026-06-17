@@ -77,7 +77,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
         key: data.keyId,
         subscription_id: data.subscriptionId,
         name: "MAANGco",
-        description: `${PLANS[selectedPlan].label} Premium`,
+        description: `${plans.find((p) => p.id === selectedPlan)?.label ?? selectedPlan} Premium`,
         prefill: {
           email: data.prefill.email || userEmail || "",
           contact: data.prefill.contact || "",
@@ -85,12 +85,12 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
         theme: { color: "#4a7c41" },
         handler: (response: {
           razorpay_payment_id: string;
-          razorpay_subscription_id: string;
+          razorpay_subscription_id?: string;
           razorpay_signature: string;
         }) => {
           verifySubscription(authToken!, {
             razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_subscription_id: response.razorpay_subscription_id,
+            razorpay_subscription_id: response.razorpay_subscription_id ?? "",
             razorpay_signature: response.razorpay_signature,
           })
             .then(() => {

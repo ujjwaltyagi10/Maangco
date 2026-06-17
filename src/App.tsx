@@ -5,11 +5,9 @@ import { PremiumModal } from "./components/premium-modal";
 import { AppRouter } from "./routes/app-router";
 import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, isValidEmail, loginUser, logoutUser, registerUser, requestPasswordReset, resetPassword, resendVerificationEmail, type AuthSession, type AuthUser } from "./lib/auth-api";
 import { fetchProgress, toggleProgress, emptyProgress, type ProgressState } from "./lib/progress-api";
+import { fetchDsaGrouped, fetchSystemDesignQuestions, fetchFrontendQuestions, fetchRoadmap } from "./lib/questions-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
-import { dsaCompanies } from "./data/dsa";
-import { systemDesignQuestions } from "./data/system-design";
-import { frontendQuestions, roadmapWeeks } from "./data/frontend";
-import type { FrontendQuestionId, QuestionId, SystemDesignQuestionId } from "./types/maangco";
+import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "./types/maangco";
 import { ROUTES, type AuthSubmitResult } from "./routes/route-paths";
 import "./App.css";
 
@@ -108,6 +106,10 @@ function App() {
   const [changePasswordInfo, setChangePasswordInfo] = useState<string | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [premiumModalDefaultPlan, setPremiumModalDefaultPlan] = useState<"monthly" | "yearly">("monthly");
+  const [dsaCompanies, setDsaCompanies] = useState<DsaCompany[]>([]);
+  const [systemDesignQuestions, setSystemDesignQuestions] = useState<SystemDesignQuestion[]>([]);
+  const [frontendQuestions, setFrontendQuestions] = useState<FrontendQuestion[]>([]);
+  const [roadmapWeeks, setRoadmapWeeks] = useState<RoadmapWeek[]>([]);
 
   const authToken = authSession?.token;
 
@@ -134,26 +136,37 @@ function App() {
     if (authSession?.token) {
       const token = authSession.token;
       const user = authSession.user;
-      // Hydrate user + subscription status
       void tryHydrateSessionFromBackend(token, user)
         .then((session) => setAuthSession(session))
         .catch(() => {});
-      // Load persisted progress from backend (overrides localStorage)
       void fetchProgress(token)
         .then(applyProgress)
         .catch(() => {});
     }
+    // Load question data from API
+    void fetchDsaGrouped()
+      .then((companies) => setDsaCompanies(companies as DsaCompany[]))
+      .catch(() => {});
+    void fetchSystemDesignQuestions({})
+      .then(({ data }) => setSystemDesignQuestions(data))
+      .catch(() => {});
+    void Promise.all([fetchFrontendQuestions({}), fetchRoadmap()])
+      .then(([feRes, weeks]) => {
+        setFrontendQuestions(feRes.data);
+        setRoadmapWeeks(weeks);
+      })
+      .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // runs once on mount; intentionally captures initial localStorage session
+  }, []); // runs once on mount
 
   const dsaQuestionCount = useMemo(
     () => dsaCompanies.reduce((total, company) => total + company.questions.length, 0),
-    [],
+    [dsaCompanies],
   );
   const frontendQuestionCount = frontendQuestions.length;
   const roadmapDayCount = useMemo(
-    () => roadmapWeeks.reduce((total, week) => total + week.days.length, 0),
-    [],
+    () => roadmapWeeks.reduce((total, week) => total + (week.days?.length ?? 0), 0),
+    [roadmapWeeks],
   );
 
   const dsaProgress =
