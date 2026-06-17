@@ -84,6 +84,10 @@ function flushBatch() {
   if (_queue.length === 0) return;
   const items = _queue.splice(0);
   const token = _batchToken;
+  sendWithRetry(token, items, 3);
+}
+
+function sendWithRetry(token: string, items: BatchItem[], retriesLeft: number) {
   fetch(`${AUTH_API_BASE_URL}/api/progress/batch`, {
     method: "POST",
     credentials: "include",
@@ -93,5 +97,9 @@ function flushBatch() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ items }),
-  }).catch(() => {});
+  }).catch(() => {
+    if (retriesLeft > 0) {
+      setTimeout(() => sendWithRetry(token, items, retriesLeft - 1), 2000);
+    }
+  });
 }
