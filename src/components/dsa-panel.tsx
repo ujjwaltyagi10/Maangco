@@ -306,22 +306,31 @@ export function DsaPanel({
         {/* ── RIGHT: company sidebar skeleton ── */}
         <aside className="dsa-sidebar">
           <div className="dsa-sidebar-head">
-            <div>
-              <Skeleton w={80} h={14} style={{ marginBottom: 5 }} />
-              <Skeleton w={70} h={11} />
+            <div className="dsa-sidebar-head-row">
+              <div>
+                <Skeleton w={80} h={14} style={{ marginBottom: 5 }} />
+                <Skeleton w={70} h={11} />
+              </div>
+              <Skeleton w={28} h={28} radius={6} />
             </div>
+            <Skeleton w="100%" h={32} radius={6} style={{ marginTop: 8 }} />
           </div>
-          <div style={{ padding: "8px 10px" }}>
-            <Skeleton w="100%" h={32} radius={6} />
-          </div>
-          <div className="dsa-sidebar-list">
+          <div className="dsa-sidebar-companies">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="dsa-co-item" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <Skeleton w={28} h={28} radius={999} style={{ flexShrink: 0 }} />
-                <Skeleton w={`${50 + (i % 4) * 12}%`} h={13} />
-                <Skeleton w={30} h={13} style={{ marginLeft: "auto" }} />
+              <div key={i} className="co-item co-item--sidebar" style={{ pointerEvents: "none" }}>
+                <div className="co-logo"><Skeleton w={28} h={28} radius={999} /></div>
+                <div className="co-info"><Skeleton w={`${50 + (i % 4) * 12}%`} h={13} /></div>
+                <div className="co-prog"><Skeleton w={30} h={13} /></div>
               </div>
             ))}
+          </div>
+          <div className="dsa-sidebar-footer">
+            <Skeleton w={80} h={11} style={{ marginBottom: 6 }} />
+            <Skeleton w="100%" h={4} radius={2} style={{ marginBottom: 6 }} />
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <Skeleton w={55} h={11} />
+              <Skeleton w={55} h={11} />
+            </div>
           </div>
         </aside>
       </div>

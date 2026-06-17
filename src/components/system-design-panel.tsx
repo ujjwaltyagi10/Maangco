@@ -325,17 +325,26 @@ export function SystemDesignPanel({
                 <Skeleton w={80} h={14} style={{ marginBottom: 5 }} />
                 <Skeleton w={70} h={11} />
               </div>
+              <Skeleton w={28} h={28} radius={6} />
             </div>
             <Skeleton w="100%" h={32} radius={6} style={{ marginTop: 8 }} />
           </div>
           <div className="sd-cosb-list">
             {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="sd-cosb-item" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <Skeleton w={28} h={28} radius={999} style={{ flexShrink: 0 }} />
-                <Skeleton w={`${45 + (i % 4) * 12}%`} h={13} />
-                <Skeleton w={28} h={13} style={{ marginLeft: "auto" }} />
+              <div key={i} className="sd-cosb-item" style={{ pointerEvents: "none" }}>
+                <div className="sd-cosb-avatar"><Skeleton w={28} h={28} radius={999} /></div>
+                <div className="sd-cosb-info"><Skeleton w={`${45 + (i % 4) * 12}%`} h={13} /></div>
+                <div className="sd-cosb-count"><Skeleton w={28} h={13} /></div>
               </div>
             ))}
+          </div>
+          <div className="sd-cosb-footer">
+            <Skeleton w={80} h={11} style={{ marginBottom: 6 }} />
+            <Skeleton w="100%" h={4} radius={2} style={{ marginBottom: 6 }} />
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <Skeleton w={55} h={11} />
+              <Skeleton w={55} h={11} />
+            </div>
           </div>
         </aside>
       </div>
