@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import adobeLogo from "@/assets/adobe.png";
 import airbnbLogo from "@/assets/airbnb.png";
@@ -132,10 +133,15 @@ export function SystemDesignPanel({
   onCompletedIdsChange,
   isLoading,
 }: SystemDesignPanelProps) {
-  const [selectedCat, setSelectedCat] = useState<typeof ALL_CAT | SystemDesignCategory>(ALL_CAT);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedCat, setSelectedCat] = useState<typeof ALL_CAT | SystemDesignCategory>(
+    () => (searchParams.get("cat") as SystemDesignCategory) ?? ALL_CAT,
+  );
   const [freqFilter, setFreqFilter] = useState<"All" | SystemDesignFrequency>("All");
   const [levelFilter, setLevelFilter] = useState<"All" | "HLD" | "LLD" | "Both">("All");
-  const [selectedCompany, setSelectedCompany] = useState<string>(ALL_CO);
+  const [selectedCompany, setSelectedCompany] = useState<string>(
+    () => searchParams.get("co") ?? ALL_CO,
+  );
   const [search, setSearch] = useState("");
   const [companySearch, setCompanySearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -156,6 +162,21 @@ export function SystemDesignPanel({
     if (filtersOpen) document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [filtersOpen]);
+
+  // Sync company + category to URL
+  useEffect(() => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (selectedCompany === ALL_CO) next.delete("co");
+        else next.set("co", selectedCompany);
+        if (selectedCat === ALL_CAT) next.delete("cat");
+        else next.set("cat", selectedCat);
+        return next;
+      },
+      { replace: true },
+    );
+  }, [selectedCompany, selectedCat]);
 
   // Company counts from all questions
   const companyCounts = useMemo(() => {

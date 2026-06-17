@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import type {
   FrontendQuestion,
@@ -92,14 +93,19 @@ export function FrontendPanel({
   onBuyPremium,
   isLoading,
 }: FrontendPanelProps) {
-  const [activeTab, setActiveTab] = useState<FrontendTab>("roadmap");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<FrontendTab>(
+    () => (searchParams.get("tab") as FrontendTab) ?? "roadmap",
+  );
   const [searchValue, setSearchValue] = useState("");
   const [difficultyFilter, setDifficultyFilter] =
     useState<QuestionDifficulty>("All");
   const [selectedCategory, setSelectedCategory] =
-    useState<FrontendQuestion["category"]>("JavaScript");
+    useState<FrontendQuestion["category"]>(
+      () => (searchParams.get("cat") as FrontendQuestion["category"]) ?? "JavaScript",
+    );
   const [expandedWeekId, setExpandedWeekId] = useState(
-    roadmapWeeks[0]?.id ?? "",
+    () => searchParams.get("week") ?? roadmapWeeks[0]?.id ?? "",
   );
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [tabMenuOpen, setTabMenuOpen] = useState(false);
@@ -125,6 +131,23 @@ export function FrontendPanel({
     if (filtersOpen) document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [filtersOpen]);
+
+  // Sync tab + week + category to URL
+  useEffect(() => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (activeTab === "roadmap") next.delete("tab");
+        else next.set("tab", activeTab);
+        if (expandedWeekId) next.set("week", expandedWeekId);
+        else next.delete("week");
+        if (selectedCategory === "JavaScript") next.delete("cat");
+        else next.set("cat", selectedCategory);
+        return next;
+      },
+      { replace: true },
+    );
+  }, [activeTab, expandedWeekId, selectedCategory]);
 
   const categories = useMemo(
     () =>

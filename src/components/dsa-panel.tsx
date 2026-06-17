@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import type { DsaCompany, DsaQuestion, QuestionId } from "@/types/maangco";
 import { Skeleton } from "./ui/shimmer";
@@ -46,7 +47,10 @@ export function DsaPanel({
   onBookmarkedIdsChange,
   isLoading,
 }: DsaPanelProps) {
-  const [selectedCompanyId, setSelectedCompanyId] = useState(ALL_ID);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedCompanyId, setSelectedCompanyId] = useState(
+    () => searchParams.get("co") ?? ALL_ID,
+  );
   const [companySearch, setCompanySearch] = useState("");
   const [difficultyFilter, setDifficultyFilter] =
     useState<DifficultyFilter>("all");
@@ -154,6 +158,19 @@ export function DsaPanel({
     if (filtersOpen) document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [filtersOpen]);
+
+  // Sync selected company to URL
+  useEffect(() => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (selectedCompanyId === ALL_ID) next.delete("co");
+        else next.set("co", selectedCompanyId);
+        return next;
+      },
+      { replace: true },
+    );
+  }, [selectedCompanyId]);
 
   // Reset to page 1 whenever filters or selected company change
   useEffect(() => {
