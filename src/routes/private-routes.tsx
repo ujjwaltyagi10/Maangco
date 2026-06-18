@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import { AppShell } from "@/components/app-shell";
@@ -96,6 +96,16 @@ export function PrivateRoutes({
   const location = useLocation();
   const activePanel = panelFromPath(location.pathname);
   const onSignIn = () => navigate(ROUTES.login);
+
+  useEffect(() => {
+    const titles: Record<string, string> = {
+      dashboard: "Dashboard – MAANGco",
+      dsa: "DSA Practice – MAANGco",
+      "system-design": "System Design Prep – MAANGco",
+      frontend: "Frontend Interview Prep – MAANGco",
+    };
+    document.title = titles[activePanel] ?? "MAANGco";
+  }, [activePanel]);
   const onSignUp = () => navigate(ROUTES.signup);
   const isAuthenticated = Boolean(authSession?.token);
   const isFrontendFree = activePanel === "frontend";

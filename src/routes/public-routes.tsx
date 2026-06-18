@@ -208,6 +208,16 @@ export function PublicRoutes({
   const navigate = useNavigate();
   const mode = useMemo(() => authModeFromPath(location.pathname), [location.pathname]);
 
+  useEffect(() => {
+    const pageTitles: Record<string, string> = {
+      "/": "MAANGco – MAANG Interview Prep | DSA, System Design & Frontend",
+      "/login": "Sign In – MAANGco",
+      "/signup": "Get Started Free – MAANGco",
+      "/forgot-password": "Reset Password – MAANGco",
+    };
+    document.title = pageTitles[location.pathname] ?? "MAANGco";
+  }, [location.pathname]);
+
   const isAuthenticated = Boolean(authSession?.token);
 
   // Redirect logged-in users away from auth screens only (not the landing page)

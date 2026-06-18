@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /signup
+Disallow: /dashboard
+Disallow: /dsa
+Disallow: /system-design
+Disallow: /frontend
+Disallow: /api/
+
+Sitemap: https://maangco.com/sitemap.xml
