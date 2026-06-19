@@ -439,6 +439,18 @@ export function getGoogleAuthUrl() {
   return buildUrl(googlePath);
 }
 
+export async function googleOneTapLogin(credential: string): Promise<{ token: string; user: AuthUser }> {
+  const res = await fetch(buildUrl("/api/google/one-tap"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ credential }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.message || "Google One Tap failed");
+  return { token: data.accessToken, user: data.user };
+}
+
 export function parseAuthCallbackSearch(search: string) {
   const params = new URLSearchParams(search);
   const userValue = params.get("user");

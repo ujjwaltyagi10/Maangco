@@ -7,6 +7,7 @@ import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyM
 import { fetchProgress, toggleProgress, emptyProgress, type ProgressState } from "./lib/progress-api";
 import { fetchDsaGrouped, fetchSystemDesignQuestions, fetchFrontendQuestions, fetchRoadmap } from "./lib/questions-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
+import { useGoogleOneTap } from "./hooks/useGoogleOneTap";
 import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "./types/maangco";
 import { ROUTES, type AuthSubmitResult } from "./routes/route-paths";
 import "./App.css";
@@ -366,6 +367,11 @@ function App() {
       .then(applyProgress)
       .catch(() => {});
   };
+
+  useGoogleOneTap({
+    isAuthenticated: Boolean(authSession?.token),
+    onSuccess: handleGoogleCallback,
+  });
 
   const handleLogout = async () => {
     setAuthSubmitting(true);
