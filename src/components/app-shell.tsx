@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { BookOpen, Code2, ExternalLink, LayoutDashboard, Layers, Server } from "lucide-react";
+import { BookOpen, Code2, ExternalLink, LayoutDashboard, /* Layers, */ Server } from "lucide-react";
 
 import type { AppPanel } from "@/types/maangco";
 
