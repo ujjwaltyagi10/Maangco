@@ -1,6 +1,6 @@
 export const AUTH_API_BASE_URL = (
   (import.meta.env.VITE_AUTH_API_BASE_URL as string | undefined)?.trim() ||
-  "https://backend-maangco.vercel.app"
+  "https://api.maangco.com"
 ).replace(/\/$/, "");
 
 export interface AuthSubscription {
