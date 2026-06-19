@@ -45,7 +45,7 @@ export function AuthGateModal({
 
           <div className="auth-gate-mini-title">Login/Sign up to access MAANGco Plus</div>
           <div className="auth-gate-mini-subtitle">
-            Unlock the dashboard, DSA, and system design sections. Frontend Prep stays free.
+            Unlock the dashboard, DSA, and system design sections.
           </div>
 
           <div className="auth-gate-mini-actions">

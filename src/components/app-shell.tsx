@@ -26,7 +26,7 @@ const navItems = [
   { id: "dashboard" as AppPanel, label: "Dashboard", icon: LayoutDashboard },
   { id: "dsa" as AppPanel, label: "DSA Practice", icon: Code2, badge: "LC" },
   { id: "system-design" as AppPanel, label: "System Design", icon: Server, badge: "150" },
-  { id: "frontend" as AppPanel, label: "Frontend Prep", icon: Layers, badge: "45d" },
+  // { id: "frontend" as AppPanel, label: "Frontend Prep", icon: Layers, badge: "45d" },
 ];
 
 const panelLabels: Record<AppPanel, string> = {

@@ -156,23 +156,12 @@ export function DashboardPanel({
       onClick: onOpenSystemDesign,
       locked: !isPremium,
     },
-    {
-      key: "fe",
-      icon: "🎯",
-      label: "Frontend Prep",
-      tag: "45-Day Roadmap",
-      desc: "Structured plan covering JS, React, TypeScript + 275 interview Qs.",
-      progress: frontendProgress,
-      color: "var(--green)",
-      colorBg: "var(--green-bg)",
-      stats: [
-        { val: completedFrontendCount, lbl: "Done" },
-        { val: "275", lbl: "Questions" },
-        { val: `${completedRoadmapDays}/${totalRoadmapDays}`, lbl: "Days" },
-      ],
-      onClick: onOpenFrontend,
-      locked: false,
-    },
+    // { key: "fe", icon: "🎯", label: "Frontend Prep", tag: "45-Day Roadmap",
+    //   desc: "Structured plan covering JS, React, TypeScript + 275 interview Qs.",
+    //   progress: frontendProgress, color: "var(--green)", colorBg: "var(--green-bg)",
+    //   stats: [{ val: completedFrontendCount, lbl: "Done" }, { val: "275", lbl: "Questions" },
+    //           { val: `${completedRoadmapDays}/${totalRoadmapDays}`, lbl: "Days" }],
+    //   onClick: onOpenFrontend, locked: false },
   ];
 
   return (
@@ -187,7 +176,7 @@ export function DashboardPanel({
             <span className="dp-hero-accent">let&apos;s keep the streak alive.</span>
           </h1>
           <p className="dp-hero-sub">
-            Track DSA, System Design, and Frontend progress all in one place.
+            Track DSA and System Design progress all in one place.
           </p>
         </div>
         <div className="dp-hero-stats">

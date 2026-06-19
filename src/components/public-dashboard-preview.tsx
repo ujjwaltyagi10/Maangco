@@ -24,16 +24,9 @@ const features = [
     labelB: "Companies",
     accent: "var(--amber)",
   },
-  {
-    icon: "🎯",
-    name: "Frontend Prep",
-    desc: "A free 45-day path covering JS, React, TypeScript, Testing, and performance.",
-    statA: "45",
-    labelA: "Days",
-    statB: "275",
-    labelB: "Questions",
-    accent: "var(--blue)",
-  },
+  // { icon: "🎯", name: "Frontend Prep",
+  //   desc: "A free 45-day path covering JS, React, TypeScript, Testing, and performance.",
+  //   statA: "45", labelA: "Days", statB: "275", labelB: "Questions", accent: "var(--blue)" },
 ];
 
 
