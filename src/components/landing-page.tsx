@@ -314,11 +314,29 @@ export function LandingPage({
   const [aidModalOpen, setAidModalOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
+  const lfspSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const onScroll = () => setNavScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const targets = document.querySelectorAll("[data-scroll-reveal]");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("sr-visible");
+            observer.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    targets.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
   const mentorshipCalendarUrl = buildMentorshipCalendarUrl();
   const mentorshipCtaLabel = isPremium ? "Add to calendar" : "Reserve My Spot";
@@ -938,23 +956,25 @@ export function LandingPage({
         return (
           <section className="lfsp-section">
             <div className="lfsp-container">
-              <p className="lfsp-eyebrow">What's inside</p>
+              <p className="lfsp-eyebrow" data-scroll-reveal>What's inside</p>
 
               {/* DSA Panel — text left, video right */}
-              <div className="lfsp-panel">
+              <div className="lfsp-panel" data-scroll-reveal>
                 <div className="lfsp-panel-text">
-                  <div className="lfsp-panel-title">DSA Practice</div>
-                  <p className="lfsp-panel-sub">
+                  <div className="lfsp-panel-title sr-child" style={{ "--sr-delay": "0s" } as React.CSSProperties}>DSA Practice</div>
+                  <p className="lfsp-panel-sub sr-child" style={{ "--sr-delay": "0.15s" } as React.CSSProperties}>
                     840+ company-tagged problems across 23 companies, sorted by
                     real interview frequency.
                   </p>
-                  <Accordion
-                    items={dsaItems}
-                    openId={dsaOpen}
-                    setOpenId={setDsaOpen}
-                  />
+                  <div className="sr-child" style={{ "--sr-delay": "0.3s" } as React.CSSProperties}>
+                    <Accordion
+                      items={dsaItems}
+                      openId={dsaOpen}
+                      setOpenId={setDsaOpen}
+                    />
+                  </div>
                 </div>
-                <div className="lfsp-panel-media">
+                <div className="lfsp-panel-media sr-child" style={{ "--sr-delay": "0.2s" } as React.CSSProperties}>
                   <div className="lfsp-media">
                     <video
                       autoPlay
@@ -974,20 +994,22 @@ export function LandingPage({
               </div>
 
               {/* SD Panel — video left, text right */}
-              <div className="lfsp-panel lfsp-panel--reverse">
+              <div className="lfsp-panel lfsp-panel--reverse" data-scroll-reveal>
                 <div className="lfsp-panel-text">
-                  <div className="lfsp-panel-title">System Design</div>
-                  <p className="lfsp-panel-sub">
+                  <div className="lfsp-panel-title sr-child" style={{ "--sr-delay": "0s" } as React.CSSProperties}>System Design</div>
+                  <p className="lfsp-panel-sub sr-child" style={{ "--sr-delay": "0.15s" } as React.CSSProperties}>
                     150-question roadmap from HLD to LLD — structured, tracked
                     and company-tagged.
                   </p>
-                  <Accordion
-                    items={sdItems}
-                    openId={sdOpen}
-                    setOpenId={setSdOpen}
-                  />
+                  <div className="sr-child" style={{ "--sr-delay": "0.3s" } as React.CSSProperties}>
+                    <Accordion
+                      items={sdItems}
+                      openId={sdOpen}
+                      setOpenId={setSdOpen}
+                    />
+                  </div>
                 </div>
-                <div className="lfsp-panel-media">
+                <div className="lfsp-panel-media sr-child" style={{ "--sr-delay": "0.2s" } as React.CSSProperties}>
                   <div className="lfsp-media">
                     <video
                       autoPlay

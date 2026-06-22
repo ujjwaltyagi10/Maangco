@@ -206,6 +206,31 @@ a.lbtn-lg {
 }
 
 /* ─────────────────────────────────────────
+   SCROLL REVEAL
+───────────────────────────────────────── */
+@keyframes sr-fade-up {
+  from { opacity: 0; transform: translateY(24px); filter: blur(2px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+[data-scroll-reveal] { }
+[data-scroll-reveal] .sr-child {
+  opacity: 0;
+}
+[data-scroll-reveal].sr-visible .sr-child {
+  animation: sr-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--sr-delay, 0s);
+}
+[data-scroll-reveal]:not(.lfsp-panel) {
+  opacity: 0;
+  transition: opacity 0.9s ease, transform 0.9s ease;
+  transform: translateY(16px);
+}
+[data-scroll-reveal]:not(.lfsp-panel).sr-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─────────────────────────────────────────
    FEATURES SPLIT (Obsidian-style)
 ───────────────────────────────────────── */
 .lfsp-section {
