@@ -14,6 +14,7 @@ import googleLogo from "@/assets/google.png";
 import metaLogo from "@/assets/meta.png";
 import stoneLeftImg from "@/assets/stone-left.webp";
 import stoneRightImg from "@/assets/stone-right.webp";
+import statsHeroImg from "@/assets/stats-hero.webp";
 
 import adobeSvg from "@/assets/svg/adobe.svg";
 import airbnbSvg from "@/assets/svg/airbnb.svg";
@@ -23,6 +24,14 @@ import microsoftSvg from "@/assets/svg/microsoft.svg";
 import netflixSvg from "@/assets/svg/netflix.svg";
 import pinterestSvg from "@/assets/svg/pinterest.svg";
 import salesforceSvg from "@/assets/svg/salesforce.svg";
+import amazonSvg from "@/assets/svg/amazon.svg";
+import appleSvg from "@/assets/svg/apple.svg";
+import atlassianSvg from "@/assets/svg/atlassian.svg";
+import nvidiaLightSvg from "@/assets/svg/nvidia-light.svg";
+import oracleSvg from "@/assets/svg/oracle.svg";
+import snowflakeSvg from "@/assets/svg/snowflake.svg";
+import uberDarkSvg from "@/assets/svg/uber-dark.svg";
+import visaSvg from "@/assets/svg/visa.svg";
 
 const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url)
   .href;
@@ -332,20 +341,28 @@ export function LandingPage({
   }, []);
 
   useEffect(() => {
-    const targets = document.querySelectorAll("[data-scroll-reveal]");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("sr-visible");
-            observer.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.12, root: landingRef.current }
-    );
-    targets.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const container = landingRef.current;
+    if (!container) return;
+    let observer: IntersectionObserver;
+    const timer = setTimeout(() => {
+      const targets = container.querySelectorAll("[data-scroll-reveal]");
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("sr-visible");
+              observer.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.08, root: null }
+      );
+      targets.forEach((el) => observer.observe(el));
+    }, 100);
+    return () => {
+      clearTimeout(timer);
+      observer?.disconnect();
+    };
   }, []);
   const mentorshipCalendarUrl = buildMentorshipCalendarUrl();
   const mentorshipCtaLabel = isPremium ? "Add to calendar" : "Reserve My Spot";
@@ -744,6 +761,36 @@ export function LandingPage({
         <div className="lhero-obsidian-bg" />
         <div className="lhero-obsidian-vignette" />
 
+        {/* Floating background logos */}
+        <div className="lhero-float-logos" aria-hidden>
+          {[
+            { src: googleSvg,     style: { top: "9%",     right: "8%",   width: 44 }, delay: 0 },
+            { src: metaSvg,       style: { top: "14%",    left: "5%",    width: 30 }, delay: 1.2 },
+            { src: microsoftSvg,  style: { top: "36%",    left: "28%",   width: 34 }, delay: 0.6 },
+            { src: netflixSvg,    style: { bottom: "22%", right: "13%",  width: 28 }, delay: 1.8 },
+            { src: adobeSvg,      style: { top: "28%",    right: "22%",  width: 26 }, delay: 2.4 },
+            { src: airbnbSvg,     style: { bottom: "32%", left: "10%",   width: 32 }, delay: 0.9 },
+            { src: salesforceSvg, style: { top: "68%",    right: "5%",   width: 38 }, delay: 1.5 },
+            { src: pinterestSvg,  style: { top: "38%",    left: "42%",   width: 26 }, delay: 3.0 },
+            { src: amazonSvg,     style: { bottom: "14%", left: "28%",   width: 40 }, delay: 2.1 },
+            { src: appleSvg,      style: { top: "22%",    left: "15%",   width: 28 }, delay: 0.3 },
+            { src: atlassianSvg,  style: { top: "60%",    left: "48%",   width: 30 }, delay: 1.0 },
+            { src: nvidiaLightSvg,style: { top: "18%",    right: "32%",  width: 42 }, delay: 2.7 },
+            { src: oracleSvg,     style: { bottom: "28%", right: "28%",  width: 36 }, delay: 1.4 },
+            { src: snowflakeSvg,  style: { top: "75%",    left: "25%",   width: 28 }, delay: 3.3 },
+            { src: uberDarkSvg,   style: { bottom: "10%", right: "42%",  width: 32 }, delay: 0.5 },
+            { src: visaSvg,       style: { top: "42%",    right: "35%",  width: 36 }, delay: 2.0 },
+          ].map((logo, i) => (
+            <img
+              key={i}
+              src={logo.src}
+              className="lhero-float-logo"
+              style={{ ...logo.style, animationDelay: `${logo.delay}s` } as React.CSSProperties}
+              alt=""
+            />
+          ))}
+        </div>
+
         <div className="lhero-obsidian-inner">
           {/* Headline + sub + CTA */}
           <div className="lhero-obsidian-text">
@@ -757,7 +804,7 @@ export function LandingPage({
               ))}
             </h1>
             <p className="lhero-obsidian-sub lhero-fade-in" style={{ animationDelay: "0.75s" }}>
-              Company-wise DSA sheets and System Design roadmaps — curated from
+              Company-wise DSA sheets and System Design roadmaps curated from
               real interview experiences at top tech companies.
             </p>
             {isPremium ? (
@@ -829,7 +876,7 @@ export function LandingPage({
                 {/* Main content */}
                 <div className="lodm-main">
                   <div className="lodm-topbar">
-                    <span className="lodm-welcome">Welcome back, Ujjwal 👋</span>
+                    <span className="lodm-welcome">Welcome back 👋</span>
                     <div className="lodm-topbar-right">
                       <div className="lodm-co-pill active-co">Google</div>
                       <div className="lodm-co-pill">Meta</div>
@@ -914,6 +961,36 @@ export function LandingPage({
           </div>
         </div>
       </div>
+
+      {/* ── STATS / SOCIAL PROOF ── */}
+      <section className="lstat-section">
+        <img src={statsHeroImg} alt="" className="lstat-bg-img" aria-hidden />
+        <div className="lstat-overlay" />
+        <div className="lstat-inner" data-scroll-reveal>
+          <p className="lstat-eyebrow sr-child" style={{ "--sr-delay": "0s" } as React.CSSProperties}>Trusted by engineers worldwide</p>
+          <div className="lstat-big-number sr-child" style={{ "--sr-delay": "0.1s" } as React.CSSProperties}>10,000<span>+</span></div>
+          <h2 className="lstat-heading sr-child" style={{ "--sr-delay": "0.2s" } as React.CSSProperties}>Engineers preparing for MAANG</h2>
+          <p className="lstat-sub sr-child" style={{ "--sr-delay": "0.32s" } as React.CSSProperties}>
+            From fresh graduates to senior engineers — MAANGco is the go-to platform<br />for structured, focused MAANG interview preparation.
+          </p>
+          <div className="lstat-chips sr-child" style={{ "--sr-delay": "0.44s" } as React.CSSProperties}>
+            <div className="lstat-chip">
+              <div className="lstat-chip-val">2,500+</div>
+              <div className="lstat-chip-lbl">DSA problems curated</div>
+            </div>
+            <div className="lstat-chip-divider" />
+            <div className="lstat-chip">
+              <div className="lstat-chip-val">150+</div>
+              <div className="lstat-chip-lbl">System design topics</div>
+            </div>
+            <div className="lstat-chip-divider" />
+            <div className="lstat-chip">
+              <div className="lstat-chip-val">25+</div>
+              <div className="lstat-chip-lbl">Company sheets</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── FEATURES SPLIT ── */}
       {(() => {
@@ -1407,32 +1484,33 @@ export function LandingPage({
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="lsection lsection--alt" id="testimonials">
-        <div className="landing-container">
-          <div className="lsection-header">
-            <div className="lsection-tag">Reviews</div>
-            <h2 className="lsection-title">
-              Engineers who cracked it with MAANGco
+      <section className="ltesti-section" id="testimonials">
+        <div className="ltesti-split">
+          {/* Left: heading */}
+          <div className="ltesti-heading-col">
+            <div className="ltesti-label">Reviews</div>
+            <h2 className="ltesti-heading">
+              Engineers who<br />cracked it with<br />MAANGco
             </h2>
-            <p className="lsection-sub">
-              Real results from engineers who got into Google, Meta, Amazon,
-              Microsoft and more.
-            </p>
           </div>
-          <div className="ltesti-grid">
-            {testimonials.map((t) => (
-              <div key={t.name} className="ltesti-card">
-                <div className="ltesti-stars">{"★★★★★"}</div>
-                <p className="ltesti-text">{t.text}</p>
-                <div className="ltesti-author">
-                  <div className="ltesti-avatar">{t.initials}</div>
-                  <div>
-                    <div className="ltesti-name">{t.name}</div>
-                    <div className="ltesti-role">{t.role}</div>
+
+          {/* Right: infinite scrolling cards */}
+          <div className="ltesti-marquee-wrap">
+            <div className="ltesti-marquee-track">
+              {[...testimonials, ...testimonials].map((t, i) => (
+                <div key={i} className="ltesti-card">
+                  <div className="ltesti-card-top">
+                    <div className="ltesti-avatar">{t.initials}</div>
+                    <div>
+                      <div className="ltesti-name">{t.name}</div>
+                      <div className="ltesti-role">{t.role}</div>
+                    </div>
                   </div>
+                  <p className="ltesti-text">{t.text}</p>
+                  <div className="ltesti-stars">★★★★★</div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
