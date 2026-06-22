@@ -737,11 +737,11 @@ export function LandingPage({
           <div className="lhero-obsidian-text">
             <h1 className="lhero-obsidian-h1">
               {["The", "all-in-one", "platform"].map((w, i) => (
-                <span key={w} className="lhero-word" style={{ animationDelay: `${i * 0.1}s` }}>{w}{" "}</span>
+                <span key={w} className="lhero-word" style={{ animationDelay: `${i * 0.1}s` }}>{w}</span>
               ))}
               <br />
               {["for", "MAANG", "interviews"].map((w, i) => (
-                <span key={w} className="lhero-word" style={{ animationDelay: `${(3 + i) * 0.1}s` }}>{w}{i < 2 ? " " : ""}</span>
+                <span key={w} className="lhero-word" style={{ animationDelay: `${(3 + i) * 0.1}s` }}>{w}</span>
               ))}
             </h1>
             <p className="lhero-obsidian-sub lhero-fade-in" style={{ animationDelay: "0.75s" }}>
@@ -770,7 +770,7 @@ export function LandingPage({
           </div>
 
           {/* Dashboard mockup */}
-          <div className="lhero-obsidian-screenshot">
+          <div className="lhero-obsidian-screenshot lhero-fade-in" style={{ animationDelay: "0.4s" }}>
             <div className="lodm-mockup">
               {/* Chrome bar */}
               <div className="lodm-chrome">
