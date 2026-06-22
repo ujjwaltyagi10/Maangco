@@ -323,6 +323,12 @@ export function LandingPage({
   }, []);
 
   useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 1024) setMobileMenuOpen(false); };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
     const targets = document.querySelectorAll("[data-scroll-reveal]");
     const observer = new IntersectionObserver(
       (entries) => {
@@ -376,7 +382,7 @@ export function LandingPage({
   return (
     <div className="landing w-full min-w-0">
       {/* ── NAVBAR ── */}
-      <nav className={`landing-nav${navScrolled ? " scrolled" : ""}`}>
+      <nav className={`landing-nav${navScrolled ? " scrolled" : ""}${mobileMenuOpen ? " mobile-open" : ""}`}>
         <div className="landing-container">
           <div className="landing-nav-row">
             <div className="landing-nav-left">
@@ -427,7 +433,7 @@ export function LandingPage({
                       width="15"
                       height="15"
                     >
-                      <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
+                      <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
                     </svg>
                   ) : (
                     <svg
@@ -532,7 +538,7 @@ export function LandingPage({
                               fill="currentColor"
                               style={{ width: 14, height: 14 }}
                             >
-                              <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
+                              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
                             </svg>
                           ) : (
                             <svg
@@ -639,7 +645,7 @@ export function LandingPage({
                     width="14"
                     height="14"
                   >
-                    <path d="M14.8 12.9a6.7 6.7 0 1 1-7.7-9.8 7.2 7.2 0 0 0 7.7 9.8Z" />
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
                   </svg>
                 ) : (
                   <svg
@@ -680,25 +686,26 @@ export function LandingPage({
             </div>
           </div>
 
-          {mobileMenuOpen ? (
-            <div className="lg:hidden pb-4 flex flex-col gap-1">
+          {mobileMenuOpen && (
+            <div className="lnav-mobile-drawer">
               {["#features", "#pricing", "#testimonials", "#faq"].map(
                 (href, i) => (
                   <a
                     key={href}
                     href={href}
-                    className="landing-nav-link block"
+                    className="lnav-mobile-link"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {["Features", "Pricing", "Reviews", "FAQ"][i]}
                   </a>
                 ),
               )}
-              <div className="flex gap-2 mt-2">
+              <div className="lnav-mobile-actions">
                 {isAuthenticated ? (
                   <button
                     type="button"
-                    className="lnav-get-started flex-1"
+                    className="lnav-get-started"
+                    style={{ flex: 1 }}
                     onClick={onGoToDashboard}
                   >
                     Go to Dashboard →
@@ -707,14 +714,16 @@ export function LandingPage({
                   <>
                     <button
                       type="button"
-                      className="lnav-sign-in flex-1"
+                      className="lnav-sign-in"
+                      style={{ flex: 1 }}
                       onClick={onSignIn}
                     >
                       Sign In
                     </button>
                     <button
                       type="button"
-                      className="lnav-get-started flex-1"
+                      className="lnav-get-started"
+                      style={{ flex: 1 }}
                       onClick={onGetStarted}
                     >
                       Get Started
@@ -723,7 +732,7 @@ export function LandingPage({
                 )}
               </div>
             </div>
-          ) : null}
+          )}
         </div>
       </nav>
 
