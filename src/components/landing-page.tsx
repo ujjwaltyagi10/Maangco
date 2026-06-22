@@ -12,6 +12,17 @@ import { FinancialAidModal } from "./financial-aid-modal";
 import amazonLogo from "@/assets/Amazon.png";
 import googleLogo from "@/assets/google.png";
 import metaLogo from "@/assets/meta.png";
+import stoneLeftImg from "@/assets/stone-left.webp";
+import stoneRightImg from "@/assets/stone-right.webp";
+
+import adobeSvg from "@/assets/svg/adobe.svg";
+import airbnbSvg from "@/assets/svg/airbnb.svg";
+import googleSvg from "@/assets/svg/google.svg";
+import metaSvg from "@/assets/svg/meta.svg";
+import microsoftSvg from "@/assets/svg/microsoft.svg";
+import netflixSvg from "@/assets/svg/netflix.svg";
+import pinterestSvg from "@/assets/svg/pinterest.svg";
+import salesforceSvg from "@/assets/svg/salesforce.svg";
 
 const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url)
   .href;
@@ -35,32 +46,6 @@ interface LandingPageProps {
   onBuyPremium?: (plan?: "monthly" | "yearly") => void;
   isPremium?: boolean;
 }
-
-const companies = [
-  "Google",
-  "Meta",
-  "Amazon",
-  "Microsoft",
-  "Apple",
-  "Uber",
-  "Netflix",
-  "Atlassian",
-  "Adobe",
-  "Walmart",
-  "Flipkart",
-  "Nvidia",
-  "Bloomberg",
-  "Salesforce",
-  "TikTok",
-  "Citadel",
-  "Goldman Sachs",
-  "Visa",
-  "Oracle",
-  "Pinterest",
-  "Airbnb",
-  "Snowflake",
-  "TCS",
-];
 
 const PLAN_FEATURES = [
   "840+ company-wise DSA questions",
@@ -327,7 +312,14 @@ export function LandingPage({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const [aidModalOpen, setAidModalOpen] = useState(false);
+  const [navScrolled, setNavScrolled] = useState(false);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => setNavScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   const mentorshipCalendarUrl = buildMentorshipCalendarUrl();
   const mentorshipCtaLabel = isPremium ? "Add to calendar" : "Reserve My Spot";
 
@@ -366,7 +358,7 @@ export function LandingPage({
   return (
     <div className="landing w-full min-w-0">
       {/* ── NAVBAR ── */}
-      <nav className="landing-nav">
+      <nav className={`landing-nav${navScrolled ? " scrolled" : ""}`}>
         <div className="landing-container">
           <div className="landing-nav-row">
             <div className="landing-nav-left">
@@ -717,279 +709,306 @@ export function LandingPage({
         </div>
       </nav>
 
-      {/* ── HERO v2 ── */}
-      <section className="lhero-v2">
-        <div className="lhero-orb lhero-orb-1" />
-        <div className="lhero-orb lhero-orb-2" />
-        <div className="lhero-orb lhero-orb-3" />
-        <div className="lhero-grid-overlay" />
+      {/* ── HERO (Obsidian stone-dark) ── */}
+      <section className="lhero-obsidian">
+        <div className="lhero-obsidian-bg" />
+        <div className="lhero-obsidian-vignette" />
 
-        <div className="landing-container lhero-v2-wrap">
-          {/* Left: content */}
-          <div className="lhero-v2-left">
-            <div className="lhero-v2-badge">
-              <span className="lhero-v2-live-dot" />
-              Live · Questions added daily from fresh FAANG reports
-            </div>
-
-            <h1 className="lhero-v2-title">
-              Crack FAANG.
-              <span className="lhero-v2-gradient-text">
-                Not a question more.
-                <br />
-                Not a concept less.
-              </span>
-            </h1>
-
-            <p className="lhero-v2-sub">
-              The exact DSA and System Design material FAANG interviews demand.
-              Zero fluff. Zero gaps. Refreshed every single day.
-            </p>
-
-            <div className="lhero-v2-ctas">
-              {isPremium ? (
-                <button
-                  type="button"
-                  className="lbtn-primary lbtn-lg lbtn-glow"
-                  onClick={onGoToDashboard}
-                >
-                  Go to Dashboard
-                  <svg
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    width="15"
-                    height="15"
-                  >
-                    <path d="M7 5l6 5-6 5V5z" />
-                  </svg>
-                </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className="lbtn-primary lbtn-lg lbtn-glow"
-                    onClick={onStartFree}
-                  >
-                    Start Learning for Free
-                    <svg
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      width="15"
-                      height="15"
-                    >
-                      <path d="M7 5l6 5-6 5V5z" />
-                    </svg>
-                  </button>
-                  <a href="#pricing" className="lbtn-outline lbtn-lg">
-                    View Pricing
-                  </a>
-                </>
-              )}
-            </div>
-
-            <div className="lhero-v2-stats">
-              {[
-                { v: "840+", l: "Company-wise\nDSA" },
-                { v: "25+", l: "DSA\nCompanies" },
-                { v: "150+", l: "System\nDesign" },
-                { v: "40+", l: "Design\nCompanies" },
-              ].map((s, i, arr) => (
-                <div
-                  key={s.l}
-                  className="lhero-v2-stat-item"
-                  style={{
-                    borderRight:
-                      i < arr.length - 1 ? "1px solid var(--border)" : "none",
-                  }}
-                >
-                  <div className="lhero-v2-stat-val">{s.v}</div>
-                  <div className="lhero-v2-stat-lbl">{s.l}</div>
-                </div>
+        <div className="lhero-obsidian-inner">
+          {/* Headline + sub + CTA */}
+          <div className="lhero-obsidian-text">
+            <h1 className="lhero-obsidian-h1">
+              {["The", "all-in-one", "platform"].map((w, i) => (
+                <span key={w} className="lhero-word" style={{ animationDelay: `${i * 0.1}s` }}>{w}{" "}</span>
               ))}
-            </div>
+              <br />
+              {["for", "MAANG", "interviews"].map((w, i) => (
+                <span key={w} className="lhero-word" style={{ animationDelay: `${(3 + i) * 0.1}s` }}>{w}{i < 2 ? " " : ""}</span>
+              ))}
+            </h1>
+            <p className="lhero-obsidian-sub lhero-fade-in" style={{ animationDelay: "0.75s" }}>
+              Company-wise DSA sheets and System Design roadmaps — curated from
+              real interview experiences at top tech companies.
+            </p>
+            {isPremium ? (
+              <button
+                type="button"
+                className="lhero-obsidian-cta lhero-fade-in"
+                style={{ animationDelay: "1s" }}
+                onClick={onGoToDashboard}
+              >
+                Go to Dashboard
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="lhero-obsidian-cta lhero-fade-in"
+                style={{ animationDelay: "1s" }}
+                onClick={onStartFree}
+              >
+                Get Started For Free
+              </button>
+            )}
           </div>
 
-          {/* Right: floating 3D cards */}
-          <div className="lhero-v2-right">
-            {/* Back card: System Design */}
-            <div className="lhfc lhfc--back">
-              <div className="lhfc-header">
-                <div className="lhfc-dots">
-                  <span />
-                  <span />
-                  <span />
+          {/* Dashboard mockup */}
+          <div className="lhero-obsidian-screenshot">
+            <div className="lodm-mockup">
+              {/* Chrome bar */}
+              <div className="lodm-chrome">
+                <div className="lodm-dots">
+                  <span className="lodm-dot" style={{ background: "#ff5f56" }} />
+                  <span className="lodm-dot" style={{ background: "#ffbd2e" }} />
+                  <span className="lodm-dot" style={{ background: "#27c93f" }} />
                 </div>
-                <span className="lhfc-title">System Design — Day 11</span>
-                <span className="lhfc-live-dot" />
+                <div className="lodm-url">maangco.com / dashboard</div>
+                <div style={{ width: 60 }} />
               </div>
-              <div className="lhfc-topic">Design YouTube Upload Flow</div>
-              <div className="lhfc-tags">
-                {["HLD", "LLD", "CDN", "Message Queue"].map((t) => (
-                  <span key={t} className="lhfc-tag">
-                    {t}
-                  </span>
-                ))}
-              </div>
-              <div className="lhfc-row-bar">
-                <span className="lhfc-bar-label">Week 2 of 13</span>
-                <div className="lhfc-bar-track">
-                  <div className="lhfc-bar-fill" style={{ width: "28%" }} />
+              {/* App grid */}
+              <div className="lodm-app">
+                {/* Sidebar */}
+                <div className="lodm-sidebar">
+                  <div className="lodm-avatar">M</div>
+                  <nav className="lodm-nav">
+                    <div className="lodm-nav-item">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                      <span>Search</span>
+                    </div>
+                    <div className="lodm-nav-item active">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                      <span>Home</span>
+                    </div>
+                    <div className="lodm-nav-item">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+                      <span>Problems</span>
+                    </div>
+                    <div className="lodm-nav-item">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                      <span>Sys Design</span>
+                    </div>
+                    <div className="lodm-nav-item">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                      <span>Bookmarks</span>
+                    </div>
+                    <div className="lodm-nav-item lodm-nav-bottom">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                      <span>Progress</span>
+                    </div>
+                  </nav>
                 </div>
-                <span className="lhfc-bar-pct">28%</span>
-              </div>
-            </div>
-
-            {/* Front card: DSA Practice */}
-            <div className="lhfc lhfc--front">
-              <div className="lhfc-header">
-                <div className="lhfc-dots">
-                  <span />
-                  <span />
-                  <span />
+                {/* Main content */}
+                <div className="lodm-main">
+                  <div className="lodm-topbar">
+                    <span className="lodm-welcome">Welcome back, Ujjwal 👋</span>
+                    <div className="lodm-topbar-right">
+                      <div className="lodm-co-pill active-co">Google</div>
+                      <div className="lodm-co-pill">Meta</div>
+                      <div className="lodm-co-pill">Amazon</div>
+                      <div className="lodm-co-pill">Microsoft</div>
+                      <div className="lodm-co-pill" style={{ color: "#444" }}>+19</div>
+                    </div>
+                  </div>
+                  {/* Progress widget */}
+                  <div className="lodm-prog-bar">
+                    <div className="lodm-ring-wrap">
+                      <svg viewBox="0 0 44 44" width="44" height="44">
+                        <circle cx="22" cy="22" r="18" fill="none" className="lodm-ring-track" strokeWidth="3.5"/>
+                        <circle cx="22" cy="22" r="18" fill="none" stroke="#4ade80" strokeWidth="3.5"
+                          strokeDasharray="113.1" strokeDashoffset="111.9"
+                          strokeLinecap="round" transform="rotate(-90 22 22)"/>
+                        <text x="22" y="26" textAnchor="middle" className="lodm-ring-pct" fontSize="7.5" fontFamily="Inter,sans-serif" fontWeight="500">0%</text>
+                      </svg>
+                    </div>
+                    <div className="lodm-prog-solved">
+                      <div className="lodm-prog-num">5<span className="lodm-prog-total">/1138</span></div>
+                      <div style={{ color: "#4ade80", fontSize: 10 }}>✓ Solved</div>
+                    </div>
+                    <div className="lodm-prog-sep" />
+                    <div className="lodm-prog-diff"><div className="lodm-diff-lbl">Easy</div><div className="lodm-diff-val" style={{ color: "#4ade80" }}>1/258</div></div>
+                    <div className="lodm-prog-diff"><div className="lodm-diff-lbl">Med.</div><div className="lodm-diff-val" style={{ color: "#fbbf24" }}>3/649</div></div>
+                    <div className="lodm-prog-diff"><div className="lodm-diff-lbl">Hard</div><div className="lodm-diff-val" style={{ color: "#f87171" }}>1/231</div></div>
+                  </div>
+                  {/* Table */}
+                  <div className="lodm-tbl-head">
+                    <span style={{ width: 20 }} /><span style={{ flex: 1 }}>Problem</span>
+                    <span style={{ width: 64 }}>Difficulty</span><span style={{ width: 96 }}>Company</span><span style={{ width: 48 }}>Freq</span>
+                  </div>
+                  {[
+                    { name: "Two Sum", diff: "easy", done: true, co: "Google · Meta", w: "88%" },
+                    { name: "Group Anagrams", diff: "med", done: true, co: "Amazon", w: "70%" },
+                    { name: "Trapping Rain Water", diff: "hard", done: false, co: "Google", w: "82%", hi: true },
+                    { name: "Top K Frequent Elements", diff: "med", done: false, co: "Google", w: "78%" },
+                    { name: "Longest Consecutive Sequence", diff: "med", done: false, co: "Meta", w: "62%" },
+                    { name: "Find Median from Data Stream", diff: "hard", done: false, co: "Amazon", w: "55%" },
+                  ].map((r) => (
+                    <div key={r.name} className={`lodm-row${r.hi ? " lodm-row-hi" : ""}`}>
+                      <div className={`lodm-chk${r.done ? " done" : ""}`} />
+                      <span className="lodm-pname">{r.name}</span>
+                      <span className={`lodm-badge ${r.diff}`}>{r.diff === "med" ? "Med." : r.diff.charAt(0).toUpperCase() + r.diff.slice(1)}</span>
+                      <span className="lodm-cotag">{r.co}</span>
+                      <div className="lodm-fbar"><div className="lodm-fbar-fill" style={{ width: r.w }} /></div>
+                    </div>
+                  ))}
                 </div>
-                <span className="lhfc-title">DSA Practice — Google</span>
-                <span className="lhfc-live-dot" />
-              </div>
-              <div className="lhfc-tabs">
-                {["All", "Google", "Meta", "Amazon"].map((c) => (
-                  <span
-                    key={c}
-                    className={`lhfc-tab${c === "Google" ? " active" : ""}`}
-                  >
-                    {c}
-                  </span>
-                ))}
-              </div>
-              {heroProblems.map((p) => (
-                <div
-                  key={p.name}
-                  className={`lhfc-problem-row${p.done ? " done" : ""}`}
-                >
-                  <span className={`lhfc-diff lhfc-diff--${p.diff}`}>
-                    {p.diff}
-                  </span>
-                  <span className="lhfc-problem-name">{p.name}</span>
-                  {p.done ? (
-                    <span className="lhfc-check">✓</span>
-                  ) : (
-                    <span className="lhfc-circle" />
-                  )}
-                </div>
-              ))}
-              <div className="lhfc-footer">
-                <div className="lhfc-footer-bar">
-                  <div className="lhfc-footer-fill" style={{ width: "45%" }} />
-                </div>
-                <span className="lhfc-footer-label">45 / 100 solved</span>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Company logos */}
+        {/* Stone decorations */}
+        <img className="lhero-stone-left" src={stoneLeftImg} alt="" aria-hidden decoding="async" loading="eager" />
+        <img className="lhero-stone-right" src={stoneRightImg} alt="" aria-hidden decoding="async" loading="eager" />
       </section>
 
-      {/* ── MARQUEE ── */}
-      <section className="lmarquee-section">
-        <div className="lmarquee-fade-left" />
-        <div className="lmarquee-fade-right" />
-        <p className="lmarquee-eyebrow">Questions sourced from engineers at</p>
+      <div className="lmarquee-section">
         <div className="lmarquee-overflow">
           <div className="lmarquee-track">
-            {[...companies, ...companies].map((c, i) => (
-              <div key={`${c}-${i}`} className="lmarquee-chip">
-                {c}
-              </div>
-            ))}
+            {(() => {
+              const logos = [
+                { name: "Google", src: googleSvg },
+                { name: "Meta", src: metaSvg },
+                { name: "Microsoft", src: microsoftSvg },
+                { name: "Netflix", src: netflixSvg },
+                { name: "Adobe", src: adobeSvg },
+                { name: "Airbnb", src: airbnbSvg },
+                { name: "Pinterest", src: pinterestSvg },
+                { name: "Salesforce", src: salesforceSvg },
+              ];
+              return [...logos, ...logos].map((c, i) => (
+                <div key={`${c.name}-${i}`} className="lmarquee-chip">
+                  <img src={c.src} alt={c.name} className="lmarquee-logo" />
+                </div>
+              ));
+            })()}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* ── VIDEO SHOWCASE ── */}
-      <section className="lsection lvideo-section">
-        <div className="landing-container">
-          <div className="lsection-header">
-            <div className="lsection-tag">See it in action</div>
-            <h2 className="lsection-title">
-              The exact tools you'll use every day.
-            </h2>
-            <p className="lsection-sub">
-              Live previews of the DSA tracker and system design roadmap —
-              exactly what you get after signing up.
-            </p>
-          </div>
-          <div className="lvideo-grid">
-            <div className="lvideo-card">
-              <div className="lvideo-header">
-                <div
-                  className="lvideo-icon"
-                  style={{
-                    background: "var(--green-bg)",
-                    color: "var(--green)",
-                  }}
-                >
-                  ⚡
+      {/* ── FEATURES SPLIT ── */}
+      {(() => {
+        const [dsaOpen, setDsaOpen] = useState("d1");
+        const [sdOpen, setSdOpen] = useState("s1");
+
+        const dsaItems = [
+          { id: "d1", name: "Company-wise Sheets", desc: "Filter the entire question bank by company. See exactly what Google, Meta, Amazon and 20+ companies ask in real interviews." },
+          { id: "d2", name: "Frequency Ranking", desc: "Every problem scored by how often it appears in real interviews — focus on what actually gets asked." },
+          { id: "d3", name: "Topic Tags", desc: "Problems tagged by DSA topic: Arrays, Trees, DP, Graphs and more for structured topic-wise preparation." },
+          { id: "d4", name: "Progress Tracking", desc: "Mark problems solved, track your Easy / Med / Hard spread and monitor completion per company at a glance." },
+        ];
+
+        const sdItems = [
+          { id: "s1", name: "90-Day Roadmap", desc: "A week-by-week structured plan covering 150 system design questions from fundamentals to senior-level depth." },
+          { id: "s2", name: "HLD + LLD Depth", desc: "Every topic covers both high-level architecture and low-level implementation detail — no surface-level answers." },
+          { id: "s3", name: "Company Tags", desc: "Each question tagged with the companies that ask it, sourced from Glassdoor, Blind and Exponent reports." },
+          { id: "s4", name: "Difficulty Levels", desc: "Questions rated from beginner-friendly to L5/L6 complexity — so you prep at exactly the right level." },
+        ];
+
+        const ACCORD_DURATION = 8000;
+
+        const Accordion = ({ items, openId, setOpenId }: { items: typeof dsaItems; openId: string; setOpenId: (id: string) => void }) => {
+          useEffect(() => {
+            const t = setTimeout(() => {
+              const idx = items.findIndex((i) => i.id === openId);
+              setOpenId(items[(idx + 1) % items.length].id);
+            }, ACCORD_DURATION);
+            return () => clearTimeout(t);
+          }, [openId, items, setOpenId]);
+
+          return (
+            <div className="lfsp-list" style={{ '--accord-dur': `${ACCORD_DURATION}ms` } as React.CSSProperties}>
+              {items.map((item) => {
+                const isOpen = openId === item.id;
+                return (
+                  <button key={item.id} className={`lfsp-item${isOpen ? " active" : ""}`} onClick={() => setOpenId(item.id)}>
+                    <span className="lfsp-item-name">{item.name}</span>
+                    <div className="lfsp-item-body">
+                      <div className="lfsp-item-body-inner">
+                        <span className="lfsp-item-desc">{item.desc}</span>
+                      </div>
+                    </div>
+                    {isOpen && <span key={openId} className="lfsp-item-progress" />}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        };
+
+        return (
+          <section className="lfsp-section">
+            <div className="lfsp-container">
+              <p className="lfsp-eyebrow">What's inside</p>
+
+              {/* DSA Panel — text left, video right */}
+              <div className="lfsp-panel">
+                <div className="lfsp-panel-text">
+                  <div className="lfsp-panel-title">DSA Practice</div>
+                  <p className="lfsp-panel-sub">
+                    840+ company-tagged problems across 23 companies, sorted by
+                    real interview frequency.
+                  </p>
+                  <Accordion
+                    items={dsaItems}
+                    openId={dsaOpen}
+                    setOpenId={setDsaOpen}
+                  />
                 </div>
-                <div>
-                  <div className="lvideo-name">DSA Practice</div>
-                  <div className="lvideo-hint">
-                    Company-wise sheets, frequency &amp; tags
+                <div className="lfsp-panel-media">
+                  <div className="lfsp-media">
+                    <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="metadata"
+                      key={`dsa-${theme}`}
+                    >
+                      <source
+                        src={theme === "dark" ? DSADarkVid : DSALightVid}
+                        type="video/webm"
+                      />
+                    </video>
                   </div>
                 </div>
-                <div className="lvideo-live-badge">Live</div>
               </div>
-              <div className="lvideo-frame">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="metadata"
-                  key={theme === "dark" ? DSADarkVid : DSALightVid}
-                >
-                  <source
-                    src={theme === "dark" ? DSADarkVid : DSALightVid}
-                    type="video/webm"
+
+              {/* SD Panel — video left, text right */}
+              <div className="lfsp-panel lfsp-panel--reverse">
+                <div className="lfsp-panel-text">
+                  <div className="lfsp-panel-title">System Design</div>
+                  <p className="lfsp-panel-sub">
+                    150-question roadmap from HLD to LLD — structured, tracked
+                    and company-tagged.
+                  </p>
+                  <Accordion
+                    items={sdItems}
+                    openId={sdOpen}
+                    setOpenId={setSdOpen}
                   />
-                </video>
-              </div>
-            </div>
-            <div className="lvideo-card">
-              <div className="lvideo-header">
-                <div
-                  className="lvideo-icon"
-                  style={{
-                    background: "var(--amber-bg)",
-                    color: "var(--amber)",
-                  }}
-                >
-                  🏗️
                 </div>
-                <div>
-                  <div className="lvideo-name">System Design</div>
-                  <div className="lvideo-hint">
-                    150-question roadmap with depth &amp; tracking
+                <div className="lfsp-panel-media">
+                  <div className="lfsp-media">
+                    <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="metadata"
+                      key={`sd-${theme}`}
+                    >
+                      <source
+                        src={theme === "dark" ? SDDarkVid : SDLightVid}
+                        type="video/webm"
+                      />
+                    </video>
                   </div>
                 </div>
-                <div className="lvideo-live-badge">Live</div>
-              </div>
-              <div className="lvideo-frame">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="metadata"
-                  key={theme === "dark" ? SDDarkVid : SDLightVid}
-                >
-                  <source
-                    src={theme === "dark" ? SDDarkVid : SDLightVid}
-                    type="video/webm"
-                  />
-                </video>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        );
+      })()}
 
       {/* ── MENTORSHIP ── */}
       <section className="lsection lmentor-section">
