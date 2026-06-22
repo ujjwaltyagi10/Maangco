@@ -315,11 +315,14 @@ export function LandingPage({
   const [navScrolled, setNavScrolled] = useState(false);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
   const lfspSectionRef = useRef<HTMLElement>(null);
+  const landingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setNavScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const el = landingRef.current;
+    if (!el) return;
+    const onScroll = () => setNavScrolled(el.scrollTop > 20);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -339,7 +342,7 @@ export function LandingPage({
           }
         });
       },
-      { threshold: 0.12 }
+      { threshold: 0.12, root: landingRef.current }
     );
     targets.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
@@ -380,7 +383,7 @@ export function LandingPage({
   }, [avatarMenuOpen]);
 
   return (
-    <div className="landing w-full min-w-0">
+    <div className="landing w-full min-w-0" ref={landingRef}>
       {/* ── NAVBAR ── */}
       <nav className={`landing-nav${navScrolled ? " scrolled" : ""}${mobileMenuOpen ? " mobile-open" : ""}`}>
         <div className="landing-container">
