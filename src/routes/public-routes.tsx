@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { AuthScreen } from "@/components/auth-screen";
+import { ContactPage } from "@/components/contact-page";
 import { LandingPage } from "@/components/landing-page";
 import { TermsAndConditionsPage } from "@/components/terms-and-conditions-page";
 import { getAuthErrorMessage, getGoogleAuthUrl, parseAuthCallbackSearch, verifyEmail, type AuthSession } from "@/lib/auth-api";
@@ -213,6 +214,7 @@ export function PublicRoutes({
     const pageTitles: Record<string, string> = {
       "/": "MAANGco – MAANG Interview Prep | DSA, System Design & Frontend",
       "/terms-and-conditions": "Terms and Conditions – MAANGco",
+      "/contact": "Contact Us – MAANGco",
       "/login": "Sign In – MAANGco",
       "/signup": "Get Started Free – MAANGco",
       "/forgot-password": "Reset Password – MAANGco",
@@ -223,7 +225,7 @@ export function PublicRoutes({
   const isAuthenticated = Boolean(authSession?.token);
 
   // Redirect logged-in users away from auth screens only (not the landing page)
-  const isPublicLegalRoute = location.pathname === ROUTES.termsConditions;
+  const isPublicLegalRoute = location.pathname === ROUTES.termsConditions || location.pathname === ROUTES.contact;
 
   if (isAuthenticated && location.pathname !== ROUTES.landing && !isPublicLegalRoute) {
     return <Navigate to={ROUTES.dashboard} replace />;
@@ -251,6 +253,7 @@ export function PublicRoutes({
         }
       />
       <Route path={ROUTES.termsConditions} element={<TermsAndConditionsPage theme={theme} onThemeChange={onThemeChange} />} />
+      <Route path={ROUTES.contact} element={<ContactPage theme={theme} onThemeChange={onThemeChange} />} />
       <Route
         path={ROUTES.login}
         element={

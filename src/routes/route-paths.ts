@@ -16,6 +16,7 @@ export const ROUTES = {
   verifyEmail: "/verify-email",
   googleCallback: "/auth/google/callback",
   termsConditions: "/terms-and-conditions",
+  contact: "/contact",
   dashboard: "/dashboard",
   dsa: "/dsa",
   systemDesign: "/system-design",

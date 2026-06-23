@@ -6016,6 +6016,10 @@ a.lbtn-lg {
   position: relative;
   overflow: hidden;
 }
+
+[data-theme="dark"] .ltc-card {
+  background: var(--bg);
+}
 .ltc-card::before {
   content: "";
   position: absolute;
@@ -6108,4 +6112,87 @@ a.lbtn-lg {
   .ltc-h1 { font-size: clamp(38px, 8vw, 56px); }
   .ltc-card { padding: 24px 20px; }
   .ltc-layout .landing-container { flex-direction: column; }
+}
+
+/* ═══════════════════════════ CONTACT PAGE ═══════════════════════════ */
+.lcontact-section {
+  min-height: calc(100vh - 220px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 24px 80px;
+}
+
+.lcontact-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 56px 52px;
+  max-width: 520px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.06);
+}
+
+[data-theme="dark"] .lcontact-card {
+  background: var(--bg);
+}
+
+.lcontact-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+}
+
+.lcontact-title {
+  font-family: 'IvoryLL', serif;
+  font-size: 38px;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  color: var(--text1);
+  margin: 0 0 20px;
+  line-height: 1.1;
+}
+
+.lcontact-body {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text2);
+  margin: 0 0 20px;
+}
+
+.lcontact-link {
+  color: #c87c4a;
+  text-decoration: none;
+  font-weight: 500;
+}
+.lcontact-link:hover { text-decoration: underline; }
+
+.lcontact-phone {
+  font-size: 14px;
+  color: var(--text2);
+  margin: 0 0 12px;
+}
+.lcontact-phone span { font-weight: 500; color: var(--text1); }
+
+.lcontact-address {
+  font-size: 13px;
+  color: var(--text3);
+  margin: 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 540px) {
+  .lcontact-card { padding: 40px 24px; }
+  .lcontact-title { font-size: 30px; }
 }

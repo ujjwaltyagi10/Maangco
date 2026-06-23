@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import stoneLeftImg from "@/assets/stone-left.webp";
 import stoneRightImg from "@/assets/stone-right.webp";
 import statsHeroImg from "@/assets/stats-hero.webp";
@@ -1123,7 +1124,7 @@ export function LandingPage({
 
             <div className="lfooter-links-row">
                 <a href={ROUTES.termsConditions} className="lfooter-link">Terms and Conditions</a>
-              <a href="#faq" className="lfooter-link">Contact us</a>
+              <Link to={ROUTES.contact} className="lfooter-link" style={{ textDecoration: "none" }}>Contact us</Link>
               <a href="#pricing" className="lfooter-link">Pricing</a>
               <a href="#" className="lfooter-link">Privacy Policy</a>
             

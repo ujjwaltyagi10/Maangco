@@ -400,7 +400,7 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
             </div>
             <div className="lfooter-links-row">
               <a href={ROUTES.termsConditions} className="lfooter-link">Terms and Conditions</a>
-              <a href="#" className="lfooter-link">Contact us</a>
+              <Link to={ROUTES.contact} className="lfooter-link" style={{ textDecoration: "none" }}>Contact us</Link>
               <a href="#" className="lfooter-link">Pricing</a>
               <a href="#" className="lfooter-link">Privacy Policy</a>
               <a href="#" className="lfooter-link">Cancellation and Refund Policy</a>
