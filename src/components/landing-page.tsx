@@ -76,20 +76,20 @@ const heroProblems = [
 
 const testimonials = [
   {
-    initials: "AR",
-    name: "Arjun Rao",
+    initials: "AT",
+    name: "Anuj Thakur",
     role: "SDE @ Amazon",
     text: "MAANGco's company-filtered DSA list is a game-changer. Focused on Amazon-tagged problems for 6 weeks, cleared my loop. No noise — just the problems that showed up in my actual rounds.",
   },
   {
-    initials: "PK",
-    name: "Priya Kapoor",
+    initials: "AJ",
+    name: "Anusha Jha",
     role: "SDE-2 @ Flipkart",
     text: "The System Design roadmap is exactly what I was missing. Went through HLD + LLD day by day and walked into every design round prepared. Offer in 8 weeks.",
   },
   {
-    initials: "SN",
-    name: "Sahil Nair",
+    initials: "AS",
+    name: "Abilaash S",
     role: "SDE-2 @ Google",
     text: "I've tried 4-5 prep platforms. MAANGco is the sharpest and most focused. No bloat, no 2,000 random problems — cleared Google in my first attempt.",
   },
@@ -143,6 +143,25 @@ const faqs = [
     a: "Yes. Sign in with Google or email and your solved problems, roadmap completion, and bookmarks persist everywhere you log in.",
   },
 ];
+
+function Faq2Item({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`lfaq2-item${open ? " open" : ""}`}>
+      <button type="button" className="lfaq2-q" onClick={() => setOpen((v) => !v)}>
+        <span>{q}</span>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="lfaq2-chevron">
+          {open ? (
+            <path d="M4 7l5 5 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          ) : (
+            <path d="M7 4l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          )}
+        </svg>
+      </button>
+      {open && <div className="lfaq2-a">{a}</div>}
+    </div>
+  );
+}
 
 function CheckIcon() {
   return (
@@ -1120,6 +1139,49 @@ export function LandingPage({
           </section>
         );
       })()}
+
+      {/* ── FAQ (Obsidian style) ── */}
+      <section className="lfaq2-section" id="faq">
+        <div className="lfaq2-inner">
+          <div className="lfaq2-left">
+            <p className="lfaq2-eyebrow">Frequently asked questions</p>
+            <h2 className="lfaq2-heading">FAQ</h2>
+          </div>
+          <div className="lfaq2-right">
+            {faqs.map((f) => (
+              <Faq2Item key={f.q} q={f.q} a={f.a} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── STUDENT REVIEWS ── */}
+      <section className="lrev-section">
+        <div className="lrev-inner">
+          <div className="lrev-left">
+            <p className="lrev-eyebrow">Student Reviews</p>
+            <h2 className="lrev-heading">What engineers say</h2>
+            <p className="lrev-count">10,000+ engineers worldwide</p>
+          </div>
+          <div className="lrev-viewport">
+            <div className="lrev-track">
+              {[...testimonials, ...testimonials].map((t, i) => (
+                <div key={i} className="lrev-card">
+                  <div className="lrev-card-top">
+                    <div className={`lrev-avatar lrev-avatar--${i % 9}`}>{t.initials}</div>
+                    <div className="lrev-card-meta">
+                      <div className="lrev-name">{t.name}</div>
+                      <div className="lrev-role">{t.role}</div>
+                    </div>
+                    <span className="lrev-card-stars">★★★★★</span>
+                  </div>
+                  <p className="lrev-text">{t.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── MENTORSHIP ── */}
       <section className="lsection lmentor-section">
