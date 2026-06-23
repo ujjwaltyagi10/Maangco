@@ -1,17 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  CalendarDays,
-  Clock3,
-  Gift,
-  MessageSquareText,
-  Star,
-  Target,
-  UsersRound,
-} from "lucide-react";
-import { FinancialAidModal } from "./financial-aid-modal";
-import amazonLogo from "@/assets/Amazon.png";
-import googleLogo from "@/assets/google.png";
-import metaLogo from "@/assets/meta.png";
 import stoneLeftImg from "@/assets/stone-left.webp";
 import stoneRightImg from "@/assets/stone-right.webp";
 import statsHeroImg from "@/assets/stats-hero.webp";
@@ -31,8 +18,6 @@ import nvidiaLightSvg from "@/assets/svg/nvidia-light.svg";
 import oracleSvg from "@/assets/svg/oracle.svg";
 import snowflakeSvg from "@/assets/svg/snowflake.svg";
 import uberDarkSvg from "@/assets/svg/uber-dark.svg";
-import linkedinSvg from "@/assets/svg/linkedin.svg";
-import xSvg from "@/assets/svg/x.svg";
 import visaSvg from "@/assets/svg/visa.svg";
 
 const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url)
@@ -66,14 +51,6 @@ const PLAN_FEATURES = [
   "Bookmark & revisit any problem",
   "25+ company-curated DSA lists",
   "Progress sync across all devices",
-];
-
-const heroProblems = [
-  { name: "Two Sum", diff: "easy", done: true },
-  { name: "LRU Cache", diff: "hard", done: false },
-  { name: "Merge Intervals", diff: "med", done: true },
-  { name: "Word Break", diff: "med", done: false },
-  { name: "Course Schedule II", diff: "hard", done: false },
 ];
 
 const testimonials = [
@@ -192,149 +169,11 @@ function CheckIcon() {
   );
 }
 
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className={`faq-item${open ? " open" : ""}`}>
-      <button
-        type="button"
-        className="faq-question"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span>{q}</span>
-        <svg
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          style={{
-            width: 16,
-            height: 16,
-            flexShrink: 0,
-            transition: "transform 0.2s",
-            transform: open ? "rotate(180deg)" : "none",
-          }}
-        >
-          <path d="M5 8l5 5 5-5" />
-        </svg>
-      </button>
-      {open ? <div className="faq-answer">{a}</div> : null}
-    </div>
-  );
-}
-
 function getInitials(label: string) {
   const parts = label.trim().split(/\s+/);
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
   return label.slice(0, 2).toUpperCase();
 }
-
-function pad2(value: number) {
-  return value.toString().padStart(2, "0");
-}
-
-function formatCalendarStamp(date: Date) {
-  return (
-    [date.getFullYear(), pad2(date.getMonth() + 1), pad2(date.getDate())].join(
-      "",
-    ) + `T${pad2(date.getHours())}${pad2(date.getMinutes())}00`
-  );
-}
-
-function getLastSaturdayOfMonth(year: number, monthIndex: number) {
-  const lastDay = new Date(year, monthIndex + 1, 0);
-  const offset = (lastDay.getDay() - 6 + 7) % 7;
-  return new Date(year, monthIndex + 1, 0 - offset);
-}
-
-function getUpcomingMentorshipSession(reference = new Date()) {
-  const thisMonthSession = getLastSaturdayOfMonth(
-    reference.getFullYear(),
-    reference.getMonth(),
-  );
-  thisMonthSession.setHours(19, 0, 0, 0);
-
-  if (reference <= thisMonthSession) {
-    return thisMonthSession;
-  }
-
-  const nextMonthSession = getLastSaturdayOfMonth(
-    reference.getFullYear(),
-    reference.getMonth() + 1,
-  );
-  nextMonthSession.setHours(19, 0, 0, 0);
-  return nextMonthSession;
-}
-
-function buildMentorshipCalendarUrl() {
-  const start = getUpcomingMentorshipSession();
-  const end = new Date(start.getTime() + 90 * 60 * 1000);
-  const params = new URLSearchParams({
-    action: "TEMPLATE",
-    text: "MAANGco Monthly Mentorship",
-    details:
-      "Monthly Zoom mentorship for MAANGco premium users. Ask questions, get guidance, and learn from FAANG engineers.",
-    location: "Zoom",
-    ctz: "Asia/Kolkata",
-    dates: `${formatCalendarStamp(start)}/${formatCalendarStamp(end)}`,
-    recur: "RRULE:FREQ=MONTHLY;BYDAY=SA;BYSETPOS=-1",
-  });
-
-  return `https://calendar.google.com/calendar/render?${params.toString()}`;
-}
-
-const mentorshipCompanies = [
-  { name: "Google", logo: googleLogo },
-  { name: "Meta", logo: metaLogo },
-  { name: "Amazon", logo: amazonLogo },
-];
-
-const mentorshipHighlights = [
-  {
-    icon: MessageSquareText,
-    label: "Real conversations",
-    value: "Ask anything and get honest, practical answers.",
-  },
-  {
-    icon: Target,
-    label: "Actionable guidance",
-    value: "Leave with clarity and a clear next step.",
-  },
-  {
-    icon: UsersRound,
-    label: "Top engineers",
-    value: "Learn from people who've been there, done that.",
-  },
-  {
-    icon: Star,
-    label: "Community of builders",
-    value: "Connect with ambitious peers like you.",
-  },
-];
-
-const mentorshipStats = [
-  {
-    icon: UsersRound,
-    value: "5000+",
-    label: "Premium\nmembers",
-  },
-  {
-    icon: CalendarDays,
-    value: "24+",
-    label: "Sessions\nconducted",
-  },
-  {
-    icon: MessageSquareText,
-    value: "10K+",
-    label: "Questions\nanswered",
-  },
-  {
-    icon: Star,
-    value: "4.9/5",
-    label: "Session\nrating",
-  },
-];
 
 export function LandingPage({
   theme,
@@ -352,10 +191,8 @@ export function LandingPage({
 }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
-  const [aidModalOpen, setAidModalOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
-  const lfspSectionRef = useRef<HTMLElement>(null);
   const landingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -396,27 +233,6 @@ export function LandingPage({
       observer?.disconnect();
     };
   }, []);
-  const mentorshipCalendarUrl = buildMentorshipCalendarUrl();
-  const mentorshipCtaLabel = isPremium ? "Add to calendar" : "Reserve My Spot";
-
-  const handleMentorshipCta = () => {
-    if (!isAuthenticated) {
-      onSignIn();
-      return;
-    }
-
-    if (!isPremium) {
-      if (onBuyPremium) {
-        onBuyPremium("monthly");
-      } else {
-        onSignIn();
-      }
-      return;
-    }
-
-    window.open(mentorshipCalendarUrl, "_blank", "noopener,noreferrer");
-  };
-
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -803,7 +619,7 @@ export function LandingPage({
             { src: adobeSvg,      style: { top: "28%",    right: "22%",  width: 26 }, delay: 2.4 },
             { src: airbnbSvg,     style: { top: "32%", left: "10%",   width: 32 }, delay: 0.9 },
             { src: salesforceSvg, style: { top: "68%",    right: "5%",   width: 38 }, delay: 1.5 },
-            { src: pinterestSvg,  style: { top: "38%",    left: "42%",   width: 26 }, delay: 3.0 },
+            { src: pinterestSvg,  style: { top: "38%",    left: "40%",   width: 26 }, delay: 3.0 },
             { src: amazonSvg,     style: { bottom: "14%", left: "28%",   width: 40 }, delay: 2.1 },
             { src: appleSvg,      style: { top: "22%",    left: "15%",   width: 28 }, delay: 0.3 },
             { src: atlassianSvg,  style: { top: "60%",    left: "48%",   width: 30 }, delay: 1.0 },
@@ -1024,7 +840,6 @@ export function LandingPage({
         </div>
       </section>
 
-      {/* ── FEATURES SPLIT ── */}
       {(() => {
         const [dsaOpen, setDsaOpen] = useState("d1");
         const [sdOpen, setSdOpen] = useState("s1");
@@ -1152,7 +967,7 @@ export function LandingPage({
           </section>
         );
       })()}
-
+      
       {/* ── PRICING SNAPSHOT ── */}
       {!isPremium && (
         <section className="lobs-price-section" data-scroll-reveal>
@@ -1286,201 +1101,6 @@ export function LandingPage({
             {faqs.map((f, i) => (
               <Faq2Item key={f.q} q={f.q} a={f.a} delay={`${i * 0.08 + 0.06}s`} />
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── BENTO FEATURES ── */}
-      <section className="lsection" id="features">
-        <div className="landing-container">
-          <div className="lsection-header">
-            <div className="lsection-tag">Features</div>
-            <h2 className="lsection-title">
-              Everything you need. Nothing you don't.
-            </h2>
-            <p className="lsection-sub">
-              Three precision modules — DSA, System Design, and progress
-              tracking. Built to crack FAANG, not overwhelm you.
-            </p>
-          </div>
-
-          <div className="lbento-grid">
-            {/* DSA — large left card */}
-            <div className="lbento-card lbento-dsa">
-              <div className="lbento-card-inner">
-                <div
-                  className="lbento-tag"
-                  style={{
-                    color: "var(--amber)",
-                    background: "var(--amber-bg)",
-                  }}
-                >
-                  DSA Practice
-                </div>
-                <h3 className="lbento-title">
-                  Company-wise questions.
-                  <br />
-                  Only what they ask.
-                </h3>
-                <p className="lbento-desc">
-                  840+ curated problems organised by company. No filler — just
-                  the exact patterns FAANG tests. New problems added every
-                  single day.
-                </p>
-                <ul className="lbento-list">
-                  <li>
-                    <CheckIcon /> Easy / Medium / Hard difficulty tags
-                  </li>
-                  <li>
-                    <CheckIcon /> Bookmark problems to revisit later
-                  </li>
-                  <li>
-                    <CheckIcon /> New questions added every day
-                  </li>
-                </ul>
-                <button
-                  type="button"
-                  className="lfeat-cta"
-                  onClick={onGetStarted}
-                >
-                  Start practising →
-                </button>
-              </div>
-              <div className="lbento-dsa-visual">
-                <div className="lbdv-header">
-                  <div className="lhfc-dots">
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                  <span className="lhfc-title">Amazon · 148 problems</span>
-                  <span className="lhfc-live-dot" />
-                </div>
-                {[
-                  { name: "Two Sum", diff: "easy", done: true },
-                  { name: "LRU Cache", diff: "hard", done: false },
-                  { name: "Merge Intervals", diff: "med", done: true },
-                  { name: "Word Break", diff: "med", done: false },
-                  { name: "Trapping Rain Water", diff: "hard", done: false },
-                ].map((q) => (
-                  <div
-                    key={q.name}
-                    className={`lhfc-problem-row${q.done ? " done" : ""}`}
-                    style={{
-                      padding: "8px 0",
-                      borderBottom: "1px solid var(--border)",
-                    }}
-                  >
-                    <span className={`lhfc-diff lhfc-diff--${q.diff}`}>
-                      {q.diff}
-                    </span>
-                    <span className="lhfc-problem-name">{q.name}</span>
-                    {q.done ? (
-                      <span className="lhfc-check">✓</span>
-                    ) : (
-                      <span className="lhfc-circle" />
-                    )}
-                  </div>
-                ))}
-                <div className="lbdv-footer">
-                  <span className="lbdv-new-badge">+3 new today</span>
-                  <div
-                    style={{
-                      flex: 1,
-                      height: 4,
-                      background: "var(--border)",
-                      borderRadius: 99,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "45%",
-                        height: "100%",
-                        background: "var(--amber)",
-                        borderRadius: 99,
-                      }}
-                    />
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      color: "var(--text3)",
-                      fontWeight: 600,
-                    }}
-                  >
-                    45%
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* System Design — top right */}
-            <div className="lbento-card lbento-sysdesign">
-              <div
-                className="lbento-tag"
-                style={{ color: "var(--blue)", background: "var(--blue-bg)" }}
-              >
-                System Design
-              </div>
-              <h3 className="lbento-title">90-day HLD + LLD mastery</h3>
-              <p className="lbento-desc">
-                From CAP theorem to designing YouTube — every FAANG topic, one
-                per day. Exactly the depth senior rounds expect.
-              </p>
-              <div className="lbento-topic-pills">
-                {[
-                  "CAP Theorem",
-                  "Load Balancing",
-                  "Caching (Redis)",
-                  "DB Sharding",
-                  "Design Twitter",
-                  "Message Queues",
-                ].map((t) => (
-                  <span key={t} className="lbento-pill">
-                    {t}
-                  </span>
-                ))}
-              </div>
-              <button
-                type="button"
-                className="lfeat-cta"
-                onClick={onGetStarted}
-              >
-                Explore roadmap →
-              </button>
-            </div>
-
-            {/* Dashboard — bottom right */}
-            <div className="lbento-card lbento-dashboard">
-              <div
-                className="lbento-tag"
-                style={{ color: "var(--green)", background: "var(--green-bg)" }}
-              >
-                Dashboard
-              </div>
-              <h3 className="lbento-title">Know exactly where you stand</h3>
-              <div className="lbento-dash-rows">
-                {[
-                  { l: "DSA", v: 45, c: "var(--amber)" },
-                  { l: "Sys Design", v: 78, c: "var(--blue)" },
-                  { l: "Overall", v: 62, c: "var(--green)" },
-                ].map((s) => (
-                  <div key={s.l} className="lbento-dash-row">
-                    <span className="lbento-dash-label">{s.l}</span>
-                    <div className="lbento-dash-track">
-                      <div
-                        className="lbento-dash-fill"
-                        style={{ width: `${s.v}%`, background: s.c }}
-                      />
-                    </div>
-                    <span className="lbento-dash-pct" style={{ color: s.c }}>
-                      {s.v}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </section>

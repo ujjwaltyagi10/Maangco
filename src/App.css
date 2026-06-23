@@ -496,25 +496,13 @@ a.lbtn-lg {
 .lfsp-item.active .lfsp-item-desc { opacity: 1; }
 .lfsp-panel-media {}
 .lfsp-media {
-  border-radius: 24px;
-  background: #1c1c1e;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.04);
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-[data-theme="light"] .lfsp-media {
-  background: #e8e4dc;
-  border-color: rgba(0,0,0,0.08);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.12);
+  display: block;
 }
 .lfsp-media video {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 @media (max-width: 900px) {
   .lfsp-container { padding: 0 24px; }
@@ -2001,6 +1989,422 @@ a.lbtn-lg {
 /* ─────────────────────────────────────────
    BENTO FEATURES GRID
 ───────────────────────────────────────── */
+/* ── OBSIDIAN FEATURES SECTION ── */
+.lobsf-section {
+  background: #080808;
+  padding-top: 8px;
+}
+[data-theme="light"] .lobsf-section {
+  background: var(--bg);
+}
+.lobsf-hdr {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 48px;
+}
+.lobsf-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c87c4a;
+  margin-bottom: 16px;
+}
+.lobsf-section-title {
+  font-family: 'IvoryLL', serif;
+  font-size: clamp(42px, 5.5vw, 42px);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #f0ece4;
+  margin-bottom: 18px;
+}
+[data-theme="light"] .lobsf-section-title { color: var(--text1); }
+.lobsf-section-sub {
+  font-size: 13px;
+  color: rgba(240,236,228,0.45);
+  line-height: 1.7;
+  max-width: 520px;
+  margin: 0 auto;
+}
+[data-theme="light"] .lobsf-section-sub { color: var(--text2); }
+
+/* ── OBSIDIAN FEATURES GRID ── */
+.lobsf-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  min-height: 580px;
+}
+.lobsf-card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #0c0c0c;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.lobsf-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+/* Mock UI sits at top of each card, fades into the text below */
+.lobsf-mock {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Gradient fade from mock UI into card body */
+.lobsf-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    rgba(12,12,12,0) 0%,
+    rgba(12,12,12,0) 30%,
+    rgba(12,12,12,0.85) 60%,
+    rgba(12,12,12,1) 75%
+  );
+  pointer-events: none;
+}
+
+/* ── DSA mock ── */
+.lobsf-mock--dsa {
+  padding: 18px 20px 0;
+}
+.lobsf-mock-topbar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.lobsf-mock-pill {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.05);
+  color: rgba(240,236,228,0.4);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.lobsf-mock-pill.active {
+  background: rgba(200,124,74,0.18);
+  color: #c87c4a;
+  border-color: rgba(200,124,74,0.35);
+}
+.lobsf-mock-tbl-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 9px;
+  color: rgba(240,236,228,0.25);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.lobsf-mock-col-name { flex: 1; }
+.lobsf-mock-col-diff { width: 36px; text-align: center; }
+.lobsf-mock-col-freq { width: 40px; }
+.lobsf-mock-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 10px;
+}
+.lobsf-mock-row--hi {
+  background: rgba(200,124,74,0.06);
+  border-radius: 6px;
+}
+.lobsf-mock-chk {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.15);
+  flex-shrink: 0;
+}
+.lobsf-mock-chk.done {
+  background: #4ade80;
+  border-color: #4ade80;
+}
+.lobsf-mock-pname {
+  flex: 1;
+  color: rgba(240,236,228,0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lobsf-mock-badge {
+  font-size: 8.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  width: 36px;
+  text-align: center;
+}
+.lobsf-mock-badge--easy  { background: rgba(74,222,128,0.12); color: #4ade80; }
+.lobsf-mock-badge--med   { background: rgba(251,191,36,0.12);  color: #fbbf24; }
+.lobsf-mock-badge--hard  { background: rgba(248,113,113,0.12); color: #f87171; }
+.lobsf-mock-fbar {
+  width: 40px;
+  height: 3px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.lobsf-mock-fbar-fill {
+  height: 100%;
+  background: rgba(200,124,74,0.6);
+  border-radius: 999px;
+}
+
+/* ── System Design mock ── */
+.lobsf-mock--sysdesign {
+  padding: 18px 20px 0;
+}
+.lobsf-mock-sd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.lobsf-mock-sd-day {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(240,236,228,0.8);
+}
+.lobsf-mock-sd-total { color: rgba(240,236,228,0.3); font-weight: 400; }
+.lobsf-mock-sd-pct {
+  font-size: 10px;
+  color: #6b9fe4;
+}
+.lobsf-mock-sd-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.lobsf-mock-sd-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b67c4, #6b9fe4);
+  border-radius: 999px;
+}
+.lobsf-mock-sd-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.lobsf-mock-sd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: rgba(240,236,228,0.35);
+}
+.lobsf-mock-sd-item.done { color: rgba(240,236,228,0.55); }
+.lobsf-mock-sd-item.active { color: rgba(240,236,228,0.9); font-weight: 600; }
+.lobsf-mock-sd-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  flex-shrink: 0;
+}
+.lobsf-mock-sd-dot.done  { background: #6b9fe4; }
+.lobsf-mock-sd-dot.active { background: #fff; box-shadow: 0 0 6px rgba(255,255,255,0.6); }
+.lobsf-mock-sd-now {
+  margin-left: auto;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #6b9fe4;
+  background: rgba(107,159,228,0.12);
+  border: 1px solid rgba(107,159,228,0.25);
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+/* ── Dashboard mock ── */
+.lobsf-mock--dashboard {
+  padding: 16px 18px 0;
+}
+.lobsf-mock-db-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.lobsf-mock-db-stats {
+  display: flex;
+  gap: 14px;
+}
+.lobsf-mock-db-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.lobsf-mock-db-val {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+.lobsf-mock-db-lbl {
+  font-size: 8.5px;
+  color: rgba(240,236,228,0.3);
+}
+.lobsf-mock-db-cos {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.lobsf-mock-db-co {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+}
+.lobsf-mock-db-co-name {
+  color: rgba(240,236,228,0.45);
+  width: 44px;
+  flex-shrink: 0;
+}
+.lobsf-mock-db-co-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.lobsf-mock-db-co-fill {
+  height: 100%;
+  border-radius: 999px;
+  opacity: 0.75;
+}
+.lobsf-mock-db-co-pct {
+  color: rgba(240,236,228,0.3);
+  width: 28px;
+  text-align: right;
+}
+.lobsf-card--dsa {
+  grid-row: span 2;
+  background: #0c0c0c;
+}
+.lobsf-card--sysdesign {
+  background: #0c0c0c;
+}
+.lobsf-card--dashboard {
+  background: #0c0c0c;
+}
+.lobsf-content {
+  position: relative;
+  z-index: 2;
+  padding: 28px 30px;
+}
+.lobsf-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(200,124,74,0.15);
+  color: #c87c4a;
+  border: 1px solid rgba(200,124,74,0.28);
+  margin-bottom: 14px;
+}
+.lobsf-tag--blue {
+  background: rgba(56,100,180,0.18);
+  color: #6b9fe4;
+  border-color: rgba(56,100,180,0.3);
+}
+.lobsf-tag--green {
+  background: rgba(74,124,65,0.18);
+  color: #7cb870;
+  border-color: rgba(74,124,65,0.3);
+}
+.lobsf-title {
+  font-size: clamp(18px, 1.8vw, 24px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #f0ece4;
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+.lobsf-desc {
+  font-size: 13px;
+  color: rgba(240,236,228,0.48);
+  line-height: 1.65;
+  margin-bottom: 0;
+}
+.lobsf-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.lobsf-list li {
+  font-size: 12.5px;
+  color: rgba(240,236,228,0.42);
+  padding-left: 16px;
+  position: relative;
+}
+.lobsf-list li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: rgba(200,124,74,0.55);
+  font-size: 11px;
+}
+.lobsf-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #c87c4a;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  letter-spacing: -0.01em;
+}
+.lobsf-cta:hover { background: #d48a5a; transform: translateX(2px); }
+.lobsf-cta--ghost {
+  background: rgba(255,255,255,0.07);
+  color: rgba(240,236,228,0.8);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.lobsf-cta--ghost:hover { background: rgba(255,255,255,0.12); transform: translateX(2px); }
+
+[data-theme="light"] .lobsf-card--dsa,
+[data-theme="light"] .lobsf-card--sysdesign,
+[data-theme="light"] .lobsf-card--dashboard {
+  background: #111;
+}
+
+@media (max-width: 900px) {
+  .lobsf-grid { grid-template-columns: 1fr; grid-template-rows: auto; min-height: unset; }
+  .lobsf-card--dsa { grid-row: auto; min-height: 360px; }
+  .lobsf-card--sysdesign, .lobsf-card--dashboard { min-height: 240px; }
+}
+
 .lbento-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
