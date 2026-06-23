@@ -31,6 +31,8 @@ import nvidiaLightSvg from "@/assets/svg/nvidia-light.svg";
 import oracleSvg from "@/assets/svg/oracle.svg";
 import snowflakeSvg from "@/assets/svg/snowflake.svg";
 import uberDarkSvg from "@/assets/svg/uber-dark.svg";
+import linkedinSvg from "@/assets/svg/linkedin.svg";
+import xSvg from "@/assets/svg/x.svg";
 import visaSvg from "@/assets/svg/visa.svg";
 
 const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url)
@@ -1289,7 +1291,7 @@ export function LandingPage({
       </section>
 
       {/* ── MENTORSHIP ── */}
-      <section className="lsection lmentor-section">
+      <section className="lsection lmentor-section" id="mentor">
         <div className="landing-container">
           <div className="lsection-header lsection-header--mentor">
             <div className="lsection-tag lsection-tag--icon">
@@ -1788,46 +1790,40 @@ export function LandingPage({
       {/* ── FOOTER ── */}
       <footer className="lfooter">
         <div className="landing-container">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 flex-wrap">
-            <a href="/" className="landing-logo">
-              <div
-                className="landing-logo-mark"
-                style={{ width: 28, height: 28 }}
-              >
-                <svg viewBox="0 0 20 20" width="13" height="13">
-                  <path
-                    d="M10 1L2 6v8l8 5 8-5V6L10 1zm0 2.3L16 7v6l-6 3.7L4 13V7l6-3.7z"
-                    fill="white"
-                  />
-                </svg>
-              </div>
-              <span className="landing-logo-text" style={{ fontSize: 14 }}>
-                MAANG<em>co</em>
-              </span>
-            </a>
-            <p className="lfooter-copy">
-              © 2025 MAANGco. Built for engineers, by engineers.
-            </p>
-            <div className="flex items-center gap-1">
-              <button type="button" className="lfooter-link" onClick={onSignIn}>
-                Sign In
-              </button>
-              <button
-                type="button"
-                className="lfooter-link"
-                onClick={onGetStarted}
-              >
-                Get Started
-              </button>
-              <a href="#features" className="lfooter-link">
-                Features
+          <div className="lfooter-center">
+            {/* Icon only — no text */}
+            <div className="lfooter-logo-mark-wrap">
+              <svg viewBox="0 0 20 20" width="26" height="26">
+                <path
+                  d="M10 1L2 6v8l8 5 8-5V6L10 1zm0 2.3L16 7v6l-6 3.7L4 13V7l6-3.7z"
+                  fill="white"
+                />
+              </svg>
+            </div>
+
+            <div className="lfooter-links-row">
+                <a href="#" className="lfooter-link">Terms and Conditions</a>
+              <a href="#faq" className="lfooter-link">Contact us</a>
+              <a href="#pricing" className="lfooter-link">Pricing</a>
+              <a href="#" className="lfooter-link">Privacy Policy</a>
+            
+              <a href="#" className="lfooter-link">Cancellation and Refund Policy</a>
+            </div>
+
+            <div className="lfooter-social-row">
+              <a href="https://x.com" target="_blank" rel="noreferrer" className="lfooter-social-link" aria-label="X">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               </a>
-              <a href="#pricing" className="lfooter-link">
-                Pricing
+              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="lfooter-social-link" aria-label="LinkedIn">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
               </a>
-              <a href="#faq" className="lfooter-link">
-                FAQ
-              </a>
+            </div>
+
+            <div className="lfooter-divider" />
+
+            <div className="lfooter-bottom">
+              <p className="lfooter-wordmark">MAANG<em>co</em></p>
+              <p className="lfooter-copy">© 2025 MAANGco. All rights reserved.</p>
             </div>
           </div>
         </div>
