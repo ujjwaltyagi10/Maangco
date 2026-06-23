@@ -144,10 +144,21 @@ const faqs = [
   },
 ];
 
-function Faq2Item({ q, a }: { q: string; a: string }) {
+function Faq2Item({
+  q,
+  a,
+  delay = "0s",
+}: {
+  q: string;
+  a: string;
+  delay?: string;
+}) {
   const [open, setOpen] = useState(false);
   return (
-    <div className={`lfaq2-item${open ? " open" : ""}`}>
+    <div
+      className={`lfaq2-item sr-child${open ? " open" : ""}`}
+      style={{ "--sr-delay": delay } as React.CSSProperties}
+    >
       <button type="button" className="lfaq2-q" onClick={() => setOpen((v) => !v)}>
         <span>{q}</span>
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="lfaq2-chevron">
@@ -1140,30 +1151,15 @@ export function LandingPage({
         );
       })()}
 
-      {/* ── FAQ (Obsidian style) ── */}
-      <section className="lfaq2-section" id="faq">
-        <div className="lfaq2-inner">
-          <div className="lfaq2-left">
-            <p className="lfaq2-eyebrow">Frequently asked questions</p>
-            <h2 className="lfaq2-heading">FAQ</h2>
-          </div>
-          <div className="lfaq2-right">
-            {faqs.map((f) => (
-              <Faq2Item key={f.q} q={f.q} a={f.a} />
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── STUDENT REVIEWS ── */}
-      <section className="lrev-section">
+      <section className="lrev-section" data-scroll-reveal>
         <div className="lrev-inner">
-          <div className="lrev-left">
+          <div className="lrev-left sr-child" style={{ "--sr-delay": "0s" } as React.CSSProperties}>
             <p className="lrev-eyebrow">Student Reviews</p>
             <h2 className="lrev-heading">What engineers say</h2>
             <p className="lrev-count">10,000+ engineers worldwide</p>
           </div>
-          <div className="lrev-viewport">
+          <div className="lrev-viewport sr-child" style={{ "--sr-delay": "0.16s" } as React.CSSProperties}>
             <div className="lrev-track">
               {[...testimonials, ...testimonials].map((t, i) => (
                 <div key={i} className="lrev-card">
@@ -1179,6 +1175,21 @@ export function LandingPage({
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ (Obsidian style) ── */}
+      <section className="lfaq2-section" id="faq" data-scroll-reveal>
+        <div className="lfaq2-inner">
+          <div className="lfaq2-left sr-child" style={{ "--sr-delay": "0s" } as React.CSSProperties}>
+            <p className="lfaq2-eyebrow">Frequently asked questions</p>
+            <h2 className="lfaq2-heading">FAQ</h2>
+          </div>
+          <div className="lfaq2-right sr-child" style={{ "--sr-delay": "0.14s" } as React.CSSProperties}>
+            {faqs.map((f, i) => (
+              <Faq2Item key={f.q} q={f.q} a={f.a} delay={`${i * 0.08 + 0.06}s`} />
+            ))}
           </div>
         </div>
       </section>

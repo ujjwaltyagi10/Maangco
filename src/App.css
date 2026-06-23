@@ -5022,7 +5022,11 @@ a.lbtn-lg {
 }
 
 /* ── LANDING FAQ v2 (Obsidian style) ── */
-.lfaq2-section { padding: 60px 0 80px; background: var(--bg); }
+.lfaq2-section {
+  padding: 60px 0 80px;
+  margin-top: 24px;
+  background: var(--bg);
+}
 .lfaq2-inner {
   max-width: 1200px; margin: 0 auto; padding: 0 60px;
   display: grid; grid-template-columns: 280px 1fr; gap: 80px; align-items: start;
@@ -5056,6 +5060,7 @@ a.lbtn-lg {
 [data-theme="dark"] .lfaq2-a { color: #666; }
 
 @media (max-width: 900px) {
+  .lfaq2-section { margin-top: 20px; }
   .lfaq2-inner { grid-template-columns: 1fr; gap: 40px; padding: 0 24px; }
   .lfaq2-left { position: static; }
   .lfaq2-heading { font-size: clamp(28px, 8vw, 40px); }
