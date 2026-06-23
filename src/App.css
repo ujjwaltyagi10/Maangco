@@ -2699,7 +2699,7 @@ a.lbtn-lg {
 .lfooter {
   position: relative;
   border-top: none;
-  padding: 52px 0 calc(42px + env(safe-area-inset-bottom, 0px));
+  padding: 52px 0 calc(28px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(180deg, transparent 0%, rgba(8, 8, 8, 0.6) 20%, rgba(8, 8, 8, 1) 100%);
 }
 [data-theme="light"] .lfooter {
@@ -2730,7 +2730,7 @@ a.lbtn-lg {
   text-align: center;
   max-width: 980px;
   margin: 0 auto;
-  gap: 18px;
+  gap: 12px;
 }
 .lfooter-logo-mark-wrap {
   width: 34px; height: 34px; border-radius: 12px;
@@ -2764,7 +2764,6 @@ a.lbtn-lg {
 .lfooter-divider {
   width: min(900px, 100%);
   height: 1px;
-  margin: 10px 0 6px;
   background: rgba(245, 243, 238, 0.22);
 }
 [data-theme="light"] .lfooter-divider {
@@ -2778,9 +2777,9 @@ a.lbtn-lg {
   font-weight: 700; letter-spacing: -0.03em; color: #f0e8e0;
   line-height: 1;
 }
-.lfooter-wordmark em { font-style: normal; color: rgba(245,243,238,0.5); }
+.lfooter-wordmark em { font-style: normal; color: #c87c4a; }
 [data-theme="light"] .lfooter-wordmark { color: var(--text1); }
-[data-theme="light"] .lfooter-wordmark em { color: var(--green); }
+[data-theme="light"] .lfooter-wordmark em { color: #c87c4a; }
 .lfooter-copy {
   font-size: 12px;
   color: rgba(245, 243, 238, 0.38);
