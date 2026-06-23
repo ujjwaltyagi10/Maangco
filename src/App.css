@@ -2461,6 +2461,125 @@ a.lbtn-lg {
   color: var(--text3);
 }
 
+/* ── PRICING SNAPSHOT (Obsidian style) ── */
+.lobs-price-section {
+  padding: 96px 0 96px;
+  background: var(--bg);
+}
+.lobs-price-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 60px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.lobs-price-left {
+  position: sticky;
+  top: 120px;
+  text-align: left;
+}
+.lobs-price-eyebrow {
+  font-size: 12px;
+  color: #c87c4a;
+  margin-bottom: 10px;
+  font-weight: 400;
+}
+.lobs-price-heading {
+  font-family: 'IvoryLL', serif;
+  font-size: clamp(34px, 4vw, 42px);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--fg);
+  margin-bottom: 16px;
+}
+.lobs-price-sub {
+  font-size: 14px;
+  color: var(--fg-muted, #888);
+  line-height: 1.75;
+  max-width: 420px;
+}
+.lobs-price-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.lobs-price-cards {
+  max-width: none;
+  margin: 0;
+}
+.lobs-price-note {
+  text-align: center;
+  margin-top: 2px;
+  width: 100%;
+}
+
+.lobs-price-section .lprice-card--highlight {
+  border-color: rgba(200, 124, 74, 0.35);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, rgba(200, 124, 74, 0.18) 80%, transparent) 0%,
+    var(--surface) 60%
+  );
+  box-shadow:
+    0 0 0 1px rgba(200, 124, 74, 0.18),
+    var(--shadow-md);
+}
+.lobs-price-section .lprice-popular-badge {
+  background: linear-gradient(90deg, #8b5a3c, #c87c4a);
+}
+.lobs-price-section .lprice-feature svg {
+  color: #c87c4a;
+}
+.lobs-price-section .lprice-feature--bonus {
+  color: #c87c4a;
+}
+.lobs-price-section .lprice-card-btn--pro {
+  background: #c87c4a;
+  color: #fff;
+}
+.lobs-price-section .lprice-card-btn--pro:hover {
+  opacity: 0.9;
+}
+.lobs-price-section .lprice-card-btn--outline {
+  border-color: rgba(200, 124, 74, 0.35);
+}
+.lobs-price-section .lprice-card-btn--outline:hover {
+  background: rgba(200, 124, 74, 0.08);
+}
+.lobs-price-section .lbtn-primary {
+  background: linear-gradient(135deg, #8b5a3c 0%, #c87c4a 100%);
+  box-shadow: none;
+}
+.lobs-price-section .lbtn-primary:hover {
+  box-shadow: 0 8px 28px rgba(200, 124, 74, 0.38);
+}
+.lobs-price-section .lbtn-glow {
+  animation: glow-pulse-brown 2.5s ease-in-out infinite;
+}
+@keyframes glow-pulse-brown {
+  0%,
+  100% {
+    box-shadow: 0 4px 20px rgba(200, 124, 74, 0.28);
+  }
+  50% {
+    box-shadow: 0 4px 36px rgba(200, 124, 74, 0.52);
+  }
+}
+
+@media (max-width: 900px) {
+  .lobs-price-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 0 24px;
+  }
+  .lobs-price-left {
+    position: static;
+  }
+}
+
 /* ─────────────────────────────────────────
    FAQ
 ───────────────────────────────────────── */
@@ -5023,15 +5142,19 @@ a.lbtn-lg {
 
 /* ── LANDING FAQ v2 (Obsidian style) ── */
 .lfaq2-section {
-  padding: 60px 0 80px;
-  margin-top: 24px;
+  padding: 96px 0 96px;
+  margin-top: 32px;
   background: var(--bg);
 }
 .lfaq2-inner {
   max-width: 1200px; margin: 0 auto; padding: 0 60px;
   display: grid; grid-template-columns: 280px 1fr; gap: 80px; align-items: start;
 }
-.lfaq2-left { position: sticky; top: 120px; }
+.lfaq2-left {
+  position: sticky;
+  top: 120px;
+  text-align: left;
+}
 .lfaq2-eyebrow { font-size: 12px; color: #c87c4a; margin-bottom: 10px; font-weight: 400; }
 .lfaq2-heading {
   font-family: 'IvoryLL', serif; font-size: clamp(36px, 4vw, 52px);
@@ -5064,18 +5187,25 @@ a.lbtn-lg {
   .lfaq2-inner { grid-template-columns: 1fr; gap: 40px; padding: 0 24px; }
   .lfaq2-left { position: static; }
   .lfaq2-heading { font-size: clamp(28px, 8vw, 40px); }
+  .lobs-price-inner { grid-template-columns: 1fr; gap: 40px; padding: 0 24px; }
+  .lobs-price-left { position: static; }
 }
 
 /* ── STUDENT REVIEWS (vertical carousel) ── */
-.lrev-section { padding: 60px 0 80px; background: var(--bg); }
+.lrev-section { padding: 96px 0 96px; background: var(--bg); }
 .lrev-inner {
   max-width: 1200px; margin: 0 auto; padding: 0 60px;
-  display: grid; grid-template-columns: 280px 1fr; gap: 80px; align-items: start;
+  display: grid; grid-template-columns: 1fr 340px; gap: 80px; align-items: start;
 }
-.lrev-left { position: sticky; top: 120px; }
+.lrev-left {
+  position: sticky;
+  top: 120px;
+  text-align: right;
+  width: 340px;
+}
 .lrev-eyebrow { font-size: 12px; color: #c87c4a; margin-bottom: 10px; font-weight: 400; }
 .lrev-heading {
-  font-family: 'IvoryLL', serif; font-size: clamp(42px, 5.5vw, 42px);
+  font-family: 'IvoryLL', serif; font-size: clamp(34px, 4vw, 40px);
   font-weight: 300; letter-spacing: -0.03em; line-height: 1.05;
   color: var(--fg); margin-bottom: 20px;
 }
@@ -5083,6 +5213,9 @@ a.lbtn-lg {
 .lrev-stars { color: #f59e0b; font-size: 16px; letter-spacing: 2px; }
 .lrev-rating-num { font-size: 14px; font-weight: 600; color: var(--fg); }
 .lrev-count { font-size: 12px; color: var(--fg-muted, #888); }
+.lrev-left .lrev-heading {
+  margin-left: auto;
+}
 
 .lrev-viewport {
   height: 520px; overflow: hidden; position: relative;

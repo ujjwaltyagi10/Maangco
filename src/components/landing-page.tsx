@@ -1005,8 +1005,8 @@ export function LandingPage({
           </p>
           <div className="lstat-chips sr-child" style={{ "--sr-delay": "0.44s" } as React.CSSProperties}>
             <div className="lstat-chip">
-              <div className="lstat-chip-val">2,500+</div>
-              <div className="lstat-chip-lbl">DSA problems curated</div>
+              <div className="lstat-chip-val">840+</div>
+              <div className="lstat-chip-lbl">DSA problems</div>
             </div>
             <div className="lstat-chip-divider" />
             <div className="lstat-chip">
@@ -1151,14 +1151,99 @@ export function LandingPage({
         );
       })()}
 
+      {/* ── PRICING SNAPSHOT ── */}
+      {!isPremium && (
+        <section className="lobs-price-section" data-scroll-reveal>
+          <div className="lobs-price-inner">
+            <div className="lobs-price-left sr-child" style={{ "--sr-delay": "0.14s" } as React.CSSProperties}>
+              <p className="lobs-price-eyebrow">Pricing</p>
+              <h2 className="lobs-price-heading">One plan. Everything unlocked.</h2>
+              <p className="lobs-price-sub">
+                Simple, Obsidian-style pricing with no tiers or upsells. Pick
+                monthly to start, or yearly to save more.
+              </p>
+            </div>
+
+            <div className="lobs-price-right sr-child" style={{ "--sr-delay": "0s" } as React.CSSProperties}>
+              <div className="lprice-cards lobs-price-cards">
+                <div className="lprice-card">
+                  <div className="lprice-plan-name">Monthly</div>
+                  <div className="lprice-amount">
+                    <span className="lprice-currency">₹</span>
+                    <span className="lprice-num">299</span>
+                    <span className="lprice-period">/month</span>
+                  </div>
+                  <p className="lprice-tagline">Great to start. Cancel anytime.</p>
+                  <ul className="lprice-features">
+                    {PLAN_FEATURES.map((f) => (
+                      <li key={f} className="lprice-feature">
+                        <CheckIcon />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    className="lbtn-outline lprice-btn"
+                    onClick={
+                      isAuthenticated && onBuyPremium
+                        ? () => onBuyPremium("monthly")
+                        : onGetStarted
+                    }
+                  >
+                    Start monthly →
+                  </button>
+                </div>
+
+                <div className="lprice-card lprice-card--highlight">
+                  <div className="lprice-popular-badge">
+                    Most Popular · Save 33%
+                  </div>
+                  <div className="lprice-plan-name">Yearly</div>
+                  <div className="lprice-amount">
+                    <span className="lprice-currency">₹</span>
+                    <span className="lprice-num">1,999</span>
+                    <span className="lprice-period">/year</span>
+                  </div>
+                  <p className="lprice-tagline">
+                    ₹167/month · Save ₹1,589 vs monthly
+                  </p>
+                  <ul className="lprice-features">
+                    {PLAN_FEATURES.map((f) => (
+                      <li key={f} className="lprice-feature">
+                        <CheckIcon />
+                        {f}
+                      </li>
+                    ))}
+                    <li className="lprice-feature lprice-feature--bonus">
+                      <CheckIcon />
+                      Priority support
+                    </li>
+                  </ul>
+                  <button
+                    type="button"
+                    className="lbtn-primary lprice-btn lbtn-glow"
+                    onClick={
+                      isAuthenticated && onBuyPremium
+                        ? () => onBuyPremium("yearly")
+                        : onGetStarted
+                    }
+                  >
+                    Get yearly access →
+                  </button>
+                </div>
+              </div>
+              <p className="lobs-price-note">
+                Secure payment · Cancel anytime · All major cards accepted
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── STUDENT REVIEWS ── */}
       <section className="lrev-section" data-scroll-reveal>
         <div className="lrev-inner">
-          <div className="lrev-left sr-child" style={{ "--sr-delay": "0s" } as React.CSSProperties}>
-            <p className="lrev-eyebrow">Student Reviews</p>
-            <h2 className="lrev-heading">What engineers say</h2>
-            <p className="lrev-count">10,000+ engineers worldwide</p>
-          </div>
           <div className="lrev-viewport sr-child" style={{ "--sr-delay": "0.16s" } as React.CSSProperties}>
             <div className="lrev-track">
               {[...testimonials, ...testimonials].map((t, i) => (
@@ -1175,6 +1260,15 @@ export function LandingPage({
                 </div>
               ))}
             </div>
+          </div>
+          <div className="lrev-left sr-child" style={{ "--sr-delay": "0s" } as React.CSSProperties}>
+            <p className="lrev-eyebrow">Student Reviews</p>
+            <h2 className="lrev-heading">
+              What engineers
+              <br />
+              say . . .
+            </h2>
+            <p className="lrev-count">10,000+ engineers worldwide</p>
           </div>
         </div>
       </section>
@@ -1556,130 +1650,6 @@ export function LandingPage({
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
-      <section className="ltesti-section" id="testimonials">
-        <div className="ltesti-split">
-          {/* Left: heading */}
-          <div className="ltesti-heading-col">
-            <div className="ltesti-label">Reviews</div>
-            <h2 className="ltesti-heading">
-              Engineers who<br />cracked it with<br />MAANGco
-            </h2>
-          </div>
-
-          {/* Right: infinite scrolling cards */}
-          <div className="ltesti-marquee-wrap">
-            <div className="ltesti-marquee-track">
-              {[...testimonials, ...testimonials].map((t, i) => (
-                <div key={i} className="ltesti-card">
-                  <div className="ltesti-card-top">
-                    <div className="ltesti-avatar">{t.initials}</div>
-                    <div>
-                      <div className="ltesti-name">{t.name}</div>
-                      <div className="ltesti-role">{t.role}</div>
-                    </div>
-                  </div>
-                  <p className="ltesti-text">{t.text}</p>
-                  <div className="ltesti-stars">★★★★★</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ── */}
-      {!isPremium && (
-        <section className="lsection" id="pricing">
-          <div className="landing-container">
-            <div className="lsection-header">
-              <div className="lsection-tag">Pricing</div>
-              <h2 className="lsection-title">One plan. Everything unlocked.</h2>
-              <p className="lsection-sub">
-                No tiers, no upsells. Every feature from day one — DSA, System
-                Design, daily updates, full dashboard.
-              </p>
-            </div>
-
-            <div className="lprice-cards">
-              {/* Monthly */}
-              <div className="lprice-card">
-                <div className="lprice-plan-name">Monthly</div>
-                <div className="lprice-amount">
-                  <span className="lprice-currency">₹</span>
-                  <span className="lprice-num">299</span>
-                  <span className="lprice-period">/month</span>
-                </div>
-                <p className="lprice-tagline">
-                  Great to start. Cancel anytime.
-                </p>
-                <ul className="lprice-features">
-                  {PLAN_FEATURES.map((f) => (
-                    <li key={f} className="lprice-feature">
-                      <CheckIcon />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  type="button"
-                  className="lbtn-outline lprice-btn"
-                  onClick={
-                    isAuthenticated && onBuyPremium
-                      ? () => onBuyPremium("monthly")
-                      : onGetStarted
-                  }
-                >
-                  Start monthly →
-                </button>
-              </div>
-
-              {/* Yearly — highlighted */}
-              <div className="lprice-card lprice-card--highlight">
-                <div className="lprice-popular-badge">
-                  Most Popular · Save 33%
-                </div>
-                <div className="lprice-plan-name">Yearly</div>
-                <div className="lprice-amount">
-                  <span className="lprice-currency">₹</span>
-                  <span className="lprice-num">1,999</span>
-                  <span className="lprice-period">/year</span>
-                </div>
-                <p className="lprice-tagline">
-                  ₹167/month · Save ₹1,589 vs monthly
-                </p>
-                <ul className="lprice-features">
-                  {PLAN_FEATURES.map((f) => (
-                    <li key={f} className="lprice-feature">
-                      <CheckIcon />
-                      {f}
-                    </li>
-                  ))}
-                  <li className="lprice-feature lprice-feature--bonus">
-                    <CheckIcon />
-                    Priority support
-                  </li>
-                </ul>
-                <button
-                  type="button"
-                  className="lbtn-primary lprice-btn lbtn-glow"
-                  onClick={
-                    isAuthenticated && onBuyPremium
-                      ? () => onBuyPremium("yearly")
-                      : onGetStarted
-                  }
-                >
-                  Get yearly access →
-                </button>
-              </div>
-            </div>
-            <p className="lprice-note">
-              Secure payment · Cancel anytime · All major cards accepted
-            </p>
-          </div>
-        </section>
-      )}
-
       {/* ── FINANCIAL AID ── */}
       {!isPremium && (
         <section className="lsection lfa-section" id="financial-aid">
@@ -1810,61 +1780,10 @@ export function LandingPage({
           </div>
         </section>
       )}
-
       <FinancialAidModal
         open={aidModalOpen}
         onClose={() => setAidModalOpen(false)}
       />
-
-      {/* ── FAQ ── */}
-      <section className="lsection lsection--alt" id="faq">
-        <div className="landing-container">
-          <div className="lsection-header">
-            <div className="lsection-tag">FAQ</div>
-            <h2 className="lsection-title">Frequently asked questions</h2>
-          </div>
-          <div className="lfaq-list">
-            {faqs.map((f) => (
-              <FaqItem key={f.q} q={f.q} a={f.a} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FINAL CTA ── */}
-      <section className="lfinal-cta">
-        <div className="lfinal-glow" />
-        <div className="landing-container relative z-10 text-center">
-          <div className="lfinal-badge">
-            <span className="lhero-v2-live-dot" />
-            Questions updated daily
-          </div>
-          <h2 className="lfinal-title">
-            Stop winging your prep.
-            <br />
-            Start cracking FAANG.
-          </h2>
-          <p className="lfinal-sub">
-            The exact DSA and System Design material FAANG tests — structured,
-            daily-updated, nothing extra.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-5">
-            <button
-              type="button"
-              className="lbtn-primary lbtn-lg lbtn-glow"
-              onClick={onGetStarted}
-            >
-              Start your prep →
-            </button>
-            <a href="#pricing" className="lbtn-outline lbtn-lg">
-              View Pricing
-            </a>
-          </div>
-          <p className="lfinal-note">
-            Secure payment · Cancel anytime · Questions refreshed daily
-          </p>
-        </div>
-      </section>
 
       {/* ── FOOTER ── */}
       <footer className="lfooter">
