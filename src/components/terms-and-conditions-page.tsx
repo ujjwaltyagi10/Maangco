@@ -67,11 +67,14 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
   const [navScrolled, setNavScrolled] = useState(false);
   const [activeId, setActiveId] = useState<string>(TOC[0].id);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setNavScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const el = containerRef.current;
+    if (!el) return;
+    const onScroll = () => setNavScrolled(el.scrollTop > 20);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -79,7 +82,6 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
     // rootMargin pushes the trigger zone to the upper-middle of the viewport
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        // pick the topmost entry that is intersecting
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
@@ -87,7 +89,7 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
           setActiveId(visible[0].target.id);
         }
       },
-      { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+      { root: containerRef.current, rootMargin: "-30% 0px -60% 0px", threshold: 0 }
     );
     ids.forEach((id) => {
       const el = document.getElementById(id);
@@ -97,7 +99,7 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
   }, []);
 
   return (
-    <div className="landing w-full min-w-0">
+    <div className="landing w-full min-w-0" ref={containerRef}>
 
       {/* ── NAVBAR (same as landing page) ── */}
       <nav className={`landing-nav${navScrolled ? " scrolled" : ""}${mobileMenuOpen ? " mobile-open" : ""}`}>
@@ -133,7 +135,10 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
                 )}
               </button>
               <Link to={ROUTES.landing} className="lnav-sign-in" style={{ textDecoration: "none" }}>
-                ← Back to home
+                Sign In
+              </Link>
+              <Link to={ROUTES.landing} className="lnav-get-started" style={{ textDecoration: "none" }}>
+                Back to home →
               </Link>
             </div>
 
@@ -164,10 +169,25 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
 
           {mobileMenuOpen && (
             <div className="lnav-mobile-drawer">
-              <div className="lnav-mobile-actions">
-                <Link to={ROUTES.landing} className="lnav-sign-in" style={{ textDecoration: "none" }}
+              {[
+                { href: `${ROUTES.landing}#features`, label: "Features" },
+                { href: `${ROUTES.landing}#pricing`,  label: "Pricing" },
+                { href: `${ROUTES.landing}#testimonials`, label: "Reviews" },
+                { href: `${ROUTES.landing}#faq`,     label: "FAQ" },
+              ].map(({ href, label }) => (
+                <Link key={href} to={href} className="lnav-mobile-link" style={{ textDecoration: "none" }}
                   onClick={() => setMobileMenuOpen(false)}>
-                  ← Back to home
+                  {label}
+                </Link>
+              ))}
+              <div className="lnav-mobile-actions">
+                <Link to={ROUTES.landing} className="lnav-sign-in" style={{ flex: 1, textDecoration: "none" }}
+                  onClick={() => setMobileMenuOpen(false)}>
+                  Sign In
+                </Link>
+                <Link to={ROUTES.landing} className="lnav-get-started" style={{ flex: 1, textDecoration: "none" }}
+                  onClick={() => setMobileMenuOpen(false)}>
+                  Back to home →
                 </Link>
               </div>
             </div>
