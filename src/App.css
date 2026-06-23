@@ -161,7 +161,7 @@ a.lbtn-lg {
 
 /* ── Section shells ── */
 .lsection {
-  padding: 66px 0;
+  padding: 96px 0;
 }
 .lsection--alt {
   background: var(--surface);
@@ -366,7 +366,7 @@ a.lbtn-lg {
 }
 
 .lfsp-section {
-  padding: 60px 0 60px;
+  padding: 96px 0;
   background: var(--bg);
 }
 .lfsp-container {
