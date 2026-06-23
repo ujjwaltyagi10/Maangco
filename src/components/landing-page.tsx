@@ -19,6 +19,7 @@ import oracleSvg from "@/assets/svg/oracle.svg";
 import snowflakeSvg from "@/assets/svg/snowflake.svg";
 import uberDarkSvg from "@/assets/svg/uber-dark.svg";
 import visaSvg from "@/assets/svg/visa.svg";
+import { ROUTES } from "@/routes/route-paths";
 
 const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url)
   .href;
@@ -45,7 +46,7 @@ interface LandingPageProps {
 
 const PLAN_FEATURES = [
   "840+ company-wise DSA questions",
-  "System Design roadmap — 90 days, HLD + LLD",
+  "150 company-wise System Design questions",
   "Unified progress dashboard",
   "Questions refreshed every single day",
   "Bookmark & revisit any problem",
@@ -64,7 +65,7 @@ const testimonials = [
     initials: "AJ",
     name: "Anusha Jha",
     role: "SDE-2 @ Flipkart",
-    text: "The System Design roadmap is exactly what I was missing. Went through HLD + LLD day by day and walked into every design round prepared. Offer in 8 weeks.",
+    text: "The System Design question bank is exactly what I was missing. Went through the company-wise problems with HLD + LLD breakdowns and walked into every design round prepared. Offer in 8 weeks.",
   },
   {
     initials: "AS",
@@ -76,7 +77,7 @@ const testimonials = [
     initials: "MT",
     name: "Mihika Tiwari",
     role: "SWE @ Microsoft",
-    text: "Everything in one place — DSA tracker, system design roadmap, progress dashboard. The daily updates kept my prep fresh. Landed Microsoft in 10 weeks.",
+    text: "Everything in one place — DSA tracker, system design question bank, progress dashboard. The daily updates kept my prep fresh. Landed Microsoft in 10 weeks.",
   },
   {
     initials: "RS",
@@ -95,7 +96,7 @@ const testimonials = [
 const faqs = [
   {
     q: "What's included in a MAANGco subscription?",
-    a: "Everything FAANG interviews actually test: 500+ company-wise DSA problems, a 90-day System Design roadmap (HLD + LLD), a unified dashboard, and daily question updates. Not a single extra topic you won't need.",
+    a: "Everything FAANG interviews actually test: 840+ company-wise DSA problems, 150 company-wise System Design questions with HLD + LLD breakdowns, a unified dashboard, and daily question updates. Not a single extra topic you won't need.",
   },
   {
     q: "How often are questions updated?",
@@ -106,8 +107,8 @@ const faqs = [
     a: "500+ LeetCode-style problems organised by company. Each tagged by difficulty and topic — only the patterns that actually appear in real FAANG rounds, no filler.",
   },
   {
-    q: "What does the System Design roadmap cover?",
-    a: "A 90-day structured plan from CAP theorem to designing Twitter, YouTube, and distributed databases. Every day covers one concept with HLD + LLD breakdown — the exact depth FAANG senior rounds expect.",
+    q: "What System Design questions are included?",
+    a: "150 company-wise System Design questions covering core interview patterns with HLD + LLD breakdowns. The focus is on the depth FAANG senior rounds expect.",
   },
   {
     q: "Is there a yearly discount?",
@@ -119,7 +120,7 @@ const faqs = [
   },
   {
     q: "Will my progress sync across devices?",
-    a: "Yes. Sign in with Google or email and your solved problems, roadmap completion, and bookmarks persist everywhere you log in.",
+    a: "Yes. Sign in with Google or email and your solved problems, question progress, and bookmarks persist everywhere you log in.",
   },
 ];
 
@@ -652,7 +653,7 @@ export function LandingPage({
               ))}
             </h1>
             <p className="lhero-obsidian-sub lhero-fade-in" style={{ animationDelay: "0.75s" }}>
-              Company-wise DSA sheets and System Design roadmaps curated from
+              Company-wise DSA sheets and System Design questions curated from
               real interview experiences at top tech companies.
             </p>
             {isPremium ? (
@@ -852,7 +853,7 @@ export function LandingPage({
         ];
 
         const sdItems = [
-          { id: "s1", name: "90-Day Roadmap", desc: "A week-by-week structured plan covering 150 system design questions from fundamentals to senior-level depth." },
+          { id: "s1", name: "Question Bank", desc: "A company-wise set of 150 System Design questions covering fundamentals to senior-level depth." },
           { id: "s2", name: "HLD + LLD Depth", desc: "Every topic covers both high-level architecture and low-level implementation detail — no surface-level answers." },
           { id: "s3", name: "Company Tags", desc: "Each question tagged with the companies that ask it, sourced from Glassdoor, Blind and Exponent reports." },
           { id: "s4", name: "Difficulty Levels", desc: "Questions rated from beginner-friendly to L5/L6 complexity — so you prep at exactly the right level." },
@@ -934,7 +935,8 @@ export function LandingPage({
                 <div className="lfsp-panel-text">
                   <div className="lfsp-panel-title sr-child" style={{ "--sr-delay": "0s" } as React.CSSProperties}>System Design</div>
                   <p className="lfsp-panel-sub sr-child" style={{ "--sr-delay": "0.15s" } as React.CSSProperties}>
-                    150-question roadmap from HLD to LLD — structured, tracked
+                    150 company-wise questions with HLD + LLD breakdowns —
+                    structured, tracked
                     and company-tagged.
                   </p>
                   <div className="sr-child" style={{ "--sr-delay": "0.3s" } as React.CSSProperties}>
@@ -1120,7 +1122,7 @@ export function LandingPage({
             </div>
 
             <div className="lfooter-links-row">
-                <a href="#" className="lfooter-link">Terms and Conditions</a>
+                <a href={ROUTES.termsConditions} className="lfooter-link">Terms and Conditions</a>
               <a href="#faq" className="lfooter-link">Contact us</a>
               <a href="#pricing" className="lfooter-link">Pricing</a>
               <a href="#" className="lfooter-link">Privacy Policy</a>
@@ -1129,10 +1131,10 @@ export function LandingPage({
             </div>
 
             <div className="lfooter-social-row">
-              <a href="https://x.com" target="_blank" rel="noreferrer" className="lfooter-social-link" aria-label="X">
+              <a href="https://x.com/MAANGcode" target="_blank" rel="noreferrer" className="lfooter-social-link" aria-label="X">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="lfooter-social-link" aria-label="LinkedIn">
+              <a href="https://www.linkedin.com/company/maangco" target="_blank" rel="noreferrer" className="lfooter-social-link" aria-label="LinkedIn">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
               </a>
             </div>
