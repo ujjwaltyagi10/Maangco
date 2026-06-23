@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes/route-paths";
 
@@ -31,10 +31,9 @@ function BulletList({ items }: { items: string[] }) {
   );
 }
 
-/* ── accordion item for TOC on mobile ── */
-function TocLink({ id, label }: { id: string; label: string }) {
+function TocLink({ id, label, active }: { id: string; label: string; active: boolean }) {
   return (
-    <a href={`#${id}`} className="ltc-toc-link">
+    <a href={`#${id}`} className={`ltc-toc-link${active ? " active" : ""}`}>
       {label}
     </a>
   );
@@ -65,12 +64,43 @@ const TOC = [
 
 export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [navScrolled, setNavScrolled] = useState(false);
+  const [activeId, setActiveId] = useState<string>(TOC[0].id);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    const onScroll = () => setNavScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const ids = TOC.map((t) => t.id);
+    // rootMargin pushes the trigger zone to the upper-middle of the viewport
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        // pick the topmost entry that is intersecting
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) {
+          setActiveId(visible[0].target.id);
+        }
+      },
+      { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observerRef.current!.observe(el);
+    });
+    return () => observerRef.current?.disconnect();
+  }, []);
 
   return (
     <div className="landing w-full min-w-0">
 
       {/* ── NAVBAR (same as landing page) ── */}
-      <nav className={`landing-nav${mobileMenuOpen ? " mobile-open" : ""}`}>
+      <nav className={`landing-nav${navScrolled ? " scrolled" : ""}${mobileMenuOpen ? " mobile-open" : ""}`}>
         <div className="landing-container">
           <div className="landing-nav-row">
             <div className="landing-nav-left">
@@ -154,20 +184,6 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
             These terms govern your access to and use of MAANGco our website, dashboard,
             DSA question bank, System Design roadmap, and all related services.
           </p>
-          <div className="ltc-meta-row">
-            <div className="ltc-meta-chip">
-              <span className="ltc-meta-label">Last updated</span>
-              <span className="ltc-meta-value">June 24, 2026</span>
-            </div>
-            <div className="ltc-meta-chip">
-              <span className="ltc-meta-label">Platform</span>
-              <span className="ltc-meta-value">MAANGco</span>
-            </div>
-            <div className="ltc-meta-chip">
-              <span className="ltc-meta-label">Jurisdiction</span>
-              <span className="ltc-meta-value">India</span>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -180,7 +196,7 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
             <p className="ltc-sidebar-label">On this page</p>
             <nav className="ltc-toc">
               {TOC.map((item) => (
-                <TocLink key={item.id} id={item.id} label={item.label} />
+                <TocLink key={item.id} id={item.id} label={item.label} active={activeId === item.id} />
               ))}
             </nav>
           </aside>
