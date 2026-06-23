@@ -738,7 +738,7 @@ export function LandingPage({
                     <div className="lodm-ring-wrap">
                       <svg viewBox="0 0 44 44" width="44" height="44">
                         <circle cx="22" cy="22" r="18" fill="none" className="lodm-ring-track" strokeWidth="3.5"/>
-                        <circle cx="22" cy="22" r="18" fill="none" stroke="#4ade80" strokeWidth="3.5"
+                        <circle cx="22" cy="22" r="18" fill="none" stroke="#c87c4a" strokeWidth="3.5"
                           strokeDasharray="113.1" strokeDashoffset="111.9"
                           strokeLinecap="round" transform="rotate(-90 22 22)"/>
                         <text x="22" y="26" textAnchor="middle" className="lodm-ring-pct" fontSize="7.5" fontFamily="Inter,sans-serif" fontWeight="500">0%</text>
@@ -746,10 +746,10 @@ export function LandingPage({
                     </div>
                     <div className="lodm-prog-solved">
                       <div className="lodm-prog-num">5<span className="lodm-prog-total">/1138</span></div>
-                      <div style={{ color: "#4ade80", fontSize: 10 }}>✓ Solved</div>
+                      <div style={{ color: "#c87c4a", fontSize: 10 }}>✓ Solved</div>
                     </div>
                     <div className="lodm-prog-sep" />
-                    <div className="lodm-prog-diff"><div className="lodm-diff-lbl">Easy</div><div className="lodm-diff-val" style={{ color: "#4ade80" }}>1/258</div></div>
+                    <div className="lodm-prog-diff"><div className="lodm-diff-lbl">Easy</div><div className="lodm-diff-val" style={{ color: "#c87c4a" }}>1/258</div></div>
                     <div className="lodm-prog-diff"><div className="lodm-diff-lbl">Med.</div><div className="lodm-diff-val" style={{ color: "#fbbf24" }}>3/649</div></div>
                     <div className="lodm-prog-diff"><div className="lodm-diff-lbl">Hard</div><div className="lodm-diff-val" style={{ color: "#f87171" }}>1/231</div></div>
                   </div>
