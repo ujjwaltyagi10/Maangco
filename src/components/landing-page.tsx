@@ -1001,6 +1001,10 @@ export function LandingPage({
               <div className="lprice-cards lobs-price-cards">
                 <div className="lprice-card">
                   <div className="lprice-plan-name">Monthly</div>
+                  <div className="lprice-original-row">
+                    <span className="lprice-original">₹349</span>
+                    <span className="lprice-discount-badge">14% off</span>
+                  </div>
                   <div className="lprice-amount">
                     <span className="lprice-currency">₹</span>
                     <span className="lprice-num">299</span>
@@ -1033,6 +1037,10 @@ export function LandingPage({
                     Most Popular · Save 33%
                   </div>
                   <div className="lprice-plan-name">Yearly</div>
+                  <div className="lprice-original-row">
+                    <span className="lprice-original">₹2,999</span>
+                    <span className="lprice-discount-badge">33% off</span>
+                  </div>
                   <div className="lprice-amount">
                     <span className="lprice-currency">₹</span>
                     <span className="lprice-num">1,999</span>
