@@ -130,10 +130,10 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
             Phone Number: <span>+91 98765 43210</span>
           </p> */}
 
-          <p className="lcontact-address">
+          {/* <p className="lcontact-address">
             Address: 4th floor, 123, Koramangala 5th Block, 80 Feet Road,<br />
             Bengaluru – 560 095.
-          </p>
+          </p> */}
         </div>
       </section>
 
