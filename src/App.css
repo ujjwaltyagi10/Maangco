@@ -6226,3 +6226,75 @@ a.lbtn-lg {
   .lcontact-card { padding: 40px 24px; }
   .lcontact-title { font-size: 30px; }
 }
+
+/* ═══════════════════════════ FINANCIAL AID PAGE ════════════════════════ */
+.lfa-hero-email {
+  margin: 16px 0 0;
+}
+.lfa-email-link {
+  font-size: 17px;
+  font-weight: 500;
+  color: #c87c4a;
+  text-decoration: none;
+}
+.lfa-email-link:hover { text-decoration: underline; }
+
+.lfa-section {
+  padding: 0 0 96px;
+  background: var(--bg);
+}
+
+.lfa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--border);
+}
+
+.lfa-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 28px;
+  background: var(--bg);
+}
+.lfa-item:last-child {
+  grid-column: 1 / -1;
+}
+
+.lfa-item-num {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #c87c4a;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.lfa-item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lfa-item-q {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text1);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.lfa-item-hint {
+  font-size: 12.5px;
+  color: var(--text3);
+  margin: 0;
+  line-height: 1.55;
+}
+
+@media (max-width: 700px) {
+  .lfa-grid { grid-template-columns: 1fr; }
+}

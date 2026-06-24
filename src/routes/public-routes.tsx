@@ -4,6 +4,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "re
 import { AuthScreen } from "@/components/auth-screen";
 import { CancellationPolicyPage } from "@/components/cancellation-policy-page";
 import { ContactPage } from "@/components/contact-page";
+import { FinancialAidPage } from "@/components/financial-aid-page";
 import { LandingPage } from "@/components/landing-page";
 import { PrivacyPolicyPage } from "@/components/privacy-policy-page";
 import { TermsAndConditionsPage } from "@/components/terms-and-conditions-page";
@@ -218,6 +219,7 @@ export function PublicRoutes({
       "/terms-and-conditions": "Terms and Conditions – MAANGco",
       "/privacy-policy": "Privacy Policy – MAANGco",
       "/cancellation-policy": "Cancellation & Refund Policy – MAANGco",
+      "/financial-aid": "Financial Aid – MAANGco",
       "/contact": "Contact Us – MAANGco",
       "/login": "Sign In – MAANGco",
       "/signup": "Get Started Free – MAANGco",
@@ -229,7 +231,7 @@ export function PublicRoutes({
   const isAuthenticated = Boolean(authSession?.token);
 
   // Redirect logged-in users away from auth screens only (not the landing page)
-  const isPublicLegalRoute = location.pathname === ROUTES.termsConditions || location.pathname === ROUTES.privacyPolicy || location.pathname === ROUTES.cancellationPolicy || location.pathname === ROUTES.contact;
+  const isPublicLegalRoute = location.pathname === ROUTES.termsConditions || location.pathname === ROUTES.privacyPolicy || location.pathname === ROUTES.cancellationPolicy || location.pathname === ROUTES.financialAid || location.pathname === ROUTES.contact;
 
   if (isAuthenticated && location.pathname !== ROUTES.landing && !isPublicLegalRoute) {
     return <Navigate to={ROUTES.dashboard} replace />;
@@ -259,6 +261,7 @@ export function PublicRoutes({
       <Route path={ROUTES.termsConditions} element={<TermsAndConditionsPage theme={theme} onThemeChange={onThemeChange} />} />
       <Route path={ROUTES.privacyPolicy} element={<PrivacyPolicyPage theme={theme} onThemeChange={onThemeChange} />} />
       <Route path={ROUTES.cancellationPolicy} element={<CancellationPolicyPage theme={theme} onThemeChange={onThemeChange} />} />
+      <Route path={ROUTES.financialAid} element={<FinancialAidPage theme={theme} onThemeChange={onThemeChange} />} />
       <Route path={ROUTES.contact} element={<ContactPage theme={theme} onThemeChange={onThemeChange} />} />
       <Route
         path={ROUTES.login}

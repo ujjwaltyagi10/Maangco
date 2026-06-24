@@ -322,7 +322,7 @@ export function PrivacyPolicyPage({ theme, onThemeChange }: PrivacyPolicyPagePro
             <div className="lfooter-links-row">
               <Link to={ROUTES.termsConditions} className="lfooter-link" style={{ textDecoration: "none" }}>Terms and Conditions</Link>
               <Link to={ROUTES.contact} className="lfooter-link" style={{ textDecoration: "none" }}>Contact us</Link>
-              <a href="#" className="lfooter-link">Pricing</a>
+              <Link to={ROUTES.financialAid} className="lfooter-link" style={{ textDecoration: "none" }}>Financial Aid</Link>
               <Link to={ROUTES.privacyPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Privacy Policy</Link>
               <Link to={ROUTES.cancellationPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Cancellation and Refund Policy</Link>
             </div>

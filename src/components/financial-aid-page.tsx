@@ -2,12 +2,50 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes/route-paths";
 
-interface ContactPageProps {
+interface FinancialAidPageProps {
   theme: "light" | "dark";
   onThemeChange: () => void;
 }
 
-export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
+const QUESTIONS = [
+  {
+    num: "01",
+    q: "Full name & email",
+    hint: "Your full name and the email address linked to your account (or the one you'll register with).",
+  },
+  {
+    num: "02",
+    q: "Current status",
+    hint: "Student / Fresher / Unemployed / Employed (low income) / Career switcher",
+  },
+  {
+    num: "03",
+    q: "Country & city of residence",
+    hint: "Helps us understand cost-of-living context without asking for income directly.",
+  },
+  {
+    num: "04",
+    q: "Why can't you afford the full subscription?",
+    hint: "2–3 sentences max. This is your core self-declaration.",
+  },
+  {
+    num: "05",
+    q: "What is your target goal?",
+    hint: "MAANG placement / Tier-1 startup / Any SWE job / Upskilling / Other",
+  },
+  {
+    num: "06",
+    q: "Hours per week you can commit to studying",
+    hint: "Less than 5 / 5–10 / 10–20 / 20+",
+  },
+  {
+    num: "07",
+    q: "What discount would make this accessible?",
+    hint: "25% off / 50% off / 75% off / I can't pay anything right now",
+  },
+];
+
+export function FinancialAidPage({ theme, onThemeChange }: FinancialAidPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -37,7 +75,6 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
                 <span className="landing-logo-text">MAANG<em>co</em></span>
               </Link>
             </div>
-
             <div className="hidden lg:flex items-center gap-2">
               <button type="button" className="lnav-theme-btn" onClick={onThemeChange} aria-label="Toggle theme">
                 {theme === "light" ? (
@@ -52,7 +89,6 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
                 )}
               </button>
             </div>
-
             <div className="landing-nav-mobile">
               <button type="button" className="lnav-theme-btn" onClick={onThemeChange} aria-label="Toggle theme">
                 {theme === "light" ? (
@@ -75,38 +111,37 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
               </button>
             </div>
           </div>
-
         </div>
       </nav>
 
-      {/* ── CONTACT CONTENT ── */}
-      <section className="lcontact-section">
-        <div className="lcontact-card">
-          {/* Phone icon */}
-          <div className="lcontact-icon-wrap">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#c87c4a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
-            </svg>
-          </div>
-
-          <h1 className="lcontact-title">Contact</h1>
-
-          <p className="lcontact-body">
-            You can reach us at{" "}
-            <a href="mailto:support@maangco.com" className="lcontact-link">
-              support@maangco.com
-            </a>{" "}
-            by dropping an email. We usually get back within 48–72 hours.
+      {/* ── HERO ── */}
+      <section className="ltc-hero">
+        <div className="landing-container">
+          <p className="ltc-eyebrow">Support</p>
+          <h1 className="ltc-h1">Financial Aid</h1>
+          <p className="ltc-sub">
+            We believe cost should never be a barrier to learning. Send us an email with the details below we review every application personally and respond within 3–5 business days.
           </p>
+          <p className="lfa-hero-email">
+            <a href="mailto:support@maangco.com" className="lfa-email-link">support@maangco.com</a>
+          </p>
+        </div>
+      </section>
 
-          {/* <p className="lcontact-phone">
-            Phone Number: <span>+91 98765 43210</span>
-          </p> */}
-
-          {/* <p className="lcontact-address">
-            Address: 4th floor, 123, Koramangala 5th Block, 80 Feet Road,<br />
-            Bengaluru – 560 095.
-          </p> */}
+      {/* ── QUESTIONS ── */}
+      <section className="lfa-section">
+        <div className="landing-container">
+          <div className="lfa-grid">
+            {QUESTIONS.map(({ num, q, hint }) => (
+              <div key={num} className="lfa-item">
+                <span className="lfa-item-num">{num}</span>
+                <div className="lfa-item-body">
+                  <p className="lfa-item-q">{q}</p>
+                  <p className="lfa-item-hint">{hint}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

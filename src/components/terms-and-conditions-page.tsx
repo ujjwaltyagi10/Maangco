@@ -387,7 +387,7 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
             <div className="lfooter-links-row">
               <a href={ROUTES.termsConditions} className="lfooter-link">Terms and Conditions</a>
               <Link to={ROUTES.contact} className="lfooter-link" style={{ textDecoration: "none" }}>Contact us</Link>
-              <a href="#" className="lfooter-link">Pricing</a>
+              <Link to={ROUTES.financialAid} className="lfooter-link" style={{ textDecoration: "none" }}>Financial Aid</Link>
               <Link to={ROUTES.privacyPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Privacy Policy</Link>
               <Link to={ROUTES.cancellationPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Cancellation and Refund Policy</Link>
             </div>

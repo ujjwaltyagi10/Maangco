@@ -18,6 +18,7 @@ export const ROUTES = {
   termsConditions: "/terms-and-conditions",
   privacyPolicy: "/privacy-policy",
   cancellationPolicy: "/cancellation-policy",
+  financialAid: "/financial-aid",
   contact: "/contact",
   dashboard: "/dashboard",
   dsa: "/dsa",
