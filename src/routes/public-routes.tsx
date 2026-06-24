@@ -173,16 +173,20 @@ function GoogleCallbackPage({ onGoogleCallback }: Pick<PublicRoutesProps, "onGoo
 
   return (
     <div className="auth-status-page">
-      <div className="auth-status-card">
+      <div className="auth-status-plain">
+        {status === "loading" ? (
+          <div className="auth-status-loader" aria-label="Signing in">
+            <div className="auth-status-loader-ring" />
+          </div>
+        ) : null}
         <div className="auth-status-title">
-          {status === "success" ? "Signed in" : status === "error" ? "Authentication failed" : "Signing in"}
+          {status === "success" ? "Signed in" : status === "error" ? "Authentication failed" : "Hold on a moment"}
         </div>
         <div className="auth-status-copy">{message}</div>
         {status === "error" ? (
           <button
             type="button"
-            className="auth-btn-primary"
-            style={{ marginTop: 20 }}
+            className="auth-btn-primary auth-status-action"
             onClick={() => navigate(ROUTES.login, { replace: true })}
           >
             Go to Sign In
