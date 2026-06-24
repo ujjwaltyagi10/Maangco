@@ -22,11 +22,11 @@
   --sidebar-active-text: #15130f;
   --sidebar-hover-bg: #f1ece2;
 
-  --green: #4a7c41;
-  --green-bg: #edf5ec;
-  --green-light: #b8d9b4;
-  --accent: #4a7c41;
-  --accent2: #7cb870;
+  --green: #c87c4a;
+  --green-bg: #f9efe8;
+  --green-light: #e8cdb8;
+  --accent: #c87c4a;
+  --accent2: #d4956a;
   --amber: #a06020;
   --amber-bg: #fff5e6;
   --blue: #1a4a8a;
@@ -40,7 +40,7 @@
   --med-bg: rgba(181, 106, 21, 0.12);
   --hard: #cb3d4d;
   --hard-bg: rgba(203, 61, 77, 0.12);
-  --solved-bg: rgba(74, 124, 65, 0.08);
+  --solved-bg: rgba(200, 124, 74, 0.08);
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
@@ -49,29 +49,29 @@
 [data-theme="dark"] {
   /* Neutral — from color system */
   --bg: #080808;
-  --surface: #11161c;
-  --surface2: #1a1f26;
-  --surface3: #232a33;
-  --border: #2d3440;
-  --border2: #3b4250;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --surface3: #222222;
+  --border: #2a2a2a;
+  --border2: #383838;
   --text1: #e5e7eb;
   --text2: #9ca3af;
   --text3: #6b7280;
   --muted: #9ca3af;
-  --sidebar-bg: #090d11;
-  --sidebar-border: #1a1f26;
+  --sidebar-bg: #080808;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
   --sidebar-text: #9ca3af;
   --sidebar-muted: #4b5563;
-  --sidebar-active-bg: #1e2530;
+  --sidebar-active-bg: #141414;
   --sidebar-active-text: #e5e7eb;
-  --sidebar-hover-bg: #111820;
+  --sidebar-hover-bg: #0f0f0f;
 
-  /* Theme accent — UNCHANGED (logo + button gradient) */
-  --green: #5a9c50;
-  --green-bg: #0e1f0c;
-  --green-light: #1e4018;
-  --accent: #5a9c50;
-  --accent2: #7cb870;
+  /* Theme accent */
+  --green: #c87c4a;
+  --green-bg: #1f0f06;
+  --green-light: #3d1e0a;
+  --accent: #c87c4a;
+  --accent2: #d4956a;
 
   /* Semantic — from color system */
   --amber: #f59e0b;
@@ -81,14 +81,14 @@
   --purple: #8b5cf6;
   --purple-bg: rgba(139, 92, 246, 0.1);
 
-  /* Difficulty — easy keeps theme green; med/hard use new semantic colors */
+  /* Difficulty — easy stays green; med/hard use semantic colors */
   --easy: #5a9c50;
   --easy-bg: rgba(90, 156, 80, 0.12);
   --med: #f59e0b;
   --med-bg: rgba(245, 158, 11, 0.12);
   --hard: #ef4444;
   --hard-bg: rgba(239, 68, 68, 0.12);
-  --solved-bg: rgba(90, 156, 80, 0.1);
+  --solved-bg: rgba(200, 124, 74, 0.1);
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
@@ -167,7 +167,7 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  background: linear-gradient(135deg, #4a7c41 0%, #6ba860 100%);
+  background: linear-gradient(135deg, #a85e30 0%, #c87c4a 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -239,7 +239,7 @@ body {
 
 .nav-item.active {
   background: var(--sidebar-active-bg);
-  border-left-color: #7cb870;
+  border-left-color: #c87c4a;
 }
 
 .sidebar.collapsed .nav-item {
@@ -252,7 +252,7 @@ body {
 }
 
 .sidebar.collapsed .nav-item.active {
-  box-shadow: inset 3px 0 0 #7cb870;
+  box-shadow: inset 3px 0 0 #c87c4a;
 }
 
 .nav-icon {
@@ -291,7 +291,7 @@ body {
 .nav-badge {
   margin-left: auto;
   background: rgba(124, 184, 112, 0.15);
-  color: #7cb870;
+  color: #c87c4a;
   font-size: 9px;
   font-weight: 700;
   padding: 2px 6px;
@@ -506,7 +506,7 @@ body {
 
 /* ── TOP NAV ── */
 .topnav {
-  background: var(--surface);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   padding: 0 0.65rem;
   height: 60px;
@@ -611,7 +611,7 @@ body {
 }
 
 .topnav-guest-btn--primary {
-  background: linear-gradient(135deg, #4a7c41, #6ba860);
+  background: linear-gradient(135deg, #a85e30, #c87c4a);
   color: #fff;
   border-color: transparent;
   box-shadow: 0 4px 14px rgba(74, 124, 65, 0.24);
@@ -644,6 +644,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  background: var(--bg);
 }
 
 /* ── DASHBOARD ── */
@@ -652,6 +653,7 @@ body {
   padding: 0.85rem;
   flex: 1;
   min-height: 0;
+  background: var(--bg);
 }
 
 .dashboard--public {
@@ -990,7 +992,7 @@ body {
 }
 
 .dash-card.fe-card::before {
-  background: linear-gradient(90deg, #4a7c41, #7cb870);
+  background: linear-gradient(90deg, #a85e30, #c87c4a);
 }
 
 .dash-card:hover {
@@ -1052,7 +1054,7 @@ body {
 }
 
 [data-theme="dark"] .card-tag.fe {
-  color: #7cb870;
+  color: #c87c4a;
 }
 
 .card-title {
@@ -1113,7 +1115,7 @@ body {
 }
 
 [data-theme="dark"] .card-cta {
-  color: #7cb870;
+  color: #c87c4a;
 }
 
 .card-cta svg {
@@ -4903,7 +4905,7 @@ body {
 }
 
 .pd-premium-title-accent {
-  background: linear-gradient(90deg, #7cb870, #a0d494, #6ba860);
+  background: linear-gradient(90deg, #c87c4a, #d4956a, #c87c4a);
   background-size: 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -4941,7 +4943,7 @@ body {
   padding: 11px 22px;
   border: none;
   border-radius: 11px;
-  background: linear-gradient(135deg, #4a7c41 0%, #6eb864 100%);
+  background: linear-gradient(135deg, #a85e30 0%, #c87c4a 100%);
   color: #fff;
   font-size: 14px;
   font-weight: 700;
