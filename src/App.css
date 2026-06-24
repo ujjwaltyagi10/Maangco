@@ -4110,11 +4110,19 @@ a.lbtn-lg {
   border-color: var(--border2);
 }
 
+[data-theme="dark"] .profile-menu-btn {
+  background: var(--bg);
+}
+[data-theme="dark"] .profile-menu-btn:hover,
+[data-theme="dark"] .profile-menu-btn.open {
+  background: var(--surface);
+}
+
 .profile-avatar {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4a7c41, #7cb870);
+  background: linear-gradient(135deg, #a85e30, #c87c4a);
   color: white;
   font-size: 11px;
   font-weight: 700;
