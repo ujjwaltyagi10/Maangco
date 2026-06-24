@@ -76,19 +76,6 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
             </div>
           </div>
 
-          {mobileMenuOpen && (
-            <div className="lnav-mobile-drawer">
-              {[
-                { href: `${ROUTES.landing}#features`, label: "Features" },
-                { href: `${ROUTES.landing}#pricing`, label: "Pricing" },
-                { href: `${ROUTES.landing}#testimonials`, label: "Reviews" },
-                { href: `${ROUTES.landing}#faq`, label: "FAQ" },
-              ].map(({ href, label }) => (
-                <Link key={href} to={href} className="lnav-mobile-link" style={{ textDecoration: "none" }}
-                  onClick={() => setMobileMenuOpen(false)}>{label}</Link>
-              ))}
-            </div>
-          )}
         </div>
       </nav>
 
