@@ -2,7 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { AuthScreen } from "@/components/auth-screen";
+import { CancellationPolicyPage } from "@/components/cancellation-policy-page";
+import { ContactPage } from "@/components/contact-page";
+import { FinancialAidPage } from "@/components/financial-aid-page";
 import { LandingPage } from "@/components/landing-page";
+import { PrivacyPolicyPage } from "@/components/privacy-policy-page";
+import { TermsAndConditionsPage } from "@/components/terms-and-conditions-page";
 import { getAuthErrorMessage, getGoogleAuthUrl, parseAuthCallbackSearch, verifyEmail, type AuthSession } from "@/lib/auth-api";
 import { authModeFromPath, authPathForMode, ROUTES, type AuthMode, type AuthSubmitResult } from "./route-paths";
 
@@ -168,16 +173,20 @@ function GoogleCallbackPage({ onGoogleCallback }: Pick<PublicRoutesProps, "onGoo
 
   return (
     <div className="auth-status-page">
-      <div className="auth-status-card">
+      <div className="auth-status-plain">
+        {status === "loading" ? (
+          <div className="auth-status-loader" aria-label="Signing in">
+            <div className="auth-status-loader-ring" />
+          </div>
+        ) : null}
         <div className="auth-status-title">
-          {status === "success" ? "Signed in" : status === "error" ? "Authentication failed" : "Signing in"}
+          {status === "success" ? "Signed in" : status === "error" ? "Authentication failed" : "Hold on a moment"}
         </div>
         <div className="auth-status-copy">{message}</div>
         {status === "error" ? (
           <button
             type="button"
-            className="auth-btn-primary"
-            style={{ marginTop: 20 }}
+            className="auth-btn-primary auth-status-action"
             onClick={() => navigate(ROUTES.login, { replace: true })}
           >
             Go to Sign In
@@ -211,6 +220,11 @@ export function PublicRoutes({
   useEffect(() => {
     const pageTitles: Record<string, string> = {
       "/": "MAANGco – MAANG Interview Prep | DSA, System Design & Frontend",
+      "/terms-and-conditions": "Terms and Conditions – MAANGco",
+      "/privacy-policy": "Privacy Policy – MAANGco",
+      "/cancellation-policy": "Cancellation & Refund Policy – MAANGco",
+      "/financial-aid": "Financial Aid – MAANGco",
+      "/contact": "Contact Us – MAANGco",
       "/login": "Sign In – MAANGco",
       "/signup": "Get Started Free – MAANGco",
       "/forgot-password": "Reset Password – MAANGco",
@@ -221,7 +235,9 @@ export function PublicRoutes({
   const isAuthenticated = Boolean(authSession?.token);
 
   // Redirect logged-in users away from auth screens only (not the landing page)
-  if (isAuthenticated && location.pathname !== ROUTES.landing) {
+  const isPublicLegalRoute = location.pathname === ROUTES.termsConditions || location.pathname === ROUTES.privacyPolicy || location.pathname === ROUTES.cancellationPolicy || location.pathname === ROUTES.financialAid || location.pathname === ROUTES.contact;
+
+  if (isAuthenticated && location.pathname !== ROUTES.landing && !isPublicLegalRoute) {
     return <Navigate to={ROUTES.dashboard} replace />;
   }
 
@@ -246,6 +262,11 @@ export function PublicRoutes({
           />
         }
       />
+      <Route path={ROUTES.termsConditions} element={<TermsAndConditionsPage theme={theme} onThemeChange={onThemeChange} />} />
+      <Route path={ROUTES.privacyPolicy} element={<PrivacyPolicyPage theme={theme} onThemeChange={onThemeChange} />} />
+      <Route path={ROUTES.cancellationPolicy} element={<CancellationPolicyPage theme={theme} onThemeChange={onThemeChange} />} />
+      <Route path={ROUTES.financialAid} element={<FinancialAidPage theme={theme} onThemeChange={onThemeChange} />} />
+      <Route path={ROUTES.contact} element={<ContactPage theme={theme} onThemeChange={onThemeChange} />} />
       <Route
         path={ROUTES.login}
         element={

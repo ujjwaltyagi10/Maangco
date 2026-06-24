@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createSubscription, verifySubscription, SubscriptionAuthError, type PlanType } from "../lib/subscription-api";
 import { fetchPlans, type Plan } from "../lib/plans-api";
+import { COMPANY_LOGOS } from "../lib/company-logos";
 
 interface PremiumModalProps {
   open: boolean;
@@ -14,9 +15,10 @@ interface PremiumModalProps {
 
 const ALL_COMPANIES = [
   "Google", "Meta", "Amazon", "Apple", "Netflix", "Microsoft",
-  "Adobe", "Uber", "Flipkart", "Walmart", "Atlassian", "Bloomberg",
-  "TikTok", "Nvidia", "Salesforce", "Goldman Sachs", "Citadel",
-  "Snowflake", "TCS", "Airbnb", "Pinterest", "Oracle", "Visa",
+  "Adobe", "Uber", "Flipkart", "Walmart",
+  "Salesforce", "Goldman Sachs",
+  "Nvidia", "Atlassian", "Snowflake", "Airbnb",
+  "Pinterest", "Oracle", "Visa",
 ];
 
 const FALLBACK_PLANS: Plan[] = [
@@ -126,7 +128,14 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
   if (!open) return null;
 
   const plan = plans.find((p) => p.id === selectedPlan) ?? FALLBACK_PLANS.find((p) => p.id === selectedPlan)!;
-  const marqueeItems = [...ALL_COMPANIES, ...ALL_COMPANIES];
+  const marqueeItems = [...ALL_COMPANIES, ...ALL_COMPANIES].map((name) => ({
+    name,
+    logo: COMPANY_LOGOS[name],
+  }));
+  const mobileItems = ALL_COMPANIES.map((name) => ({
+    name,
+    logo: COMPANY_LOGOS[name],
+  }));
 
   return (
     <div className="premium-modal-overlay" onClick={onClose}>
@@ -141,25 +150,12 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
 
         {/* ── LEFT — Feature showcase ── */}
         <div className="pm-left">
-          <div className="pm-left-orb pm-left-orb--1" />
-          <div className="pm-left-orb pm-left-orb--2" />
-
-          <div className="pm-left-badge">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 20h20M4 20l2-8 6 4 6-4 2 8" />
-              <circle cx="4" cy="10" r="1.5" fill="#d4a04a" stroke="none" />
-              <circle cx="20" cy="10" r="1.5" fill="#d4a04a" stroke="none" />
-              <circle cx="12" cy="6" r="1.5" fill="#d4a04a" stroke="none" />
-            </svg>
-            <span>MAANGco Premium</span>
-          </div>
-
           <div className="pm-left-heading">
             <h2 className="pm-left-title">
               Unlock everything.<br />
               <span className="pm-left-accent">Crack any interview.</span>
             </h2>
-            <p className="pm-left-sub">Everything you need for MAANG and top-tier tech interviews — in one place.</p>
+            <p className="pm-left-sub">Everything you need for MAANG and top-tier tech interviews in one place.</p>
           </div>
 
           <ul className="pm-feat-list">
@@ -202,12 +198,21 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
 
           {/* Company marquee */}
           <div className="pm-left-marquee">
-            <div className="pmh-marquee">
+            <div className="pmh-marquee" aria-hidden="true">
               <div className="pmh-marquee-track">
-                {marqueeItems.map((name, i) => (
-                  <div key={i} className="pmh-chip">{name}</div>
+                {marqueeItems.map((item, i) => (
+                  <div key={`${item.name}-${i}`} className="pmh-chip pmh-chip--logo" title={item.name}>
+                    <img src={item.logo} alt="" className="pmh-chip-logo" />
+                  </div>
                 ))}
               </div>
+            </div>
+            <div className="pm-mobile-company-grid" aria-hidden="true">
+              {mobileItems.map((item) => (
+                <div key={item.name} className="pmh-chip pmh-chip--logo pmh-chip--mobile" title={item.name}>
+                  <img src={item.logo} alt="" className="pmh-chip-logo" />
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -216,7 +221,6 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
         <div className="pm-right">
           <div className="pm-right-head">
             <div className="pm-right-title">Choose your plan</div>
-            <div className="pm-right-sub">Cancel anytime. No questions asked.</div>
           </div>
 
           {/* Plan cards */}
@@ -228,9 +232,6 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
                 className={`pm-plan-card${p.isPopular ? " pm-plan-card--featured" : ""}${selectedPlan === p.id ? " pm-plan-card--active" : ""}`}
                 onClick={() => setSelectedPlan(p.id as PlanType)}
               >
-                {p.savingsLabel && (
-                  <div className="pm-plan-best-badge">Best Value · {p.savingsLabel}</div>
-                )}
                 <div className="pm-plan-row">
                   <div className="pm-plan-info">
                     <div className="pm-plan-name">{p.label}</div>

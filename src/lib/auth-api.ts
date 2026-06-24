@@ -1,7 +1,10 @@
-export const AUTH_API_BASE_URL = (
-  (import.meta.env.VITE_AUTH_API_BASE_URL as string | undefined)?.trim() ||
-  "https://api.maangco.com"
-).replace(/\/$/, "");
+const AUTH_API_BASE_URL_ENV = (import.meta.env.VITE_AUTH_API_BASE_URL as string | undefined)?.trim();
+
+if (!AUTH_API_BASE_URL_ENV) {
+  throw new Error("VITE_AUTH_API_BASE_URL is required. Set it in your environment instead of hardcoding the backend URL.");
+}
+
+export const AUTH_API_BASE_URL = AUTH_API_BASE_URL_ENV.replace(/\/$/, "");
 
 export interface AuthSubscription {
   plan: string;
