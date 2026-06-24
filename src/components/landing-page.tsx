@@ -197,7 +197,6 @@ export function LandingPage({
   const [activeSection, setActiveSection] = useState<string>("");
   const avatarMenuRef = useRef<HTMLDivElement>(null);
   const landingRef = useRef<HTMLDivElement>(null);
-  const navObserverRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     const el = landingRef.current;
@@ -213,24 +212,6 @@ export function LandingPage({
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  useEffect(() => {
-    const container = landingRef.current;
-    if (!container) return;
-    navObserverRef.current = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible.length > 0) setActiveSection(visible[0].target.id);
-      },
-      { root: container, rootMargin: "-20% 0px -60% 0px", threshold: 0 }
-    );
-    ["features", "pricing", "testimonials", "faq"].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) navObserverRef.current!.observe(el);
-    });
-    return () => navObserverRef.current?.disconnect();
-  }, []);
 
   useEffect(() => {
     const container = landingRef.current;
@@ -292,12 +273,12 @@ export function LandingPage({
               </a>
 
               <div className="hidden lg:flex items-center gap-1 flex-1">
-                <a href="#features" className={`landing-nav-link${activeSection === "features" ? " active" : ""}`}>Features</a>
+                <a href="#features" onClick={() => setActiveSection("features")} className={`landing-nav-link${activeSection === "features" ? " active" : ""}`}>Features</a>
                 {!isPremium && (
-                  <a href="#pricing" className={`landing-nav-link${activeSection === "pricing" ? " active" : ""}`}>Pricing</a>
+                  <a href="#pricing" onClick={() => setActiveSection("pricing")} className={`landing-nav-link${activeSection === "pricing" ? " active" : ""}`}>Pricing</a>
                 )}
-                <a href="#testimonials" className={`landing-nav-link${activeSection === "testimonials" ? " active" : ""}`}>Reviews</a>
-                <a href="#faq" className={`landing-nav-link${activeSection === "faq" ? " active" : ""}`}>FAQ</a>
+                <a href="#testimonials" onClick={() => setActiveSection("testimonials")} className={`landing-nav-link${activeSection === "testimonials" ? " active" : ""}`}>Reviews</a>
+                <a href="#faq" onClick={() => setActiveSection("faq")} className={`landing-nav-link${activeSection === "faq" ? " active" : ""}`}>FAQ</a>
               </div>
             </div>
 

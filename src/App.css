@@ -1060,12 +1060,8 @@ a.lbtn-lg {
   background: var(--surface2);
 }
 .landing-nav-link.active {
-  color: var(--text1);
-  background: var(--surface2);
-}
-[data-theme="dark"] .landing-nav-link.active {
-  color: #fff;
-  background: rgba(255,255,255,0.08);
+  color: #c87c4a;
+  background: transparent;
 }
 .lnav-theme-btn {
   width: 36px;
