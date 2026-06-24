@@ -2755,8 +2755,8 @@ a.lbtn-lg {
 .lprice-card {
   position: relative;
   border-radius: 24px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 1px solid #27272a;
+  background: #18181b;
   padding: 32px 28px 28px;
   display: flex;
   flex-direction: column;
@@ -2772,10 +2772,45 @@ a.lbtn-lg {
 }
 .lprice-card--highlight {
   border-color: rgba(200, 124, 74, 0.4);
-  background: linear-gradient(160deg, rgba(200, 124, 74, 0.12) 0%, var(--surface) 60%);
+  background:
+    linear-gradient(160deg, rgba(200, 124, 74, 0.12) 0%, rgba(24, 24, 27, 0.98) 60%),
+    linear-gradient(180deg, #1f1f23 0%, #18181b 100%);
   box-shadow:
     0 0 0 1px rgba(200, 124, 74, 0.2),
     var(--shadow-md);
+}
+
+.lprice-card .lprice-btn {
+  border-color: #27272a;
+  background: #111113;
+  color: #f4f4f5;
+}
+
+.lprice-card .lprice-btn:hover {
+  background: #18181b;
+  border-color: #3f3f46;
+}
+
+.lprice-card--highlight .lprice-btn {
+  border-color: rgba(200, 124, 74, 0.42);
+  background: linear-gradient(135deg, #a85e30 0%, #c87c4a 100%);
+  color: #fff;
+}
+
+.lprice-card--highlight .lprice-btn:hover {
+  background: linear-gradient(135deg, #9c552c 0%, #be7444 100%);
+  border-color: rgba(200, 124, 74, 0.5);
+}
+
+[data-theme="light"] .lprice-card {
+  background: #f5f1eb;
+  border-color: #e5ddd1;
+}
+
+[data-theme="light"] .lprice-card--highlight {
+  background:
+    linear-gradient(160deg, rgba(200, 124, 74, 0.12) 0%, rgba(245, 241, 234, 0.96) 60%),
+    linear-gradient(180deg, #fbf8f3 0%, #f5f1eb 100%);
 }
 .lprice-popular-badge {
   position: absolute;
@@ -3208,7 +3243,7 @@ a.lbtn-lg {
 [data-theme="light"] .lfooter-wordmark { color: var(--text1); }
 [data-theme="light"] .lfooter-wordmark em { color: #c87c4a; }
 .lfooter-copy {
-  font-size: 12px;
+  font-size: 10px;
   color: rgba(245, 243, 238, 0.38);
 }
 [data-theme="light"] .lfooter-copy {
