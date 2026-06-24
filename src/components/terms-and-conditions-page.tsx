@@ -134,12 +134,6 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
                   </svg>
                 )}
               </button>
-              <Link to={ROUTES.landing} className="lnav-sign-in" style={{ textDecoration: "none" }}>
-                Sign In
-              </Link>
-              <Link to={ROUTES.landing} className="lnav-get-started" style={{ textDecoration: "none" }}>
-                Back to home →
-              </Link>
             </div>
 
             {/* mobile controls */}
@@ -181,14 +175,6 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
                 </Link>
               ))}
               <div className="lnav-mobile-actions">
-                <Link to={ROUTES.landing} className="lnav-sign-in" style={{ flex: 1, textDecoration: "none" }}
-                  onClick={() => setMobileMenuOpen(false)}>
-                  Sign In
-                </Link>
-                <Link to={ROUTES.landing} className="lnav-get-started" style={{ flex: 1, textDecoration: "none" }}
-                  onClick={() => setMobileMenuOpen(false)}>
-                  Back to home →
-                </Link>
               </div>
             </div>
           )}

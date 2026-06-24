@@ -120,8 +120,6 @@ export function PrivacyPolicyPage({ theme, onThemeChange }: PrivacyPolicyPagePro
                   </svg>
                 )}
               </button>
-              <Link to={ROUTES.landing} className="lnav-sign-in" style={{ textDecoration: "none" }}>Sign In</Link>
-              <Link to={ROUTES.landing} className="lnav-get-started" style={{ textDecoration: "none" }}>Back to home →</Link>
             </div>
 
             <div className="landing-nav-mobile">
@@ -158,12 +156,6 @@ export function PrivacyPolicyPage({ theme, onThemeChange }: PrivacyPolicyPagePro
                 <Link key={href} to={href} className="lnav-mobile-link" style={{ textDecoration: "none" }}
                   onClick={() => setMobileMenuOpen(false)}>{label}</Link>
               ))}
-              <div className="lnav-mobile-actions">
-                <Link to={ROUTES.landing} className="lnav-sign-in" style={{ flex: 1, textDecoration: "none" }}
-                  onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                <Link to={ROUTES.landing} className="lnav-get-started" style={{ flex: 1, textDecoration: "none" }}
-                  onClick={() => setMobileMenuOpen(false)}>Back to home →</Link>
-              </div>
             </div>
           )}
         </div>

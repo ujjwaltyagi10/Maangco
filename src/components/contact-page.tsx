@@ -36,12 +36,6 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
                 </div>
                 <span className="landing-logo-text">MAANG<em>co</em></span>
               </Link>
-              <div className="hidden lg:flex items-center gap-1 flex-1">
-                <Link to={`${ROUTES.landing}#features`} className="landing-nav-link" style={{ textDecoration: "none" }}>Features</Link>
-                <Link to={`${ROUTES.landing}#pricing`} className="landing-nav-link" style={{ textDecoration: "none" }}>Pricing</Link>
-                <Link to={`${ROUTES.landing}#testimonials`} className="landing-nav-link" style={{ textDecoration: "none" }}>Reviews</Link>
-                <Link to={`${ROUTES.landing}#faq`} className="landing-nav-link" style={{ textDecoration: "none" }}>FAQ</Link>
-              </div>
             </div>
 
             <div className="hidden lg:flex items-center gap-2">
@@ -57,8 +51,6 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
                   </svg>
                 )}
               </button>
-              <Link to={ROUTES.landing} className="lnav-sign-in" style={{ textDecoration: "none" }}>Sign In</Link>
-              <Link to={ROUTES.signup} className="lnav-get-started" style={{ textDecoration: "none" }}>Get Started →</Link>
             </div>
 
             <div className="landing-nav-mobile">
@@ -95,12 +87,6 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
                 <Link key={href} to={href} className="lnav-mobile-link" style={{ textDecoration: "none" }}
                   onClick={() => setMobileMenuOpen(false)}>{label}</Link>
               ))}
-              <div className="lnav-mobile-actions">
-                <Link to={ROUTES.landing} className="lnav-sign-in" style={{ flex: 1, textDecoration: "none" }}
-                  onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                <Link to={ROUTES.signup} className="lnav-get-started" style={{ flex: 1, textDecoration: "none" }}
-                  onClick={() => setMobileMenuOpen(false)}>Get Started →</Link>
-              </div>
             </div>
           )}
         </div>
