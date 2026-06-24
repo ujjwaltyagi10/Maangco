@@ -1128,7 +1128,7 @@ export function LandingPage({
               <a href="#pricing" className="lfooter-link">Pricing</a>
               <Link to={ROUTES.privacyPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Privacy Policy</Link>
             
-              <a href="#" className="lfooter-link">Cancellation and Refund Policy</a>
+              <Link to={ROUTES.cancellationPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Cancellation and Refund Policy</Link>
             </div>
 
             <div className="lfooter-social-row">

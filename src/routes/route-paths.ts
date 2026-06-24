@@ -17,6 +17,7 @@ export const ROUTES = {
   googleCallback: "/auth/google/callback",
   termsConditions: "/terms-and-conditions",
   privacyPolicy: "/privacy-policy",
+  cancellationPolicy: "/cancellation-policy",
   contact: "/contact",
   dashboard: "/dashboard",
   dsa: "/dsa",

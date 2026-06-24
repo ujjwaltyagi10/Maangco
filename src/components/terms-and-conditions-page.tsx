@@ -403,7 +403,7 @@ export function TermsAndConditionsPage({ theme, onThemeChange }: TermsPageProps)
               <Link to={ROUTES.contact} className="lfooter-link" style={{ textDecoration: "none" }}>Contact us</Link>
               <a href="#" className="lfooter-link">Pricing</a>
               <Link to={ROUTES.privacyPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Privacy Policy</Link>
-              <a href="#" className="lfooter-link">Cancellation and Refund Policy</a>
+              <Link to={ROUTES.cancellationPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Cancellation and Refund Policy</Link>
             </div>
             <div className="lfooter-social-row">
               <a href="https://x.com/MAANGcode" target="_blank" rel="noreferrer" className="lfooter-social-link" aria-label="X">

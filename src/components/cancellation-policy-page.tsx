@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes/route-paths";
 
-interface PrivacyPolicyPageProps {
+interface CancellationPolicyPageProps {
   theme: "light" | "dark";
   onThemeChange: () => void;
 }
@@ -39,24 +39,20 @@ function TocLink({ id, label, active }: { id: string; label: string; active: boo
 }
 
 const TOC = [
-  { id: "acceptance",       label: "1. Acceptance" },
-  { id: "information",      label: "2. Information We Collect" },
-  { id: "use",              label: "3. Use of Information" },
-  { id: "sharing",          label: "4. Sharing of Information" },
-  { id: "cookies",          label: "5. Cookies & Tracking" },
-  { id: "security",         label: "6. Data Security" },
-  { id: "retention",        label: "7. Data Retention" },
-  { id: "user-rights",      label: "8. Your Rights" },
-  { id: "responsibility",   label: "9. User Responsibility" },
-  { id: "opt-out",          label: "10. Opt-Out" },
-  { id: "third-party",      label: "11. Third-Party Links" },
-  { id: "children",         label: "12. Children's Privacy" },
-  { id: "changes",          label: "13. Changes to Policy" },
-  { id: "governing-law",    label: "14. Governing Law" },
-  { id: "contact",          label: "15. Contact Us" },
+  { id: "overview",        label: "1. Overview" },
+  { id: "no-refund",       label: "2. No-Refund Policy" },
+  { id: "no-cancellation", label: "3. No-Cancellation Policy" },
+  { id: "unused-time",     label: "4. Unused Subscription Time" },
+  { id: "shutdown",        label: "5. Platform Shutdown" },
+  { id: "liability",       label: "6. Limitation of Liability" },
+  { id: "misuse",          label: "7. Account Misuse" },
+  { id: "blacklist",       label: "8. Blacklisted Accounts" },
+  { id: "chargebacks",     label: "9. Chargebacks" },
+  { id: "legal",           label: "10. Legal Action" },
+  { id: "contact",         label: "11. Contact Us" },
 ];
 
-export function PrivacyPolicyPage({ theme, onThemeChange }: PrivacyPolicyPageProps) {
+export function CancellationPolicyPage({ theme, onThemeChange }: CancellationPolicyPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const [activeId, setActiveId] = useState<string>(TOC[0].id);
@@ -173,9 +169,9 @@ export function PrivacyPolicyPage({ theme, onThemeChange }: PrivacyPolicyPagePro
       <section className="ltc-hero">
         <div className="landing-container">
           <p className="ltc-eyebrow">Legal</p>
-          <h1 className="ltc-h1">Privacy Policy</h1>
+          <h1 className="ltc-h1">Cancellation & Refund Policy</h1>
           <p className="ltc-sub">
-            Last updated: June 2025. This policy explains how MAANGco collects, uses, and protects your personal information.
+            Last updated: June 2025. Please read this policy carefully before making any purchase on the MAANGco platform.
           </p>
         </div>
       </section>
@@ -197,117 +193,94 @@ export function PrivacyPolicyPage({ theme, onThemeChange }: PrivacyPolicyPagePro
           {/* Sections */}
           <div className="ltc-content">
 
-            <Section id="acceptance" num="01" title="Acceptance">
-              <p>By accessing or using the MAANGco platform ("Platform"), you confirm that you have read, understood, and agree to be bound by this Privacy Policy. If you do not agree with any part of this policy, please discontinue use of the Platform immediately.</p>
+            <Section id="overview" num="01" title="Overview">
+              <p>This Cancellation & Refund Policy ("Policy") governs all purchases made on the MAANGco platform ("Platform"). By completing a purchase, you acknowledge that you have read, understood, and agreed to this Policy in full. Please review it carefully before subscribing.</p>
             </Section>
 
-            <Section id="information" num="02" title="Information We Collect">
-              <p>We collect information you provide directly and information generated through your use of the Platform:</p>
+            <Section id="no-refund" num="02" title="No-Refund Policy">
+              <p>All payments made on the MAANGco platform are <strong>strictly non-refundable</strong> once a subscription or plan has been activated. This applies to:</p>
               <BulletList items={[
-                "Personal details: name, email address, and profile information provided at registration.",
-                "Account data: learning activity, problem-solving history, progress metrics, and subscription tier.",
-                "Payment information: billing details processed securely through our payment gateway partners — MAANGco does not store raw card data.",
-                "Technical data: IP address, browser type, device identifiers, operating system, and referring URLs.",
-                "Communication records: support tickets, feedback submissions, and email correspondence.",
-                "Cookies and similar technologies: session tokens, preference cookies, and analytics identifiers.",
+                "Monthly and annual subscription plans.",
+                "One-time purchase plans or lifetime access offerings.",
+                "Any partial or unused portion of a subscription period.",
+                "Situations where the user voluntarily stops using the Platform.",
+              ]} />
+              <p style={{ marginTop: 12 }}>We encourage all users to review the free-tier features and any available trial content before making a purchase decision.</p>
+            </Section>
+
+            <Section id="no-cancellation" num="03" title="No-Cancellation Policy">
+              <p>Once a subscription is activated and payment has been processed, the subscription <strong>cannot be cancelled</strong> mid-term for a refund. Specifically:</p>
+              <BulletList items={[
+                "Cancellation requests submitted after payment will not result in a refund for the current billing cycle.",
+                "You may choose not to renew your subscription at the end of the current term by disabling auto-renewal from your account settings.",
+                "Disabling auto-renewal will take effect at the next renewal date; no refund is issued for the remaining active period.",
               ]} />
             </Section>
 
-            <Section id="use" num="03" title="Use of Information">
-              <p>We use the information we collect to:</p>
+            <Section id="unused-time" num="04" title="Unused Subscription Time">
+              <p>Users who cease using the Platform during an active subscription period are not entitled to a refund or credit for unused time. Subscription access is granted for the full term regardless of actual usage.</p>
+              <p style={{ marginTop: 12 }}>It is the subscriber's responsibility to actively manage their account and make use of the Platform during their paid period. MAANGco bears no liability for unused access.</p>
+            </Section>
+
+            <Section id="shutdown" num="05" title="Platform Shutdown">
+              <p>In the unlikely event of an abrupt or permanent shutdown of the MAANGco platform, MAANGco will not be obligated to provide refunds for any fees already collected. We will make commercially reasonable efforts to provide advance notice of any such shutdown, but refunds cannot be guaranteed under such circumstances.</p>
+            </Section>
+
+            <Section id="liability" num="06" title="Limitation of Liability">
+              <p>MAANGco shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from:</p>
               <BulletList items={[
-                "Provide, operate, and maintain the Platform and its features.",
-                "Process transactions and manage your subscription.",
-                "Personalise your learning experience and track progress.",
-                "Send transactional emails (receipts, password resets, verification).",
-                "Send service updates and, where you have opted in, promotional communications.",
-                "Analyse usage patterns to improve platform performance and content quality.",
-                "Detect, prevent, and respond to fraud, abuse, or security incidents.",
-                "Comply with applicable legal obligations.",
+                "Your use of or inability to use the Platform.",
+                "Temporary service interruptions, maintenance downtime, or technical failures.",
+                "Discontinuation of any feature, plan, or the Platform itself.",
+                "Loss of data, progress, or access due to account suspension or termination.",
+              ]} />
+              <p style={{ marginTop: 12 }}>This limitation applies equally to paying and free-tier subscribers to the maximum extent permitted by applicable law.</p>
+            </Section>
+
+            <Section id="misuse" num="07" title="Account Misuse">
+              <p>MAANGco actively monitors account activity to protect the integrity of the Platform. The following behaviours may result in account flagging, restriction, or immediate suspension without refund:</p>
+              <BulletList items={[
+                "Simultaneous logins from multiple IP addresses or devices in a manner inconsistent with personal use.",
+                "Sharing account credentials with other individuals.",
+                "Redistributing, recording, or republishing Platform content (questions, videos, roadmaps, solutions) without authorisation.",
+                "Using automated tools, bots, or scripts to access or scrape Platform content.",
+                "Any activity that places an unusual or excessive load on Platform infrastructure.",
+              ]} />
+              <p style={{ marginTop: 12 }}>No refund will be issued if a subscription is suspended or terminated due to policy violations.</p>
+            </Section>
+
+            <Section id="blacklist" num="08" title="Blacklisted Accounts">
+              <p>Users found in serious or repeated violation of MAANGco's policies may be permanently blacklisted. Consequences include:</p>
+              <BulletList items={[
+                "Immediate and permanent suspension of the account.",
+                "Complete and irrevocable loss of access to all Platform content and features.",
+                "Denial of future registration or access to the Platform under any email or identity.",
+                "Forfeiture of any remaining subscription time without compensation.",
               ]} />
             </Section>
 
-            <Section id="sharing" num="04" title="Sharing of Information">
-              <p>MAANGco does not sell your personal data. We may share information only in the following circumstances:</p>
+            <Section id="chargebacks" num="09" title="Chargebacks">
+              <p>If you have a concern about a charge, please contact our support team at <a href="mailto:support@maangco.com" className="ltc-link">support@maangco.com</a> before initiating a chargeback with your bank or payment provider.</p>
               <BulletList items={[
-                "Service providers: trusted third parties (payment gateways, email delivery, hosting, analytics) who process data on our behalf under strict confidentiality obligations.",
-                "Legal requirements: when disclosure is required by law, court order, or governmental authority.",
-                "Business transfers: in connection with a merger, acquisition, or sale of assets, subject to the acquirer honouring this policy.",
-                "Aggregated or anonymised data: non-identifiable statistical information that cannot reasonably be linked to any individual.",
+                "Initiating an unsupported chargeback may trigger immediate account suspension.",
+                "Fraudulent or unjustified chargebacks will result in permanent account revocation.",
+                "MAANGco reserves the right to dispute any chargeback and provide evidence of the agreed terms to payment processors.",
               ]} />
             </Section>
 
-            <Section id="cookies" num="05" title="Cookies & Tracking">
-              <p>We use cookies and similar tracking technologies to enhance your experience on the Platform:</p>
+            <Section id="legal" num="10" title="Legal Action">
+              <p>MAANGco reserves the right to pursue all available legal remedies against users who engage in:</p>
               <BulletList items={[
-                "Essential cookies: required for authentication and core Platform functionality.",
-                "Preference cookies: store your settings such as theme and language preferences.",
-                "Analytics cookies: help us understand how users navigate the Platform so we can improve it.",
+                "Fraudulent payment activity or chargebacks.",
+                "Unauthorised sharing, redistribution, or reproduction of Platform content.",
+                "Systematic abuse of the Platform or its users.",
+                "Any conduct that causes reputational or financial harm to MAANGco.",
               ]} />
-              <p style={{ marginTop: 12 }}>You can control or disable cookies through your browser settings. Disabling essential cookies may affect Platform functionality.</p>
+              <p style={{ marginTop: 12 }}>Legal proceedings may be initiated under applicable Indian law, including the Information Technology Act, 2000 and the Indian Penal Code. All disputes are subject to the exclusive jurisdiction of the courts of Bengaluru, Karnataka, India.</p>
             </Section>
 
-            <Section id="security" num="06" title="Data Security">
-              <p>We implement industry-standard technical and organisational measures to protect your personal data against unauthorised access, alteration, disclosure, or destruction. These include encrypted data transmission (HTTPS/TLS), hashed credential storage, and restricted internal access controls.</p>
-              <p style={{ marginTop: 12 }}>However, no method of transmission over the internet or electronic storage is 100% secure. While we strive to protect your data, we cannot guarantee absolute security.</p>
-            </Section>
-
-            <Section id="retention" num="07" title="Data Retention">
-              <p>We retain your personal data only for as long as necessary to fulfil the purposes described in this policy or as required by applicable law. Specifically:</p>
-              <BulletList items={[
-                "Active account data is retained for the duration of your account.",
-                "Payment records are retained for up to 7 years for accounting and tax compliance.",
-                "Support and communication records are retained for up to 3 years.",
-                "You may request deletion of your account and personal data by contacting us at support@maangco.com. We will action verified deletion requests within 30 days.",
-              ]} />
-            </Section>
-
-            <Section id="user-rights" num="08" title="Your Rights">
-              <p>Subject to applicable law, you have the following rights regarding your personal data:</p>
-              <BulletList items={[
-                "Access: request a copy of the personal data we hold about you.",
-                "Correction: request correction of inaccurate or incomplete data.",
-                "Deletion: request erasure of your personal data (subject to legal retention obligations).",
-                "Portability: request your data in a structured, machine-readable format.",
-                "Objection: object to processing of your data for direct marketing purposes.",
-                "Withdrawal of consent: withdraw consent at any time where processing is based on consent.",
-              ]} />
-              <p style={{ marginTop: 12 }}>To exercise any of these rights, contact us at <a href="mailto:support@maangco.com" className="ltc-link">support@maangco.com</a>. We will respond within 30 days.</p>
-            </Section>
-
-            <Section id="responsibility" num="09" title="User Responsibility">
-              <p>You are responsible for maintaining the confidentiality of your account credentials. Do not share your password with any third party. MAANGco will never ask for your password via email or support chat.</p>
-              <p style={{ marginTop: 12 }}>You must ensure that any personal data you provide to us is accurate and up to date. MAANGco disclaims liability for losses arising from unauthorised account access due to your failure to safeguard your credentials.</p>
-            </Section>
-
-            <Section id="opt-out" num="10" title="Opt-Out">
-              <p>You can opt out of promotional and marketing communications at any time by:</p>
-              <BulletList items={[
-                "Clicking the 'Unsubscribe' link in any marketing email.",
-                "Emailing us at support@maangco.com with the subject line 'Unsubscribe'.",
-              ]} />
-              <p style={{ marginTop: 12 }}>Opting out of marketing emails does not affect transactional communications (receipts, account notices, security alerts) which are necessary for service delivery.</p>
-            </Section>
-
-            <Section id="third-party" num="11" title="Third-Party Links">
-              <p>The Platform may contain links to third-party websites, resources, or services. MAANGco is not responsible for the privacy practices or content of those external sites. We encourage you to review the privacy policies of any third-party services you visit.</p>
-            </Section>
-
-            <Section id="children" num="12" title="Children's Privacy">
-              <p>The Platform is intended for users aged 16 and above. We do not knowingly collect personal data from children under 16. If you believe we have inadvertently collected data from a minor, please contact us at <a href="mailto:support@maangco.com" className="ltc-link">support@maangco.com</a> and we will promptly delete such data.</p>
-            </Section>
-
-            <Section id="changes" num="13" title="Changes to This Policy">
-              <p>We may update this Privacy Policy from time to time to reflect changes in our practices or applicable law. We will notify you of material changes by posting the revised policy on the Platform and updating the "Last updated" date at the top of this page.</p>
-              <p style={{ marginTop: 12 }}>Your continued use of the Platform following notice of changes constitutes your acceptance of the revised policy.</p>
-            </Section>
-
-            <Section id="governing-law" num="14" title="Governing Law">
-              <p>This Privacy Policy is governed by the laws of India, including the Information Technology Act, 2000 and the Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011. Any disputes arising under this policy shall be subject to the exclusive jurisdiction of the courts of Bengaluru, Karnataka, India.</p>
-            </Section>
-
-            <Section id="contact" num="15" title="Contact Us">
-              <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact our Privacy team:</p>
+            <Section id="contact" num="11" title="Contact Us">
+              <p>If you have questions about this Policy or wish to raise a billing concern before initiating any formal dispute, please reach out to us:</p>
               <BulletList items={[
                 "Email: support@maangco.com",
                 "We will acknowledge your query within 72 hours and endeavour to resolve it within 30 days.",
