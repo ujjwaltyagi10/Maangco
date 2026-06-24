@@ -3320,20 +3320,30 @@ a.lbtn-lg {
   background: var(--bg);
 }
 
-/* ── Circuit corner decorations ── */
-.auth-circuit {
-  position: absolute;
-  width: 260px;
-  height: 260px;
-  pointer-events: none;
-  opacity: 1;
+@keyframes auth-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
-.auth-circuit--tl { top: 0; left: 0; }
-.auth-circuit--tr { top: 0; right: 0; transform: scaleX(-1); }
-.auth-circuit--bl { bottom: 0; left: 0; transform: scaleY(-1); }
-.auth-circuit--br { bottom: 0; right: 0; transform: scale(-1, -1); }
 
-[data-theme="light"] .auth-circuit { opacity: 0.35; }
+.auth-float-logos {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.auth-float-logo {
+  position: absolute;
+  opacity: 0.22;
+  filter: saturate(0.72) brightness(1.22);
+  animation: auth-float 6s ease-in-out infinite;
+  height: auto;
+}
+
+[data-theme="light"] .auth-float-logo {
+  opacity: 0.42;
+  filter: saturate(0.75) brightness(0.96);
+}
 
 /* ── Auth card (replaces split form panel) ── */
 .auth-card {
@@ -3342,7 +3352,7 @@ a.lbtn-lg {
   width: 100%;
   max-width: 440px;
   max-height: calc(100svh - 64px);
-  background: #0d1117;
+  background: #000;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 20px 40px 30px;
@@ -3352,6 +3362,13 @@ a.lbtn-lg {
 
 .auth-card--signup {
   max-width: 480px;
+}
+
+[data-theme="dark"] .auth-card {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 [data-theme="light"] .auth-card {
@@ -4405,6 +4422,9 @@ a.lbtn-lg {
     padding: 16px 12px;
     align-items: flex-start;
   }
+  .auth-float-logos {
+    display: none;
+  }
   .auth-card {
     width: min(100%, calc(100vw - 24px));
     max-height: calc(100svh - 32px);
@@ -4413,9 +4433,6 @@ a.lbtn-lg {
   }
   .auth-card--signup {
     max-width: 100%;
-  }
-  .auth-circuit {
-    display: none;
   }
   .auth-card-logo-wrap {
     margin-bottom: 20px;

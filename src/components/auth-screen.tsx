@@ -1,5 +1,21 @@
-import type { FormEvent } from "react";
+import type { CSSProperties, FormEvent } from "react";
 import { useState, useEffect } from "react";
+import adobeSvg from "@/assets/svg/adobe.svg";
+import airbnbSvg from "@/assets/svg/airbnb.svg";
+import googleSvg from "@/assets/svg/google.svg";
+import metaSvg from "@/assets/svg/meta.svg";
+import microsoftSvg from "@/assets/svg/microsoft.svg";
+import netflixSvg from "@/assets/svg/netflix.svg";
+import pinterestSvg from "@/assets/svg/pinterest.svg";
+import salesforceSvg from "@/assets/svg/salesforce.svg";
+import amazonSvg from "@/assets/svg/amazon.svg";
+import appleSvg from "@/assets/svg/apple.svg";
+import atlassianSvg from "@/assets/svg/atlassian.svg";
+import nvidiaLightSvg from "@/assets/svg/nvidia-light.svg";
+import oracleSvg from "@/assets/svg/oracle.svg";
+import snowflakeSvg from "@/assets/svg/snowflake.svg";
+import uberDarkSvg from "@/assets/svg/uber-dark.svg";
+import visaSvg from "@/assets/svg/visa.svg";
 
 type AuthMode = "login" | "register" | "forgot" | "reset" | "verify";
 
@@ -24,29 +40,24 @@ interface AuthScreenProps {
   onThemeChange: () => void;
 }
 
-const CircuitSVG = () => (
-  <svg viewBox="0 0 260 260" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-    {/* IC chip */}
-    <rect x="10" y="10" width="68" height="38" rx="4" stroke="#c87c4a" strokeOpacity="0.35" strokeWidth="1"/>
-    {/* chip pins top */}
-    <circle cx="26" cy="10" r="2.5" fill="#c87c4a" fillOpacity="0.3"/>
-    <circle cx="40" cy="10" r="2.5" fill="#c87c4a" fillOpacity="0.3"/>
-    <circle cx="54" cy="10" r="2.5" fill="#c87c4a" fillOpacity="0.3"/>
-    {/* chip pins bottom */}
-    <circle cx="26" cy="48" r="2.5" fill="#c87c4a" fillOpacity="0.3"/>
-    <circle cx="40" cy="48" r="2.5" fill="#c87c4a" fillOpacity="0.3"/>
-    <circle cx="54" cy="48" r="2.5" fill="#c87c4a" fillOpacity="0.3"/>
-    {/* horizontal trace: right then down */}
-    <path d="M78 29 H175 V80" stroke="#c87c4a" strokeOpacity="0.18" strokeWidth="1"/>
-    <circle cx="175" cy="29" r="3" fill="#c87c4a" fillOpacity="0.25"/>
-    {/* vertical trace: down then right */}
-    <path d="M29 48 V158 H88" stroke="#c87c4a" strokeOpacity="0.18" strokeWidth="1"/>
-    <circle cx="29" cy="158" r="3" fill="#c87c4a" fillOpacity="0.25"/>
-    {/* secondary trace */}
-    <path d="M115 29 V60 H160" stroke="#c87c4a" strokeOpacity="0.1" strokeWidth="1"/>
-    <circle cx="115" cy="29" r="2" fill="#c87c4a" fillOpacity="0.18"/>
-  </svg>
-);
+const floatingLogos = [
+  { src: googleSvg, style: { top: "10%", right: "10%", width: 42 }, delay: 0 },
+  { src: metaSvg, style: { top: "14%", left: "6%", width: 30 }, delay: 1.1 },
+  { src: microsoftSvg, style: { top: "34%", left: "22%", width: 34 }, delay: 0.6 },
+  { src: netflixSvg, style: { bottom: "22%", right: "12%", width: 28 }, delay: 1.8 },
+  { src: adobeSvg, style: { top: "28%", right: "24%", width: 26 }, delay: 2.4 },
+  { src: airbnbSvg, style: { top: "40%", left: "10%", width: 32 }, delay: 0.9 },
+  { src: salesforceSvg, style: { bottom: "18%", right: "6%", width: 38 }, delay: 1.5 },
+  { src: pinterestSvg, style: { top: "42%", left: "42%", width: 26 }, delay: 3.0 },
+  { src: amazonSvg, style: { bottom: "12%", left: "30%", width: 38 }, delay: 2.1 },
+  { src: appleSvg, style: { top: "22%", left: "16%", width: 28 }, delay: 0.3 },
+  { src: atlassianSvg, style: { top: "62%", left: "18%", width: 30 }, delay: 1.0 },
+  { src: nvidiaLightSvg, style: { top: "18%", right: "28%", width: 40 }, delay: 2.7 },
+  { src: oracleSvg, style: { bottom: "30%", right: "28%", width: 34 }, delay: 1.4 },
+  { src: snowflakeSvg, style: { top: "76%", left: "14%", width: 28 }, delay: 3.3 },
+  { src: uberDarkSvg, style: { bottom: "10%", right: "40%", width: 32 }, delay: 0.5 },
+  { src: visaSvg, style: { top: "46%", right: "36%", width: 34 }, delay: 2.0 },
+];
 
 export function AuthScreen({
   mode,
@@ -134,12 +145,6 @@ export function AuthScreen({
   return (
     <div className="auth-page-v2 w-full min-w-0">
 
-      {/* ── Circuit corner decorations ── */}
-      <div className="auth-circuit auth-circuit--tl"><CircuitSVG /></div>
-      <div className="auth-circuit auth-circuit--tr"><CircuitSVG /></div>
-      <div className="auth-circuit auth-circuit--bl"><CircuitSVG /></div>
-      <div className="auth-circuit auth-circuit--br"><CircuitSVG /></div>
-
       {/* ── Theme toggle (fixed top-right) ── */}
       <button type="button" className="auth-theme-toggle" onClick={onThemeChange} aria-label="Toggle theme">
         {theme === "light" ? (
@@ -155,6 +160,18 @@ export function AuthScreen({
       </button>
 
       {/* ── Centered card ── */}
+      <div className="auth-float-logos" aria-hidden="true">
+        {floatingLogos.map((logo, index) => (
+          <img
+            key={`${logo.src}-${index}`}
+            src={logo.src}
+            className="auth-float-logo"
+            style={{ ...logo.style, animationDelay: `${logo.delay}s` } as CSSProperties}
+            alt=""
+          />
+        ))}
+      </div>
+
       <div className={`auth-card ${isRegister ? "auth-card--signup" : ""}`}>
 
         {/* Logo mark */}
