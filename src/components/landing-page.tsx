@@ -194,8 +194,10 @@ export function LandingPage({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("");
   const avatarMenuRef = useRef<HTMLDivElement>(null);
   const landingRef = useRef<HTMLDivElement>(null);
+  const navObserverRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     const el = landingRef.current;
@@ -209,6 +211,25 @@ export function LandingPage({
     const onResize = () => { if (window.innerWidth >= 1024) setMobileMenuOpen(false); };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    const container = landingRef.current;
+    if (!container) return;
+    navObserverRef.current = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) setActiveSection(visible[0].target.id);
+      },
+      { root: container, rootMargin: "-20% 0px -60% 0px", threshold: 0 }
+    );
+    ["features", "pricing", "testimonials", "faq"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) navObserverRef.current!.observe(el);
+    });
+    return () => navObserverRef.current?.disconnect();
   }, []);
 
   useEffect(() => {
@@ -271,20 +292,12 @@ export function LandingPage({
               </a>
 
               <div className="hidden lg:flex items-center gap-1 flex-1">
-                <a href="#features" className="landing-nav-link">
-                  Features
-                </a>
+                <a href="#features" className={`landing-nav-link${activeSection === "features" ? " active" : ""}`}>Features</a>
                 {!isPremium && (
-                  <a href="#pricing" className="landing-nav-link">
-                    Pricing
-                  </a>
+                  <a href="#pricing" className={`landing-nav-link${activeSection === "pricing" ? " active" : ""}`}>Pricing</a>
                 )}
-                <a href="#testimonials" className="landing-nav-link">
-                  Reviews
-                </a>
-                <a href="#faq" className="landing-nav-link">
-                  FAQ
-                </a>
+                <a href="#testimonials" className={`landing-nav-link${activeSection === "testimonials" ? " active" : ""}`}>Reviews</a>
+                <a href="#faq" className={`landing-nav-link${activeSection === "faq" ? " active" : ""}`}>FAQ</a>
               </div>
             </div>
 
@@ -892,7 +905,7 @@ export function LandingPage({
         };
 
         return (
-          <section className="lfsp-section">
+          <section className="lfsp-section" id="features">
             <div className="lfsp-container">
               <p className="lfsp-eyebrow" data-scroll-reveal>What's inside</p>
 
@@ -973,7 +986,7 @@ export function LandingPage({
       
       {/* ── PRICING SNAPSHOT ── */}
       {!isPremium && (
-        <section className="lobs-price-section" data-scroll-reveal>
+        <section className="lobs-price-section" id="pricing" data-scroll-reveal>
           <div className="lobs-price-inner">
             <div className="lobs-price-left sr-child" style={{ "--sr-delay": "0.14s" } as React.CSSProperties}>
               <p className="lobs-price-eyebrow">Pricing</p>
@@ -1062,7 +1075,7 @@ export function LandingPage({
       )}
 
       {/* ── STUDENT REVIEWS ── */}
-      <section className="lrev-section" data-scroll-reveal>
+      <section className="lrev-section" id="testimonials" data-scroll-reveal>
         <div className="lrev-inner">
           <div className="lrev-viewport sr-child" style={{ "--sr-delay": "0.16s" } as React.CSSProperties}>
             <div className="lrev-track">
