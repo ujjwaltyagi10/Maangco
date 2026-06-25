@@ -233,7 +233,6 @@ export function PublicRoutes({
   authSession,
   userLabel,
   onAuthSubmit,
-  onResendVerification,
   onGoogleCallback,
   onLogout,
   onOpenChangePassword,

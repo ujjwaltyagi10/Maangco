@@ -180,7 +180,6 @@ function getInitials(label: string) {
 export function LandingPage({
   theme,
   onThemeChange,
-  onSignIn,
   onGetStarted,
   onStartFree,
   isAuthenticated = false,
