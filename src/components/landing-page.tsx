@@ -180,7 +180,6 @@ function getInitials(label: string) {
 export function LandingPage({
   theme,
   onThemeChange,
-  onSignIn,
   onGetStarted,
   onStartFree,
   isAuthenticated = false,
@@ -476,22 +475,13 @@ export function LandingPage({
                   ) : null}
                 </div>
               ) : (
-                <>
-                  <button
-                    type="button"
-                    className="lnav-sign-in"
-                    onClick={onSignIn}
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    type="button"
-                    className="lnav-get-started"
-                    onClick={onGetStarted}
-                  >
-                    Get Started →
-                  </button>
-                </>
+                <button
+                  type="button"
+                  className="lnav-get-started"
+                  onClick={onGetStarted}
+                >
+                  Get Started →
+                </button>
               )}
             </div>
 
@@ -575,24 +565,14 @@ export function LandingPage({
                     Go to Dashboard →
                   </button>
                 ) : (
-                  <>
-                    <button
-                      type="button"
-                      className="lnav-sign-in"
-                      style={{ flex: 1 }}
-                      onClick={onSignIn}
-                    >
-                      Sign In
-                    </button>
-                    <button
-                      type="button"
-                      className="lnav-get-started"
-                      style={{ flex: 1 }}
-                      onClick={onGetStarted}
-                    >
-                      Get Started
-                    </button>
-                  </>
+                  <button
+                    type="button"
+                    className="lnav-get-started"
+                    style={{ flex: 1 }}
+                    onClick={onGetStarted}
+                  >
+                    Get Started
+                  </button>
                 )}
               </div>
             </div>

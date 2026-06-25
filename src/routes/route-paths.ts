@@ -1,6 +1,6 @@
 import type { AppPanel } from "@/types/maangco";
 
-export type AuthMode = "login" | "register" | "forgot" | "reset" | "verify";
+export type AuthMode = "login" | "register" | "forgot" | "reset" | "verify" | "otp";
 
 export interface AuthSubmitResult {
   nextRoute: string;

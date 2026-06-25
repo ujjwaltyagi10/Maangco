@@ -454,6 +454,21 @@ export async function googleOneTapLogin(credential: string): Promise<{ token: st
   return { token: data.accessToken, user: data.user };
 }
 
+export async function sendOtp(email: string): Promise<void> {
+  const result = await requestJson("/api/send-otp", withJson({ method: "POST" }, { email }));
+  if (!result.response.ok) {
+    throw authErrorFromResponse(result, "Unable to send code.");
+  }
+}
+
+export async function verifyOtp(email: string, otp: string): Promise<AuthSession> {
+  const result = await requestJson("/api/verify-otp", withJson({ method: "POST" }, { email, otp }));
+  if (!result.response.ok) {
+    throw authErrorFromResponse(result, "Invalid or expired code.");
+  }
+  return normalizeSession(result.data, { email });
+}
+
 export function parseAuthCallbackSearch(search: string) {
   const params = new URLSearchParams(search);
   const userValue = params.get("user");

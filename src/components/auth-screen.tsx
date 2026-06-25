@@ -1,5 +1,5 @@
-import type { CSSProperties, FormEvent } from "react";
-import { useState, useEffect } from "react";
+import type { CSSProperties, FormEvent, KeyboardEvent, ClipboardEvent } from "react";
+import { useState, useRef, useEffect } from "react";
 import adobeSvg from "@/assets/svg/adobe.svg";
 import airbnbSvg from "@/assets/svg/airbnb.svg";
 import googleSvg from "@/assets/svg/google.svg";
@@ -17,25 +17,18 @@ import snowflakeSvg from "@/assets/svg/snowflake.svg";
 import uberDarkSvg from "@/assets/svg/uber-dark.svg";
 import visaSvg from "@/assets/svg/visa.svg";
 
-type AuthMode = "login" | "register" | "forgot" | "reset" | "verify";
+export type AuthScreenMode = "login" | "otp";
 
 interface AuthScreenProps {
-  mode: AuthMode;
-  onModeChange: (mode: AuthMode) => void;
-  onSubmit: (input: {
-    mode: AuthMode;
-    first_name: string;
-    last_name: string;
-    email: string;
-    password: string;
-    resetToken: string;
-  }) => Promise<void>;
+  mode: AuthScreenMode;
+  onModeChange: (mode: AuthScreenMode) => void;
+  onSubmit: (input: { mode: AuthScreenMode; email: string; otp: string }) => Promise<void>;
   onGoogleLogin: () => void;
-  onResendVerification: (email: string) => Promise<void>;
+  onResendOtp?: (email: string) => Promise<void>;
   isLoading: boolean;
   errorMessage: string | null;
   infoMessage: string | null;
-  resetTokenHint?: string;
+  otpEmail?: string;
   theme: "light" | "dark";
   onThemeChange: () => void;
 }
@@ -59,93 +52,121 @@ const floatingLogos = [
   { src: visaSvg, style: { top: "46%", right: "36%", width: 34 }, delay: 2.0 },
 ];
 
+interface OtpBoxesProps {
+  value: string;
+  onChange: (v: string) => void;
+  disabled: boolean;
+}
+
+function OtpBoxes({ value, onChange, disabled }: OtpBoxesProps) {
+  const inputs = useRef<(HTMLInputElement | null)[]>([]);
+  const digits = Array.from({ length: 6 }, (_, i) => value[i] ?? "");
+
+  const handleChange = (index: number, raw: string) => {
+    const char = raw.replace(/\D/g, "").slice(-1);
+    const newVal = digits.map((d, i) => (i === index ? char : d)).join("");
+    onChange(newVal);
+    if (char && index < 5) inputs.current[index + 1]?.focus();
+  };
+
+  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !digits[index] && index > 0) {
+      const newVal = digits.map((d, i) => (i === index - 1 ? "" : d)).join("");
+      onChange(newVal);
+      inputs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    onChange(pasted.padEnd(0, "").slice(0, 6));
+    const focusIndex = Math.min(pasted.length, 5);
+    inputs.current[focusIndex]?.focus();
+  };
+
+  return (
+    <div className="auth-otp-boxes">
+      {digits.map((d, i) => (
+        <input
+          key={i}
+          ref={(el) => { inputs.current[i] = el; }}
+          className="auth-otp-box"
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={d}
+          onChange={(e) => handleChange(i, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(i, e)}
+          onPaste={handlePaste}
+          disabled={disabled}
+          autoFocus={i === 0}
+          autoComplete={i === 0 ? "one-time-code" : "off"}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function AuthScreen({
   mode,
   onModeChange,
   onSubmit,
   onGoogleLogin,
-  onResendVerification,
+  onResendOtp,
   isLoading,
   errorMessage,
   infoMessage,
-  resetTokenHint,
+  otpEmail,
   theme,
   onThemeChange,
 }: AuthScreenProps) {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [resetToken, setResetToken] = useState(resetTokenHint ?? "");
-  const [verificationEmail, setVerificationEmail] = useState("");
-  const [verificationBusy, setVerificationBusy] = useState(false);
-  const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
+  const [otp, setOtp] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendBusy, setResendBusy] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
 
-  const isRegister = mode === "register";
-  const isForgot = mode === "forgot";
-  const isReset = mode === "reset";
-  const isVerify = mode === "verify";
-  const isSecondary = isForgot || isReset || isVerify;
-
+  // Reset OTP digits when entering OTP mode
   useEffect(() => {
-    if (mode === "verify" && !verificationEmail && email) {
-      setVerificationEmail(email);
-    }
-  }, [email, mode, verificationEmail]);
+    if (mode === "otp") setOtp("");
+  }, [mode]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if ((isRegister || isReset) && password !== confirmPassword) return;
-    await onSubmit({
-      mode,
-      first_name: firstName,
-      last_name: lastName,
-      email: mode === "verify" ? verificationEmail : email,
-      password,
-      resetToken,
-    });
+  // Cooldown countdown
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (mode === "otp" && otp.replace(/\D/g, "").length < 6) return;
+    await onSubmit({ mode, email: otpEmail ?? email, otp });
   };
 
   const handleResend = async () => {
-    setVerificationBusy(true);
-    setVerificationMessage(null);
+    if (!onResendOtp || !otpEmail || resendCooldown > 0) return;
+    setResendBusy(true);
+    setResendMessage(null);
     try {
-      await onResendVerification(verificationEmail);
-      setVerificationMessage("Verification email sent.");
+      await onResendOtp(otpEmail);
+      setResendCooldown(60);
+      setResendMessage("New code sent.");
     } catch {
-      setVerificationMessage("Unable to resend. Try again.");
+      setResendMessage("Could not resend. Try again.");
     } finally {
-      setVerificationBusy(false);
+      setResendBusy(false);
     }
   };
 
-  const title =
-    isRegister ? "Create account" :
-    isForgot ? "Reset password" :
-    isReset ? "New password" :
-    isVerify ? "Verify email" :
-    "Welcome back";
-
-  const subtitle =
-    isRegister ? "Start tracking your interview prep today." :
-    isForgot ? "Enter your email and we'll send a reset link." :
-    isReset ? "Enter the token from your email and set a new password." :
-    isVerify ? "Enter your email to get a fresh verification link." :
-    "Sign in to your MAANGco account.";
-
-  const submitLabel = isLoading ? "Working..." :
-    isRegister ? "Create account" :
-    isForgot ? "Send reset email" :
-    isReset ? "Set new password" :
-    isVerify ? "Send verification" :
-    "Log in";
+  const isOtp = mode === "otp";
+  const canSubmit = isOtp ? otp.replace(/\D/g, "").length === 6 : email.trim().length > 0;
 
   return (
     <div className="auth-page-v2 w-full min-w-0">
 
-      {/* ── Theme toggle (fixed top-right) ── */}
+      {/* Theme toggle */}
       <button type="button" className="auth-theme-toggle" onClick={onThemeChange} aria-label="Toggle theme">
         {theme === "light" ? (
           <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
@@ -159,7 +180,7 @@ export function AuthScreen({
         )}
       </button>
 
-      {/* ── Centered card ── */}
+      {/* Floating logos */}
       <div className="auth-float-logos" aria-hidden="true">
         {floatingLogos.map((logo, index) => (
           <img
@@ -172,9 +193,9 @@ export function AuthScreen({
         ))}
       </div>
 
-      <div className={`auth-card ${isRegister ? "auth-card--signup" : ""}`}>
+      <div className="auth-card">
 
-        {/* Logo mark */}
+        {/* Logo */}
         <div className="auth-card-logo-wrap">
           <a href="/" className="auth-card-logo-link" aria-label="MAANGco home">
             <div className="auth-card-logo-mark">
@@ -185,18 +206,25 @@ export function AuthScreen({
           </a>
         </div>
 
-        {isSecondary ? (
+        {/* Back button — OTP step only */}
+        {isOtp ? (
           <button type="button" className="auth-back" onClick={() => onModeChange("login")} aria-label="Back">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 16, height: 16 }}>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}>
               <path d="M13 5L8 10L13 15" />
             </svg>
           </button>
         ) : null}
 
-        <h1 className="auth-form-title">{title}</h1>
-        <p className="auth-form-subtitle">{subtitle}</p>
+        {/* Header */}
+        <h1 className="auth-form-title">{isOtp ? "Check your email" : "Welcome to MAANGco"}</h1>
+        <p className="auth-form-subtitle">
+          {isOtp
+            ? `We sent a 6-digit code to ${otpEmail ?? "your email"}. Enter it below.`
+            : "Sign in or create an account with your email."}
+        </p>
 
-        {!isSecondary ? (
+        {/* Google OAuth — login step only */}
+        {!isOtp ? (
           <>
             <button type="button" className="auth-google-btn-v2" onClick={onGoogleLogin}>
               <svg viewBox="0 0 20 20" width="18" height="18" style={{ flexShrink: 0 }}>
@@ -205,46 +233,16 @@ export function AuthScreen({
                 <path d="M4.4 11.89A5.94 5.94 0 0 1 4.09 10c0-.66.11-1.3.31-1.89V5.51H1.07A10 10 0 0 0 0 10c0 1.61.38 3.14 1.07 4.49l3.33-2.6Z" fill="#FBBC05"/>
                 <path d="M10 3.98c1.47 0 2.79.51 3.83 1.5l2.86-2.86C14.96.9 12.7 0 10 0A10 10 0 0 0 1.07 5.51l3.33 2.6C5.2 5.73 7.4 3.98 10 3.98Z" fill="#EA4335"/>
               </svg>
-              Sign {isRegister ? "up" : "in"} with Google
+              Continue with Google
             </button>
             <div className="auth-divider-v2"><span>OR</span></div>
           </>
         ) : null}
 
         <form className="auth-form-v2" onSubmit={handleSubmit}>
-          {isRegister ? (
-            <div className="auth-name-row">
-              <label className="auth-field-v2">
-                <span className="auth-field-head">
-                  <span className="auth-field-title">First name <span className="auth-required-mark">*</span></span>
-                </span>
-                <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First name" autoComplete="given-name" required />
-              </label>
-              <label className="auth-field-v2">
-                <span className="auth-field-head">
-                  <span className="auth-field-title">Last name <span className="auth-required-mark">*</span></span>
-                </span>
-                <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last name" autoComplete="family-name" required />
-              </label>
-            </div>
-          ) : null}
 
-          {!isForgot && !isReset && !isVerify ? (
-            <label className="auth-field-v2">
-              <span className="auth-field-head">
-                <span className="auth-field-title">Email <span className="auth-required-mark">*</span></span>
-              </span>
-              <div className="auth-input-icon-wrap">
-                <svg className="auth-input-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="5" width="16" height="12" rx="2"/>
-                  <path d="M2 7.5l8 5 8-5"/>
-                </svg>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email address" autoComplete="email" required />
-              </div>
-            </label>
-          ) : null}
-
-          {isForgot || isVerify ? (
+          {/* Email step */}
+          {!isOtp ? (
             <label className="auth-field-v2">
               <span className="auth-field-head">
                 <span className="auth-field-title">Email <span className="auth-required-mark">*</span></span>
@@ -256,9 +254,9 @@ export function AuthScreen({
                 </svg>
                 <input
                   type="email"
-                  value={isVerify ? verificationEmail : email}
-                  onChange={(e) => isVerify ? setVerificationEmail(e.target.value) : setEmail(e.target.value)}
-                  placeholder="email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
                   autoComplete="email"
                   required
                 />
@@ -266,124 +264,37 @@ export function AuthScreen({
             </label>
           ) : null}
 
-          {isReset ? (
-            <label className="auth-field-v2">
+          {/* OTP step */}
+          {isOtp ? (
+            <div className="auth-field-v2">
               <span className="auth-field-head">
-                <span className="auth-field-title">Reset Token <span className="auth-required-mark">*</span></span>
+                <span className="auth-field-title">6-digit code</span>
               </span>
-              <input value={resetToken} onChange={(e) => setResetToken(e.target.value)} placeholder="Paste token from email" required />
-            </label>
-          ) : null}
-
-          {(mode === "login" || isRegister || isReset) && !isForgot ? (
-            <label className="auth-field-v2">
-              <span className="auth-field-head">
-                <span className="auth-field-title">Password <span className="auth-required-mark">*</span></span>
-                {mode === "login" ? (
-                  <button type="button" className="auth-forgot-inline" onClick={() => onModeChange("forgot")}>
-                    Forgot password?
-                  </button>
-                ) : null}
-              </span>
-              <div className="auth-password-wrap">
-                <div className="auth-input-icon-wrap">
-                  <svg className="auth-input-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="4" y="9" width="12" height="9" rx="2"/>
-                    <path d="M7 9V6a3 3 0 0 1 6 0v3"/>
-                  </svg>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    autoComplete={isRegister ? "new-password" : "current-password"}
-                    minLength={6}
-                    required
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="auth-eye-btn"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" style={{ width: 15, height: 15 }}>
-                      <path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6Z"/><circle cx="10" cy="10" r="2.5"/>
-                      <path d="M3 3l14 14"/>
-                    </svg>
-                  ) : (
-                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" style={{ width: 15, height: 15 }}>
-                      <path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6Z"/><circle cx="10" cy="10" r="2.5"/>
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </label>
-          ) : null}
-
-          {isRegister || isReset ? (
-            <label className="auth-field-v2">
-              <span className="auth-field-head">
-                <span className="auth-field-title">Confirm Password <span className="auth-required-mark">*</span></span>
-              </span>
-              <div className="auth-input-icon-wrap">
-                <svg className="auth-input-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="4" y="9" width="12" height="9" rx="2"/>
-                  <path d="M7 9V6a3 3 0 0 1 6 0v3"/>
-                </svg>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm password"
-                  autoComplete="new-password"
-                  minLength={6}
-                  required
-                />
-              </div>
-            </label>
-          ) : null}
-
-          {(isRegister || isReset) && password && confirmPassword && password !== confirmPassword ? (
-            <div className="auth-error-v2">Passwords do not match.</div>
+              <OtpBoxes value={otp} onChange={setOtp} disabled={isLoading} />
+            </div>
           ) : null}
 
           {errorMessage ? <div className="auth-error-v2">{errorMessage}</div> : null}
           {infoMessage ? <div className="auth-info-v2">{infoMessage}</div> : null}
-          {verificationMessage ? <div className="auth-info-v2">{verificationMessage}</div> : null}
+          {resendMessage ? <div className="auth-info-v2">{resendMessage}</div> : null}
 
-          {isVerify ? (
-            <button type="button" className="auth-submit-v2 auth-submit-v2--secondary" onClick={handleResend} disabled={verificationBusy}>
-              {verificationBusy ? "Sending..." : "Resend verification email"}
-            </button>
-          ) : null}
-
-          <button type="submit" className="auth-submit-v2" disabled={isLoading}>
-            {submitLabel}
+          <button type="submit" className="auth-submit-v2" disabled={isLoading || !canSubmit}>
+            {isLoading ? "Working..." : isOtp ? "Verify code" : "Continue"}
           </button>
         </form>
 
-        {!isSecondary ? (
-          <div className="auth-switch-row">
-            {mode === "login" ? (
-              <>
-                Don't have an account?{" "}
-                <button type="button" className="auth-switch-link" onClick={() => onModeChange("register")}>Sign up</button>
-              </>
-            ) : (
-              <>
-                Already have an account?{" "}
-                <button type="button" className="auth-switch-link" onClick={() => onModeChange("login")}>Log in</button>
-              </>
-            )}
-          </div>
-        ) : null}
-
-        {mode === "login" ? (
-          <div className="auth-extra-links">
-            <button type="button" className="auth-extra-link" onClick={() => onModeChange("verify")}>Resend verification email</button>
+        {/* Resend — OTP step only */}
+        {isOtp ? (
+          <div className="auth-resend-row">
+            Didn't get a code?{" "}
+            <button
+              type="button"
+              className="auth-switch-link"
+              onClick={handleResend}
+              disabled={resendBusy || resendCooldown > 0}
+            >
+              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : resendBusy ? "Sending..." : "Resend"}
+            </button>
           </div>
         ) : null}
 

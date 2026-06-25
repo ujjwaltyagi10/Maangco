@@ -49,12 +49,13 @@ export interface AppRouterProps {
   companyCount: number;
   isQuestionsLoading: boolean;
   onAuthSubmit: (input: {
-    mode: "login" | "register" | "forgot" | "reset" | "verify";
+    mode: "login" | "register" | "forgot" | "reset" | "verify" | "otp";
     first_name: string;
     last_name: string;
     email: string;
     password: string;
     resetToken: string;
+    otp?: string;
   }) => Promise<AuthSubmitResult>;
   onResendVerification: (email: string) => Promise<void>;
   onGoogleCallback: (session: AuthSession) => Promise<void> | void;
