@@ -661,6 +661,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  height: max-content;
+  min-height: 100%;
 }
 
 /* ── Hero card ── */
@@ -2130,11 +2132,15 @@ body {
   background: var(--surface2);
 }
 
-.q-row.solved {
-  background: var(--solved-bg);
+.q-row.solved td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
-.q-row.solved .q-title {
+.q-row.solved .q-title a {
+  color: var(--muted);
+}
+
+.q-row.solved .q-num {
   color: var(--muted);
 }
 
@@ -4769,169 +4775,183 @@ body {
 /* ── Premium upsell hero card ── */
 /* ── Premium hero card (non-premium logged-in users) ── */
 /* Horizontal layout — height never changes, only width changes with sidebar */
+/* ── Premium upsell card ── */
 .pd-premium-hero {
-  position: relative;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  padding: 22px 30px;
-  border-radius: 18px;
+  gap: 0;
+  border-radius: 16px;
+  border: 1px solid rgba(200, 124, 74, 0.2);
+  background: #0e0b09;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
   overflow: hidden;
-  border: 1.5px solid transparent;
-  background:
-    linear-gradient(135deg, #0d1a0f 0%, #111810 40%, #1a1408 100%) padding-box,
-    linear-gradient(
-        120deg,
-        rgba(74, 124, 65, 0.65) 0%,
-        rgba(192, 120, 48, 0.55) 40%,
-        rgba(108, 99, 255, 0.45) 80%,
-        rgba(74, 124, 65, 0.65) 100%
-      )
-      border-box;
-  background-size:
-    auto,
-    300% 300%;
-  animation: premium-border-shimmer 4s linear infinite;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  min-width: 0;
+  flex-shrink: 0;
 }
 
-@keyframes premium-border-shimmer {
-  0% {
-    background-position:
-      center,
-      0% 50%;
-  }
-  50% {
-    background-position:
-      center,
-      100% 50%;
-  }
-  100% {
-    background-position:
-      center,
-      0% 50%;
-  }
+[data-theme="light"] .pd-premium-hero {
+  background: #fff8f4;
+  border-color: rgba(200, 124, 74, 0.25);
+  box-shadow: 0 2px 16px rgba(168, 94, 48, 0.08);
 }
 
-/* Glow orbs */
-.pd-premium-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(55px);
-  pointer-events: none;
-  z-index: 0;
-}
-.pd-premium-orb-1 {
-  width: 200px;
-  height: 200px;
-  background: rgba(74, 124, 65, 0.18);
-  top: -70px;
-  left: -50px;
-}
-.pd-premium-orb-2 {
-  width: 160px;
-  height: 160px;
-  background: rgba(192, 120, 48, 0.13);
-  bottom: -55px;
-  right: -30px;
+[data-theme="light"] .pd-premium-title {
+  color: #1a0f06;
 }
 
-/* Left column — natural content width, never stretches */
+[data-theme="light"] .pd-premium-feat-num {
+  color: #1a0f06;
+}
+
+[data-theme="light"] .pd-premium-feat-label {
+  color: rgba(26, 15, 6, 0.5);
+}
+
+[data-theme="light"] .pd-premium-price-amount {
+  color: #1a0f06;
+}
+
+[data-theme="light"] .pd-premium-price-period {
+  color: rgba(26, 15, 6, 0.45);
+}
+
+[data-theme="light"] .pd-premium-note {
+  color: rgba(26, 15, 6, 0.35);
+}
+
+[data-theme="light"] .pd-premium-feat-divider,
+[data-theme="light"] .pd-premium-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Amber left accent strip */
+.pd-premium-hero::before {
+  content: "";
+  display: block;
+  width: 3px;
+  align-self: stretch;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #c87c4a 0%, #a85e30 100%);
+}
+
 .pd-premium-left {
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  padding: 22px 28px;
+  overflow: hidden;
 }
 
-/* Right column — natural content width, aligned right */
-.pd-premium-right {
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-/* Label row */
-.pd-premium-label-row {
-  display: flex;
+.pd-premium-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-}
-
-.pd-premium-crown {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  background: linear-gradient(
-    135deg,
-    rgba(192, 120, 48, 0.28),
-    rgba(192, 120, 48, 0.12)
-  );
-  border: 1px solid rgba(192, 120, 48, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #d4a04a;
-  flex-shrink: 0;
-}
-
-.pd-premium-eyebrow {
+  gap: 5px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  background: rgba(200, 124, 74, 0.12);
+  border: 1px solid rgba(200, 124, 74, 0.25);
+  color: #c87c4a;
   font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #d4a04a;
+  width: fit-content;
 }
 
-/* Title — single line, never wraps → height stays constant */
 .pd-premium-title {
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 19px;
+  font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.2;
+  line-height: 1.25;
   color: #f0ede8;
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 .pd-premium-title-accent {
-  background: linear-gradient(90deg, #c87c4a, #d4956a, #c87c4a);
-  background-size: 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: premium-border-shimmer 3s linear infinite;
+  color: #c87c4a;
 }
 
-/* Pills — single row, never wrap → height stays constant */
-.pd-premium-pills {
+.pd-premium-features {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 6px;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  row-gap: 8px;
   overflow: hidden;
 }
 
-.pd-premium-pill {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-  gap: 4px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  color: rgba(240, 237, 232, 0.65);
+.pd-premium-feat {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0 18px 0 0;
+}
+
+.pd-premium-feat-num {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #f0ede8;
+  line-height: 1;
+}
+
+.pd-premium-feat-label {
   font-size: 11px;
+  color: rgba(240, 237, 232, 0.45);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pd-premium-feat-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-right: 18px;
+  flex-shrink: 0;
+}
+
+/* Vertical divider between left and right */
+.pd-premium-divider {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(255, 255, 255, 0.07);
+  flex-shrink: 0;
+  margin: 14px 0;
+}
+
+.pd-premium-right {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 32px;
+}
+
+.pd-premium-price {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.pd-premium-price-amount {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #f0ede8;
+  line-height: 1;
+}
+
+.pd-premium-price-period {
+  font-size: 12px;
+  color: rgba(240, 237, 232, 0.4);
   font-weight: 500;
 }
 
@@ -4940,49 +4960,32 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 11px 22px;
+  padding: 11px 24px;
   border: none;
-  border-radius: 11px;
+  border-radius: 10px;
   background: linear-gradient(135deg, #a85e30 0%, #c87c4a 100%);
   color: #fff;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
   white-space: nowrap;
-  animation: premium-cta-pulse 2.5s ease-in-out infinite;
-  transition:
-    transform 0.15s,
-    box-shadow 0.15s;
+  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 16px rgba(200, 124, 74, 0.3);
 }
 
 .pd-premium-cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(74, 124, 65, 0.55);
-  animation: none;
-}
-
-@keyframes premium-cta-pulse {
-  0%,
-  100% {
-    box-shadow: 0 4px 14px rgba(74, 124, 65, 0.3);
-  }
-  50% {
-    box-shadow: 0 4px 28px rgba(74, 124, 65, 0.6);
-  }
-}
-
-.pd-premium-price-hint {
-  font-size: 12px;
-  color: rgba(240, 237, 232, 0.55);
-  font-weight: 600;
-  white-space: nowrap;
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(200, 124, 74, 0.45);
 }
 
 .pd-premium-note {
   font-size: 11px;
-  color: rgba(240, 237, 232, 0.32);
+  color: rgba(240, 237, 232, 0.28);
   font-weight: 500;
   white-space: nowrap;
+  margin: 0;
+  text-align: center;
 }

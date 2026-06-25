@@ -23,11 +23,11 @@ interface DashboardPanelProps {
 
 const tips = [
   { icon: "🔁", title: "Consistency beats intensity", copy: "1 hour daily beats 8 hours on weekends. Use the 45-day roadmap." },
-  { icon: "⚡", title: "JS fundamentals first", copy: "Closures, event loop, and prototypes appear in 90% of frontend rounds." },
-  { icon: "🏗️", title: "Build, don't just read", copy: "Implement debounce, throttle, and LRU cache from scratch — they ask this." },
+  // { icon: "⚡", title: "JS fundamentals first", copy: "Closures, event loop, and prototypes appear in 90% of frontend rounds." },
+  // { icon: "🏗️", title: "Build, don't just read", copy: "Implement debounce, throttle, and LRU cache from scratch — they ask this." },
   { icon: "🔥", title: "High-freq DSA first", copy: "Sliding window & two pointers cover ~40% of rounds. Start there." },
   { icon: "🎤", title: "Explain as you code", copy: "Interviewers value communication. Think out loud even when stuck." },
-  { icon: "📐", title: "System design matters", copy: "Autocomplete and infinite scroll are the most common frontend SD questions." },
+  // { icon: "📐", title: "System design matters", copy: "Autocomplete and infinite scroll are the most common frontend SD questions." },
 ];
 
 function ProgressRing({ pct, color, size = 72 }: { pct: number; color: string; size?: number }) {
@@ -129,8 +129,8 @@ export function DashboardPanel({
       tag: "Company-wise",
       desc: "LeetCode questions sorted by company, frequency & topic tags.",
       progress: dsaProgress,
-      color: "#6c63ff",
-      colorBg: "rgba(108,99,255,0.1)",
+      color: "var(--green)",
+      colorBg: "var(--green-bg)",
       stats: [
         { val: solvedDsaCount, lbl: "Solved" },
         { val: "840+", lbl: "Questions" },
