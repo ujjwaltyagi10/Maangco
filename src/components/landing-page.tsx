@@ -28,7 +28,7 @@ const DSADarkVid = new URL("../assets/Video/DSADark.webm", import.meta.url)
   .href;
 const SDLightVid = new URL("../assets/Video/SDLight.webm", import.meta.url)
   .href;
-const SDDarkVid = new URL("../assets/Video/DSDark.webm", import.meta.url).href;
+const SDDarkVid = new URL("../assets/Video/SDDark.webm", import.meta.url).href;
 
 interface LandingPageProps {
   theme: "light" | "dark";
