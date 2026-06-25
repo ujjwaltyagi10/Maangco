@@ -3390,7 +3390,7 @@ a.lbtn-lg {
   background: #000;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
-  padding: 20px 40px 30px;
+  padding: 40px 40px 50px;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65);
   overflow-y: auto;
 }
@@ -3664,16 +3664,16 @@ a.lbtn-lg {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid var(--border, rgba(255,255,255,0.08));
-  border-radius: 8px;
-  background: rgba(255,255,255,0.04);
+  border: none;
+  border-radius: 0;
+  background: none;
   color: var(--text2);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: color 0.15s;
 }
 
 .auth-back:hover {
-  background: rgba(255,255,255,0.08);
+  background: none;
   color: var(--text1);
   border-color: rgba(255,255,255,0.14);
 }
@@ -4489,10 +4489,7 @@ a.lbtn-lg {
 @media (max-width: 640px) {
   .auth-page-v2 {
     padding: 16px 12px;
-    align-items: flex-start;
-  }
-  .auth-float-logos {
-    display: none;
+    align-items: center;
   }
   .auth-card {
     width: min(100%, calc(100vw - 24px));
@@ -6579,4 +6576,55 @@ a.lbtn-lg {
 
 @media (max-width: 700px) {
   .lfa-grid { grid-template-columns: 1fr; }
+}
+
+/* ─────────────────────────────────────────
+   OTP BOXES
+───────────────────────────────────────── */
+.auth-otp-boxes {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.auth-otp-box {
+  width: 48px;
+  height: 56px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface2);
+  color: var(--text1);
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  caret-color: transparent;
+}
+
+.auth-otp-box:focus {
+  border-color: var(--green);
+  background: var(--surface3);
+}
+
+.auth-otp-box:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth-resend-row {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text3);
+  margin-top: 16px;
+}
+
+@media (max-width: 420px) {
+  .auth-otp-box {
+    width: 40px;
+    height: 48px;
+    font-size: 18px;
+  }
+  .auth-otp-boxes { gap: 7px; }
 }

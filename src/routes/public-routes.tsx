@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { AuthScreen } from "@/components/auth-screen";
@@ -8,8 +8,8 @@ import { FinancialAidPage } from "@/components/financial-aid-page";
 import { LandingPage } from "@/components/landing-page";
 import { PrivacyPolicyPage } from "@/components/privacy-policy-page";
 import { TermsAndConditionsPage } from "@/components/terms-and-conditions-page";
-import { getAuthErrorMessage, getGoogleAuthUrl, parseAuthCallbackSearch, verifyEmail, type AuthSession } from "@/lib/auth-api";
-import { authModeFromPath, authPathForMode, ROUTES, type AuthMode, type AuthSubmitResult } from "./route-paths";
+import { getAuthErrorMessage, getGoogleAuthUrl, parseAuthCallbackSearch, sendOtp, verifyEmail, type AuthSession } from "@/lib/auth-api";
+import { ROUTES, type AuthMode, type AuthSubmitResult } from "./route-paths";
 
 interface AuthSubmitInput {
   mode: AuthMode;
@@ -18,6 +18,7 @@ interface AuthSubmitInput {
   email: string;
   password: string;
   resetToken: string;
+  otp?: string;
 }
 
 interface PublicRoutesProps {
@@ -38,50 +39,81 @@ interface PublicRoutesProps {
 }
 
 function AuthRoute({
-  mode,
   onAuthSubmit,
-  onResendVerification,
   authError,
   authInfo,
   isSubmitting,
-  resetTokenHint,
   theme,
   onThemeChange,
-}: Pick<PublicRoutesProps, "onAuthSubmit" | "onResendVerification" | "authError" | "authInfo" | "isSubmitting" | "theme" | "onThemeChange"> & {
-  mode: AuthMode;
-  resetTokenHint?: string;
-}) {
+}: Pick<PublicRoutesProps, "onAuthSubmit" | "authError" | "authInfo" | "isSubmitting" | "theme" | "onThemeChange">) {
   const navigate = useNavigate();
+  const [otpEmail, setOtpEmail] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [localInfo, setLocalInfo] = useState<string | null>(null);
+  const [localLoading, setLocalLoading] = useState(false);
 
-  const handleSubmit = async (input: AuthSubmitInput) => {
-    const result = await onAuthSubmit({ ...input, mode });
-    if (result.nextRoute) {
-      navigate(result.nextRoute, { replace: true });
+  const effectiveMode = otpEmail ? "otp" as const : "login" as const;
+
+  const handleSubmit = async (input: { mode: "login" | "otp"; email: string; otp: string }) => {
+    setLocalError(null);
+    setLocalInfo(null);
+
+    if (input.mode === "login") {
+      setLocalLoading(true);
+      try {
+        await sendOtp(input.email);
+        setOtpEmail(input.email);
+      } catch (err) {
+        setLocalError(getAuthErrorMessage(err));
+      } finally {
+        setLocalLoading(false);
+      }
+      return;
     }
+
+    // OTP verification — delegate to App.tsx
+    const result = await onAuthSubmit({
+      mode: "otp",
+      email: otpEmail ?? input.email,
+      otp: input.otp,
+      first_name: "",
+      last_name: "",
+      password: "",
+      resetToken: "",
+    });
+    if (result.nextRoute) navigate(result.nextRoute, { replace: true });
+  };
+
+  const handleResendOtp = async (email: string) => {
+    await sendOtp(email);
   };
 
   return (
     <AuthScreen
-      mode={mode}
-      onModeChange={(nextMode) => navigate(authPathForMode(nextMode, resetTokenHint))}
+      mode={effectiveMode}
+      onModeChange={(nextMode) => {
+        if (nextMode === "login") {
+          setOtpEmail(null);
+          setLocalError(null);
+          setLocalInfo(null);
+        }
+        navigate(ROUTES.login);
+      }}
       onSubmit={handleSubmit}
       onGoogleLogin={() => window.location.assign(getGoogleAuthUrl())}
-      onResendVerification={onResendVerification}
-      isLoading={isSubmitting}
-      errorMessage={authError}
-      infoMessage={authInfo}
-      resetTokenHint={resetTokenHint}
+      onResendOtp={handleResendOtp}
+      isLoading={isSubmitting || localLoading}
+      errorMessage={localError ?? authError}
+      infoMessage={otpEmail ? (localInfo ?? authInfo) : null}
+      otpEmail={otpEmail ?? undefined}
       theme={theme}
       onThemeChange={onThemeChange}
     />
   );
 }
 
-function ResetPasswordRoute(
-  props: Pick<PublicRoutesProps, "onAuthSubmit" | "onResendVerification" | "authError" | "authInfo" | "isSubmitting" | "theme" | "onThemeChange">,
-) {
-  const params = useParams();
-  return <AuthRoute {...props} mode="reset" resetTokenHint={params.token} />;
+function ResetPasswordRoute() {
+  return <Navigate to={ROUTES.login} replace />;
 }
 
 function VerifyEmailPage() {
@@ -215,7 +247,6 @@ export function PublicRoutes({
 }: PublicRoutesProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const mode = useMemo(() => authModeFromPath(location.pathname), [location.pathname]);
 
   useEffect(() => {
     const pageTitles: Record<string, string> = {
@@ -270,41 +301,17 @@ export function PublicRoutes({
       <Route
         path={ROUTES.login}
         element={
-          <AuthRoute mode="login" onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification}
+          <AuthRoute onAuthSubmit={onAuthSubmit}
             authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} theme={theme} onThemeChange={onThemeChange} />
         }
       />
-      <Route
-        path={ROUTES.signup}
-        element={
-          <AuthRoute mode="register" onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification}
-            authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} theme={theme} onThemeChange={onThemeChange} />
-        }
-      />
-      <Route
-        path={ROUTES.forgotPassword}
-        element={
-          <AuthRoute mode="forgot" onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification}
-            authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} theme={theme} onThemeChange={onThemeChange} />
-        }
-      />
-      <Route
-        path={`${ROUTES.resetPassword}/:token`}
-        element={
-          <ResetPasswordRoute onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification}
-            authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} theme={theme} onThemeChange={onThemeChange} />
-        }
-      />
-      <Route
-        path={ROUTES.verifyEmail}
-        element={
-          <AuthRoute mode="verify" onAuthSubmit={onAuthSubmit} onResendVerification={onResendVerification}
-            authError={authError} authInfo={authInfo} isSubmitting={isSubmitting} theme={theme} onThemeChange={onThemeChange} />
-        }
-      />
+      <Route path={ROUTES.signup} element={<Navigate to={ROUTES.login} replace />} />
+      <Route path={ROUTES.forgotPassword} element={<Navigate to={ROUTES.login} replace />} />
+      <Route path={`${ROUTES.resetPassword}/:token`} element={<ResetPasswordRoute />} />
+      <Route path={ROUTES.verifyEmail} element={<Navigate to={ROUTES.login} replace />} />
       <Route path={`${ROUTES.verifyEmail}/:token`} element={<VerifyEmailPage />} />
       <Route path={ROUTES.googleCallback} element={<GoogleCallbackPage onGoogleCallback={onGoogleCallback} />} />
-      <Route path="*" element={<Navigate to={mode === "login" ? ROUTES.login : authPathForMode(mode)} replace />} />
+      <Route path="*" element={<Navigate to={ROUTES.login} replace />} />
     </Routes>
   );
 }

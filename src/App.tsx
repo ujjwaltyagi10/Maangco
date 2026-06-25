@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState, type SetStateAction } from "react";
 import { ChangePasswordModal } from "./components/change-password-modal";
 import { PremiumModal } from "./components/premium-modal";
 import { AppRouter } from "./routes/app-router";
-import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, isValidEmail, loginUser, logoutUser, registerUser, requestPasswordReset, resetPassword, resendVerificationEmail, type AuthSession, type AuthUser } from "./lib/auth-api";
+import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, logoutUser, verifyOtp, type AuthSession, type AuthUser } from "./lib/auth-api";
 import { fetchProgress, toggleProgress, emptyProgress, type ProgressState } from "./lib/progress-api";
 import { fetchDsaGrouped, fetchSystemDesignQuestions, fetchFrontendQuestions, fetchRoadmap } from "./lib/questions-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
@@ -256,98 +256,37 @@ function App() {
 
   const handleAuthSubmit = async ({
     mode,
-    first_name,
-    last_name,
     email,
-    password,
-    resetToken,
+    otp,
   }: {
-    mode: "login" | "register" | "forgot" | "reset" | "verify";
+    mode: "login" | "register" | "forgot" | "reset" | "verify" | "otp";
     first_name: string;
     last_name: string;
     email: string;
     password: string;
     resetToken: string;
+    otp?: string;
   }): Promise<AuthSubmitResult> => {
     setAuthSubmitting(true);
     setAuthError(null);
     setAuthInfo(null);
 
     try {
-      if (mode === "register") {
-        if (!first_name.trim() || !last_name.trim() || !email.trim() || !password.trim()) {
-          throw new Error("All fields are required");
-        }
-        if (!isValidEmail(email)) {
-          throw new Error("Invalid email format");
-        }
-        if (!isStrongPassword(password)) {
-          throw new Error(getPasswordPolicyMessage());
-        }
+      if (mode === "otp") {
+        if (!email || !otp) throw new Error("Email and code are required");
 
-        const result = await registerUser({
-          first_name: first_name.trim(),
-          last_name: last_name.trim(),
-          email: email.trim().toLowerCase(),
-          password,
-        });
+        const session = await verifyOtp(email.trim().toLowerCase(), otp);
+        const hydratedSession = await tryHydrateSessionFromBackend(session.token, session.user);
+        setAuthSession(hydratedSession);
 
-        setAuthInfo(result.message);
-        return { nextRoute: ROUTES.verifyEmail, message: result.message };
+        void fetchProgress(session.token)
+          .then(applyProgress)
+          .catch(() => {});
+
+        return { nextRoute: ROUTES.dashboard };
       }
 
-      if (mode === "forgot") {
-        if (!email.trim()) throw new Error("Email is required");
-        if (!isValidEmail(email)) throw new Error("Invalid email format");
-
-        await requestPasswordReset(email.trim().toLowerCase());
-        const message = "Password reset email requested.";
-        setAuthInfo(message);
-        return { nextRoute: ROUTES.login, message };
-      }
-
-      if (mode === "reset") {
-        if (!resetToken) throw new Error("Missing reset token.");
-        if (!isStrongPassword(password)) {
-          throw new Error(getPasswordPolicyMessage());
-        }
-
-        await resetPassword(resetToken, password);
-        const message = "Password reset complete. You can sign in now.";
-        setAuthInfo(message);
-        return { nextRoute: ROUTES.login, message };
-      }
-
-      if (mode === "verify") {
-        if (!email.trim()) throw new Error("Email is required");
-        if (!isValidEmail(email)) throw new Error("Invalid email format");
-
-        await resendVerificationEmail(email.trim().toLowerCase());
-        const message = "Verification email sent.";
-        setAuthInfo(message);
-        return { nextRoute: ROUTES.verifyEmail, message };
-      }
-
-      if (!email.trim() || !password.trim()) {
-        throw new Error("Email and password are required");
-      }
-      if (!isValidEmail(email)) {
-        throw new Error("Invalid email format");
-      }
-
-      const session = await loginUser({
-        email: email.trim().toLowerCase(),
-        password,
-      });
-      const hydratedSession = await tryHydrateSessionFromBackend(session.token, session.user);
-      setAuthSession(hydratedSession);
-
-      // Load progress from backend after login (replaces localStorage)
-      void fetchProgress(session.token)
-        .then(applyProgress)
-        .catch(() => {});
-
-      return { nextRoute: ROUTES.dashboard };
+      return { nextRoute: ROUTES.login };
     } catch (error) {
       setAuthError(getAuthErrorMessage(error));
       return { nextRoute: ROUTES.login };
@@ -513,10 +452,7 @@ function App() {
         companyCount={dsaCompanies.length}
         isQuestionsLoading={isQuestionsLoading}
         onAuthSubmit={handleAuthSubmit}
-        onResendVerification={async (email) => {
-          await resendVerificationEmail(email);
-          setAuthInfo("Verification email sent.");
-        }}
+        onResendVerification={async () => {}}
         onGoogleCallback={handleGoogleCallback}
       />
 
