@@ -1409,13 +1409,21 @@ a.lbtn-lg {
 .lodm-prog-total { color: #bbb; font-weight: 400; }
 [data-theme="dark"] .lodm-prog-total { color: #444; }
 @media (max-width: 768px) {
-  .lhero-obsidian-inner { padding: 0 20px; }
+  .lhero-obsidian { min-height: auto; padding-top: 72px; }
+  .lhero-obsidian-inner { padding: 0 20px; gap: 24px; }
+  .lhero-obsidian-text { gap: 14px; }
+  .lhero-obsidian-h1 { font-size: clamp(22px, 7vw, 34px); letter-spacing: -0.5px; }
+  .lhero-obsidian-sub { font-size: 13px; }
+  .lhero-obsidian-cta { padding: 10px 22px; font-size: 14px; }
   .lhero-stone-left { width: 356px; height: 356px; bottom: -52px; left: -10%; }
   .lhero-stone-right { width: 456px; height: 456px; bottom: -52px; right: -200px; }
   .lhero-obsidian-screenshot { width: 92vw; overflow: hidden; }
   /* render mockup at full 1100px width, then zoom to fit — scales everything proportionally */
   .lodm-mockup { width: 1100px; zoom: 0.645; }
   .lodm-co-pill:nth-child(n+3) { display: none; }
+  .lmarquee-section { padding-top: 32px; }
+  .lmarquee-track { gap: 24px; }
+  .lmarquee-logo { height: 14px; max-width: 56px; }
 }
 @media (max-width: 680px) { .lodm-mockup { zoom: 0.570; } }
 @media (max-width: 580px) { .lodm-mockup { zoom: 0.486; } }
@@ -3324,6 +3332,22 @@ a.lbtn-lg {
   .lfooter-center {
     gap: 16px;
   }
+}
+
+/* ── Mobile section gaps ── */
+@media (max-width: 640px) {
+  .lsection { padding: 48px 0; }
+  .lsection-header { margin-bottom: 32px; }
+  .lfsp-section { padding: 48px 0; }
+  .lfsp-container { padding: 0 20px; }
+  .lobs-price-section { padding: 48px 0; }
+  .lobs-price-inner { padding: 0 20px; gap: 32px; grid-template-columns: 1fr; }
+  .lobs-price-left { position: static; }
+  .lrev-section { padding: 48px 0; }
+  .lfaq2-section { padding: 48px 0; margin-top: 0; }
+  .lfaq2-inner { padding: 0 20px; gap: 28px; grid-template-columns: 1fr; }
+  .lfaq2-left { position: static; }
+  .lstat-section { padding: 56px 20px 48px; }
 }
 
 @media (max-width: 640px) {
