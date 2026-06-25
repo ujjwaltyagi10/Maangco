@@ -186,11 +186,10 @@ export function AuthScreen({
         </div>
 
         {isSecondary ? (
-          <button type="button" className="auth-back" onClick={() => onModeChange("login")}>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
+          <button type="button" className="auth-back" onClick={() => onModeChange("login")} aria-label="Back">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 16, height: 16 }}>
               <path d="M13 5L8 10L13 15" />
             </svg>
-            Back
           </button>
         ) : null}
 
