@@ -13,6 +13,7 @@ export interface SubscriptionData {
   subscriptionId: string;
   keyId: string;
   prefill: {
+    name: string;
     email: string;
     contact: string;
   };

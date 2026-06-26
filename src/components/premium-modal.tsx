@@ -81,10 +81,11 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
         name: "MAANGco",
         description: `${plans.find((p) => p.id === selectedPlan)?.label ?? selectedPlan} Premium`,
         prefill: {
+          name: data.prefill.name || "",
           email: data.prefill.email || userEmail || "",
           contact: data.prefill.contact || "",
         },
-        theme: { color: "#4a7c41" },
+        theme: { color: "#c87c4a" },
         handler: (response: {
           razorpay_payment_id: string;
           razorpay_subscription_id?: string;

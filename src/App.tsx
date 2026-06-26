@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState, type SetStateAction } from "react";
 import { ChangePasswordModal } from "./components/change-password-modal";
 import { PremiumModal } from "./components/premium-modal";
 import { AppRouter } from "./routes/app-router";
-import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, logoutUser, verifyOtp, type AuthSession, type AuthUser } from "./lib/auth-api";
+import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, logoutUser, refreshAccessToken, verifyOtp, AuthExpiredError, type AuthSession, type AuthUser } from "./lib/auth-api";
 import { fetchProgress, toggleProgress, emptyProgress, type ProgressState } from "./lib/progress-api";
 import { fetchDsaGrouped, fetchSystemDesignQuestions, fetchFrontendQuestions, fetchRoadmap } from "./lib/questions-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
@@ -37,15 +37,24 @@ async function hydrateSessionFromBackend(
   token: string,
   fallbackUser?: AuthUser,
 ): Promise<AuthSession> {
-  const session = await getCurrentUser(token);
-
-  return {
-    token: session.token,
-    user: {
-      ...fallbackUser,
-      ...session.user,
-    },
-  };
+  try {
+    const session = await getCurrentUser(token);
+    return {
+      token: session.token,
+      user: { ...fallbackUser, ...session.user },
+    };
+  } catch (error) {
+    if (error instanceof AuthExpiredError) {
+      // Access token expired — silently get a new one using the httpOnly refresh cookie
+      const refreshed = await refreshAccessToken(); // throws if refresh cookie is also expired
+      const session = await getCurrentUser(refreshed.token);
+      return {
+        token: refreshed.token,
+        user: { ...fallbackUser, ...session.user },
+      };
+    }
+    throw error;
+  }
 }
 
 async function tryHydrateSessionFromBackend(
@@ -54,12 +63,14 @@ async function tryHydrateSessionFromBackend(
 ): Promise<AuthSession> {
   try {
     return await hydrateSessionFromBackend(token, fallbackUser);
-  } catch {
+  } catch (error) {
+    if (error instanceof AuthExpiredError) {
+      throw error; // propagate so callers can clear the session
+    }
+    // Non-auth errors (network blip etc.) — return local session so UI stays usable
     return {
       token,
-      user: {
-        ...fallbackUser,
-      },
+      user: { ...fallbackUser },
     };
   }
 }
@@ -140,7 +151,12 @@ function App() {
       const user = authSession.user;
       void tryHydrateSessionFromBackend(token, user)
         .then((session) => setAuthSession(session))
-        .catch(() => {});
+        .catch((err) => {
+          if (err instanceof AuthExpiredError) {
+            // Both access token and refresh cookie expired — log out cleanly
+            setAuthSession(null);
+          }
+        });
       void fetchProgress(token)
         .then(applyProgress)
         .catch(() => {});
