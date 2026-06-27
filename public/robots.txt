@@ -2,10 +2,19 @@ User-agent: *
 Allow: /
 Allow: /login
 Allow: /signup
+Allow: /contact
+Allow: /terms-and-conditions
+Allow: /privacy-policy
+Allow: /cancellation-policy
+Allow: /financial-aid
 Disallow: /dashboard
 Disallow: /dsa
 Disallow: /system-design
 Disallow: /frontend
+Disallow: /auth/
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
 Disallow: /api/
 
 Sitemap: https://maangco.com/sitemap.xml
