@@ -46,12 +46,17 @@ async function hydrateSessionFromBackend(
   } catch (error) {
     if (error instanceof AuthExpiredError) {
       // Access token expired — silently get a new one using the httpOnly refresh cookie
-      const refreshed = await refreshAccessToken(); // throws if refresh cookie is also expired
-      const session = await getCurrentUser(refreshed.token);
-      return {
-        token: refreshed.token,
-        user: { ...fallbackUser, ...session.user },
-      };
+      try {
+        const refreshed = await refreshAccessToken();
+        const session = await getCurrentUser(refreshed.token);
+        return {
+          token: refreshed.token,
+          user: { ...fallbackUser, ...session.user },
+        };
+      } catch {
+        // Refresh cookie also expired — signal full logout by re-throwing as AuthExpiredError
+        throw new AuthExpiredError();
+      }
     }
     throw error;
   }
