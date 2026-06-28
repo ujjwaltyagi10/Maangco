@@ -3324,9 +3324,6 @@ a.lbtn-lg {
   object-fit: contain;
   opacity: 0.95;
 }
-[data-theme="light"] .lfooter-social-icon {
-  filter: saturate(0.75) brightness(0.35);
-}
 
 @media (max-width: 1024px) {
   .lfooter-center {
