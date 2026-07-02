@@ -454,9 +454,6 @@ export function SystemDesignPanel({
                 </svg>
                 <span className="filter-btn-label">Filters</span>
                 {activeFilterCount > 0 && <span className="dsa-filter-badge">{activeFilterCount}</span>}
-                <svg className="filter-btn-chevron" viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
-                  <path d="M2 4l4 4 4-4H2z" />
-                </svg>
               </button>
               {filtersOpen && (
                 <div className="dsa-filter-panel">
@@ -500,10 +497,9 @@ export function SystemDesignPanel({
               <thead>
                 <tr>
                   <th style={{ width: 36 }} />
-                  <th>#</th>
                   <th>Title</th>
                   <th>Frequency</th>
-                  <th>Design Level</th>
+                  <th>Level</th>
                   <th>Category</th>
                   <th>Timeframe</th>
                   <th>Resource</th>
@@ -531,7 +527,6 @@ export function SystemDesignPanel({
                           onKeyDown={(e) => e.key === " " && toggleComplete(q.id)}
                         />
                       </td>
-                      <td className="q-num">{q.number}</td>
                       <td className="q-title">{q.title}</td>
                       <td>
                         <span className="diff-badge" style={{ background: fc.bg, color: fc.text }}>

@@ -151,7 +151,10 @@ export function DsaPanel({
 
   useEffect(() => {
     function handleOutside(e: MouseEvent) {
-      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
+      if (
+        filtersRef.current &&
+        !filtersRef.current.contains(e.target as Node)
+      ) {
         setFiltersOpen(false);
       }
     }
@@ -193,16 +196,39 @@ export function DsaPanel({
 
   const difficultyCounts = useMemo(() => {
     if (!selectedCompany)
-      return { easy: 0, medium: 0, hard: 0, easySolved: 0, medSolved: 0, hardSolved: 0 };
+      return {
+        easy: 0,
+        medium: 0,
+        hard: 0,
+        easySolved: 0,
+        medSolved: 0,
+        hardSolved: 0,
+      };
     return selectedCompany.questions.reduce(
       (acc, q) => {
         const solved = solvedIds.includes(q.id);
-        if (q.difficulty === "Easy") { acc.easy++; if (solved) acc.easySolved++; }
-        if (q.difficulty === "Medium") { acc.medium++; if (solved) acc.medSolved++; }
-        if (q.difficulty === "Hard") { acc.hard++; if (solved) acc.hardSolved++; }
+        if (q.difficulty === "Easy") {
+          acc.easy++;
+          if (solved) acc.easySolved++;
+        }
+        if (q.difficulty === "Medium") {
+          acc.medium++;
+          if (solved) acc.medSolved++;
+        }
+        if (q.difficulty === "Hard") {
+          acc.hard++;
+          if (solved) acc.hardSolved++;
+        }
         return acc;
       },
-      { easy: 0, medium: 0, hard: 0, easySolved: 0, medSolved: 0, hardSolved: 0 },
+      {
+        easy: 0,
+        medium: 0,
+        hard: 0,
+        easySolved: 0,
+        medSolved: 0,
+        hardSolved: 0,
+      },
     );
   }, [selectedCompany, solvedIds]);
 
@@ -231,16 +257,22 @@ export function DsaPanel({
   ].filter(Boolean).length;
 
   // Filtered progress (respects difficulty / show / search filters)
-  const visibleSolvedCount = visibleQuestions.filter((q) => solvedIds.includes(q.id)).length;
+  const visibleSolvedCount = visibleQuestions.filter((q) =>
+    solvedIds.includes(q.id),
+  ).length;
   const visibleTotal = visibleQuestions.length;
-  const visiblePct = visibleTotal > 0 ? Math.round((visibleSolvedCount / visibleTotal) * 100) : 0;
+  const visiblePct =
+    visibleTotal > 0
+      ? Math.round((visibleSolvedCount / visibleTotal) * 100)
+      : 0;
 
   // Mini arc ring (56×56 viewBox, r=22)
   const miniArcR = 22;
   const miniArcCirc = 2 * Math.PI * miniArcR;
   const miniArcLen = miniArcCirc * 0.75;
   const miniArcGap = miniArcCirc - miniArcLen;
-  const miniArcFill = miniArcLen * (visibleSolvedCount / Math.max(1, visibleTotal));
+  const miniArcFill =
+    miniArcLen * (visibleSolvedCount / Math.max(1, visibleTotal));
 
   if (isLoading) {
     return (
@@ -264,7 +296,7 @@ export function DsaPanel({
               </div>
               <div className="dsa-progress-sep" />
               <div className="dsa-diff-stats">
-                {["Easy","Med.","Hard"].map((l) => (
+                {["Easy", "Med.", "Hard"].map((l) => (
                   <div key={l} className="dsa-diff-stat">
                     <Skeleton w={28} h={11} style={{ marginBottom: 4 }} />
                     <Skeleton w={32} h={14} />
@@ -284,25 +316,48 @@ export function DsaPanel({
               <thead>
                 <tr>
                   <th style={{ width: 36 }} />
-                  <th><Skeleton w={16} h={11} /></th>
-                  <th><Skeleton w={36} h={11} /></th>
-                  <th><Skeleton w={54} h={11} /></th>
-                  <th><Skeleton w={60} h={11} /></th>
-                  <th><Skeleton w={30} h={11} /></th>
+                  <th>
+                    <Skeleton w={16} h={11} />
+                  </th>
+                  <th>
+                    <Skeleton w={36} h={11} />
+                  </th>
+                  <th>
+                    <Skeleton w={54} h={11} />
+                  </th>
+                  <th>
+                    <Skeleton w={60} h={11} />
+                  </th>
+                  <th>
+                    <Skeleton w={30} h={11} />
+                  </th>
                   <th />
                 </tr>
               </thead>
               <tbody>
                 {Array.from({ length: 14 }).map((_, i) => (
                   <tr key={i} className="q-row">
-                    <td><Skeleton w={16} h={16} radius={4} /></td>
-                    <td className="q-num"><Skeleton w={28} h={12} /></td>
-                    <td className="q-title"><Skeleton w={`${42 + (i % 5) * 9}%`} h={13} /></td>
-                    <td><Skeleton w={52} h={22} radius={20} /></td>
+                    <td>
+                      <Skeleton w={16} h={16} radius={4} />
+                    </td>
+                    <td className="q-num">
+                      <Skeleton w={28} h={12} />
+                    </td>
+                    <td className="q-title">
+                      <Skeleton w={`${42 + (i % 5) * 9}%`} h={13} />
+                    </td>
+                    <td>
+                      <Skeleton w={52} h={22} radius={20} />
+                    </td>
                     <td>
                       <div className="freq-bar">
-                        <div className="freq-dots" style={{ display: "flex", gap: 3 }}>
-                          {[1,2,3,4,5].map((d) => <Skeleton key={d} w={8} h={8} radius={999} />)}
+                        <div
+                          className="freq-dots"
+                          style={{ display: "flex", gap: 3 }}
+                        >
+                          {[1, 2, 3, 4, 5].map((d) => (
+                            <Skeleton key={d} w={8} h={8} radius={999} />
+                          ))}
                         </div>
                       </div>
                     </td>
@@ -334,10 +389,20 @@ export function DsaPanel({
           </div>
           <div className="dsa-sidebar-companies">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="co-item co-item--sidebar" style={{ pointerEvents: "none" }}>
-                <div className="co-logo"><Skeleton w={28} h={28} radius={999} /></div>
-                <div className="co-info"><Skeleton w={`${50 + (i % 4) * 12}%`} h={13} /></div>
-                <div className="co-prog"><Skeleton w={30} h={13} /></div>
+              <div
+                key={i}
+                className="co-item co-item--sidebar"
+                style={{ pointerEvents: "none" }}
+              >
+                <div className="co-logo">
+                  <Skeleton w={28} h={28} radius={999} />
+                </div>
+                <div className="co-info">
+                  <Skeleton w={`${50 + (i % 4) * 12}%`} h={13} />
+                </div>
+                <div className="co-prog">
+                  <Skeleton w={30} h={13} />
+                </div>
               </div>
             ))}
           </div>
@@ -360,18 +425,28 @@ export function DsaPanel({
       <div className="dsa-main">
         {/* ── Panel Header ── */}
         <div className="dsa-progress-header">
-
           {/* Grid cell 1: Identity card (col 1, row 1) */}
           <div className="dsa-header-identity">
             <div className="dsa-header-icon">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="16 18 22 12 16 6" />
                 <polyline points="8 6 2 12 8 18" />
               </svg>
             </div>
             <div className="dsa-header-title-group">
               <h2 className="dsa-header-title">DSA Practice</h2>
-              <span className="dsa-header-sub">Top company questions to level up your skills</span>
+              <span className="dsa-header-sub">
+                Top company questions to level up your skills
+              </span>
             </div>
           </div>
 
@@ -379,19 +454,36 @@ export function DsaPanel({
           <div className="dsa-progress-card">
             <div className="dsa-mini-ring">
               <svg viewBox="0 0 56 56" className="dsa-mini-ring-svg">
-                <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--border2)" strokeWidth="3"
-                  strokeDasharray={`${miniArcLen} ${miniArcGap}`} strokeLinecap="round"
-                  transform="rotate(135, 28, 28)" />
-                <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--accent)" strokeWidth="3"
-                  strokeDasharray={`${miniArcFill} ${miniArcCirc - miniArcFill}`} strokeLinecap="round"
+                <circle
+                  cx="28"
+                  cy="28"
+                  r={miniArcR}
+                  fill="none"
+                  stroke="var(--border2)"
+                  strokeWidth="3"
+                  strokeDasharray={`${miniArcLen} ${miniArcGap}`}
+                  strokeLinecap="round"
                   transform="rotate(135, 28, 28)"
-                  style={{ transition: "stroke-dasharray 0.5s ease" }} />
+                />
+                <circle
+                  cx="28"
+                  cy="28"
+                  r={miniArcR}
+                  fill="none"
+                  stroke="var(--accent)"
+                  strokeWidth="3"
+                  strokeDasharray={`${miniArcFill} ${miniArcCirc - miniArcFill}`}
+                  strokeLinecap="round"
+                  transform="rotate(135, 28, 28)"
+                  style={{ transition: "stroke-dasharray 0.5s ease" }}
+                />
               </svg>
               <div className="dsa-mini-ring-label">{visiblePct}%</div>
             </div>
             <div className="dsa-progress-info">
               <span className="dsa-progress-count">
-                {visibleSolvedCount}<span className="dsa-progress-total">/{visibleTotal}</span>
+                {visibleSolvedCount}
+                <span className="dsa-progress-total">/{visibleTotal}</span>
               </span>
               <span className="dsa-progress-label">✓ Solved</span>
             </div>
@@ -399,15 +491,21 @@ export function DsaPanel({
             <div className="dsa-diff-stats">
               <div className="dsa-diff-stat dsa-diff-stat--easy">
                 <span className="dsa-diff-stat-label">Easy</span>
-                <span className="dsa-diff-stat-val">{difficultyCounts.easySolved}/{difficultyCounts.easy}</span>
+                <span className="dsa-diff-stat-val">
+                  {difficultyCounts.easySolved}/{difficultyCounts.easy}
+                </span>
               </div>
               <div className="dsa-diff-stat dsa-diff-stat--medium">
                 <span className="dsa-diff-stat-label">Med.</span>
-                <span className="dsa-diff-stat-val">{difficultyCounts.medSolved}/{difficultyCounts.medium}</span>
+                <span className="dsa-diff-stat-val">
+                  {difficultyCounts.medSolved}/{difficultyCounts.medium}
+                </span>
               </div>
               <div className="dsa-diff-stat dsa-diff-stat--hard">
                 <span className="dsa-diff-stat-label">Hard</span>
-                <span className="dsa-diff-stat-val">{difficultyCounts.hardSolved}/{difficultyCounts.hard}</span>
+                <span className="dsa-diff-stat-val">
+                  {difficultyCounts.hardSolved}/{difficultyCounts.hard}
+                </span>
               </div>
             </div>
           </div>
@@ -415,7 +513,16 @@ export function DsaPanel({
           {/* Grid cell 3: search + filters (col 1, row 2) */}
           <div className="dsa-header-bottom">
             <div className="dsa-search-wrap">
-              <svg className="dsa-search-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              <svg
+                className="dsa-search-icon"
+                viewBox="0 0 16 16"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              >
                 <circle cx="6.5" cy="6.5" r="5" />
                 <path d="M10.5 10.5L14 14" />
               </svg>
@@ -424,7 +531,10 @@ export function DsaPanel({
                 type="text"
                 placeholder="Search questions or tags..."
                 value={questionSearch}
-                onChange={(e) => { setQuestionSearch(e.target.value); setCurrentPage(1); }}
+                onChange={(e) => {
+                  setQuestionSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
               />
             </div>
             <div className="dsa-filter-wrap" ref={filtersRef}>
@@ -433,23 +543,34 @@ export function DsaPanel({
                 className={`dsa-filter-btn${filtersOpen ? " open" : ""}${activeFilterCount > 0 ? " has-active" : ""}`}
                 onClick={() => setFiltersOpen((o) => !o)}
               >
-                <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <svg
+                  viewBox="0 0 16 16"
+                  width="13"
+                  height="13"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
                   <path d="M2 4h12M4 8h8M6 12h4" />
                 </svg>
                 <span className="filter-btn-label">Filters</span>
                 {activeFilterCount > 0 && (
                   <span className="dsa-filter-badge">{activeFilterCount}</span>
                 )}
-                <svg className="filter-btn-chevron" viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
-                  <path d="M2 4l4 4 4-4H2z" />
-                </svg>
               </button>
               {filtersOpen && (
                 <div className="dsa-filter-panel">
                   <div className="dsa-filter-row">
                     <span className="dsa-filter-label">Difficulty</span>
-                    <select className="sort-select dsa-filter-select" value={difficultyFilter}
-                      onChange={(e) => { setDifficultyFilter(e.target.value as DifficultyFilter); setCurrentPage(1); }}>
+                    <select
+                      className="sort-select dsa-filter-select"
+                      value={difficultyFilter}
+                      onChange={(e) => {
+                        setDifficultyFilter(e.target.value as DifficultyFilter);
+                        setCurrentPage(1);
+                      }}
+                    >
                       <option value="all">All</option>
                       <option value="Easy">Easy</option>
                       <option value="Medium">Medium</option>
@@ -458,8 +579,14 @@ export function DsaPanel({
                   </div>
                   <div className="dsa-filter-row">
                     <span className="dsa-filter-label">Show</span>
-                    <select className="sort-select dsa-filter-select" value={showFilter}
-                      onChange={(e) => { setShowFilter(e.target.value as ShowFilter); setCurrentPage(1); }}>
+                    <select
+                      className="sort-select dsa-filter-select"
+                      value={showFilter}
+                      onChange={(e) => {
+                        setShowFilter(e.target.value as ShowFilter);
+                        setCurrentPage(1);
+                      }}
+                    >
                       <option value="all">All</option>
                       <option value="saved">Saved</option>
                       <option value="unsolved">Unsolved</option>
@@ -467,23 +594,39 @@ export function DsaPanel({
                   </div>
                   <div className="dsa-filter-row">
                     <span className="dsa-filter-label">Sort</span>
-                    <select className="sort-select dsa-filter-select" value={sortMode}
+                    <select
+                      className="sort-select dsa-filter-select"
+                      value={sortMode}
                       onChange={(e) => {
                         const val = e.target.value as SortMode;
-                        if (val === "freq" && !isPremium) { onBuyPremium(); return; }
+                        if (val === "freq" && !isPremium) {
+                          onBuyPremium();
+                          return;
+                        }
                         setSortMode(val);
-                      }}>
+                      }}
+                    >
                       {isPremium && <option value="freq">Frequency</option>}
                       <option value="num">Number</option>
                       <option value="diff">Difficulty</option>
                       <option value="title">Title</option>
-                      {!isPremium && <option value="freq" disabled>Frequency 🔒</option>}
+                      {!isPremium && (
+                        <option value="freq" disabled>
+                          Frequency 🔒
+                        </option>
+                      )}
                     </select>
                   </div>
                   <div className="dsa-filter-row">
                     <span className="dsa-filter-label">Per page</span>
-                    <select className="sort-select dsa-filter-select" value={pageSize}
-                      onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}>
+                    <select
+                      className="sort-select dsa-filter-select"
+                      value={pageSize}
+                      onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                    >
                       <option value={50}>50</option>
                       <option value={75}>75</option>
                       <option value={100}>100</option>
@@ -493,7 +636,6 @@ export function DsaPanel({
               )}
             </div>
           </div>
-
         </div>
 
         {/* Question Table */}
@@ -502,12 +644,11 @@ export function DsaPanel({
             <thead>
               <tr>
                 <th style={{ width: 36 }} />
-                <th>#</th>
-                <th>Title</th>
+                <th>Problem</th>
                 <th>Difficulty</th>
                 <th>Frequency</th>
                 <th>Tags</th>
-                <th style={{ textAlign: "right" }}>★</th>
+                <th style={{ textAlign: "right" }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -531,7 +672,6 @@ export function DsaPanel({
                         onKeyDown={(e) => e.key === " " && toggleSolved(q.id)}
                       />
                     </td>
-                    <td className="q-num">{q.number}</td>
                     <td className="q-title">
                       <a href={q.url} target="_blank" rel="noopener noreferrer">
                         {q.title}
@@ -782,7 +922,9 @@ export function DsaPanel({
               />
             </div>
 
-            <div className={`dsa-sidebar-companies${!isPremium ? " dsa-sidebar-companies--gated" : ""}`}>
+            <div
+              className={`dsa-sidebar-companies${!isPremium ? " dsa-sidebar-companies--gated" : ""}`}
+            >
               {/* "All Companies" — only shown to premium users */}
               {isPremium &&
                 visibleCompanies
