@@ -156,7 +156,9 @@ export function PrivateRoutes({
                   totalRoadmapDays={totalRoadmapCount}
                   completedSystemDesignCount={completedSystemDesignIds.length}
                   totalSystemDesignCount={systemDesignQuestions.length}
+                  companies={companies}
                   onOpenDsa={() => navigate(ROUTES.dsa)}
+                  onOpenDsaCompany={(companyId) => navigate(`${ROUTES.dsa}?co=${companyId}`)}
                   onOpenFrontend={() => navigate(ROUTES.frontend)}
                   onOpenSystemDesign={() => navigate(ROUTES.systemDesign)}
                   isLoading={isQuestionsLoading}

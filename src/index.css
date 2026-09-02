@@ -94,6 +94,19 @@
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
+/* Theme-swapped company logos — see src/components/ui/company-logo.tsx */
+.company-logo-dark {
+  display: none;
+}
+
+[data-theme="dark"] .company-logo-light {
+  display: none;
+}
+
+[data-theme="dark"] .company-logo-dark {
+  display: block;
+}
+
 *,
 *::before,
 *::after {

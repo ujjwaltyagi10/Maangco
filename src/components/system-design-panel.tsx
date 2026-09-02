@@ -41,6 +41,7 @@ import type {
   SystemDesignQuestionId,
 } from "@/types/maangco";
 
+import { CompanyLogo } from "./ui/company-logo";
 import { Skeleton } from "./ui/shimmer";
 
 interface SystemDesignPanelProps {
@@ -632,7 +633,7 @@ export function SystemDesignPanel({
                     onClick={() => setSelectedCompany(c)}
                     style={logo ? undefined : { background: selectedCompany === c ? initialColor(c) : undefined, color: selectedCompany === c ? "#fff" : initialColor(c) }}
                   >
-                    {logo ? <img src={logo} alt={c} /> : c[0].toUpperCase()}
+                    {logo ? <CompanyLogo name={c} src={logo} alt={c} /> : c[0].toUpperCase()}
                   </button>
                 );
               })}
@@ -701,7 +702,7 @@ export function SystemDesignPanel({
                   >
                     {logo ? (
                       <div className="sd-cosb-avatar sd-cosb-avatar--logo">
-                        <img src={logo} alt={c} />
+                        <CompanyLogo name={c} src={logo} alt={c} />
                       </div>
                     ) : (
                       <div className="sd-cosb-avatar" style={{ background: color + "22", color }}>

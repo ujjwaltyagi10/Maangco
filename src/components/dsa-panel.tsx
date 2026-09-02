@@ -10,6 +10,7 @@ import {
 import { useSearchParams } from "react-router-dom";
 
 import type { DsaCompany, DsaQuestion, QuestionId } from "@/types/maangco";
+import { CompanyLogo } from "./ui/company-logo";
 import { Skeleton } from "./ui/shimmer";
 
 const ALL_ID = "all";
@@ -728,7 +729,7 @@ export function DsaPanel({
                           </svg>
                         </span>
                       ) : (
-                        <img src={company.logo} alt={company.name} />
+                        <CompanyLogo name={company.name} src={company.logo} alt={company.name} />
                       )}
                     </button>
                   );
@@ -881,7 +882,7 @@ export function DsaPanel({
                           tabIndex={!isPremium ? -1 : undefined}
                         >
                           <div className="co-logo">
-                            <img src={company.logo} alt={company.name} />
+                            <CompanyLogo name={company.name} src={company.logo} alt={company.name} />
                           </div>
                           <div className="co-info">
                             <div className="co-name">{company.name}</div>
