@@ -147,7 +147,7 @@ export function SystemDesignPanel({
   const [companySearch, setCompanySearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const filtersRef = useRef<HTMLDivElement>(null);
   const pageSize = 50;
 

@@ -49,6 +49,10 @@ export interface DsaQuestion {
   topicTags: DsaTopicTag[];
   frequency: DsaFrequencyWindow;
   url: string;
+  // Only present on questions in the "All companies" pseudo-view — the
+  // cross-company breadth signal a single company's question list doesn't have.
+  companiesAsked?: number;
+  companyFrequencies?: Record<string, DsaFrequencyWindow>;
 }
 
 export interface DsaCompany {

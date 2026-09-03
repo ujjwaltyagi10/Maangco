@@ -33,9 +33,10 @@ interface DsaPanelProps {
   lockedCompanyId?: string;
 }
 
-type DifficultyFilter = "all" | "Easy" | "Medium" | "Hard";
-type ShowFilter = "all" | "saved" | "unsolved";
-type SortMode = "freq" | "num" | "diff" | "title";
+type Difficulty = "Easy" | "Medium" | "Hard";
+type StatusFilter = "all" | "todo" | "solved";
+type SortMode = "freq" | "num" | "diff" | "timeframe" | "companies";
+const MIN_COMPANIES_OPTIONS = [0, 2, 3, 5, 10] as const;
 
 // A question's frequency is split into 30-day/3-month windows; for display,
 // sorting, and the dot-rating, prefer the more recent 30-day signal and fall
@@ -69,16 +70,19 @@ export function DsaPanel({
     () => lockedCompanyId ?? searchParams.get("co") ?? ALL_ID,
   );
   const [companySearch, setCompanySearch] = useState("");
-  const [difficultyFilter, setDifficultyFilter] =
-    useState<DifficultyFilter>("all");
-  const [showFilter, setShowFilter] = useState<ShowFilter>("all");
-  const [questionSearch, setQuestionSearch] = useState("");
-  const [sortMode, setSortMode] = useState<SortMode>(
-    isPremium ? "freq" : "num",
+  const [difficultyFilters, setDifficultyFilters] = useState<Set<Difficulty>>(
+    () => new Set(),
   );
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [tagFilters, setTagFilters] = useState<Set<string>>(() => new Set());
+  const [minCompanies, setMinCompanies] = useState(0);
+  const [companyInAll, setCompanyInAll] = useState("all");
+  const [tagPickerOpen, setTagPickerOpen] = useState(false);
+  const [questionSearch, setQuestionSearch] = useState("");
+  const [sortMode, setSortMode] = useState<SortMode>("num");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const filtersRef = useRef<HTMLDivElement>(null);
 
@@ -100,6 +104,8 @@ export function DsaPanel({
         topicTags: q.topicTags,
         frequency: q.globalFrequency,
         url: q.url,
+        companiesAsked: q.frequencyData.companiesAsked,
+        companyFrequencies: q.frequencyData.companyFrequencies,
       }))
       .sort((a, b) => effectiveFreq(b.frequency) - effectiveFreq(a.frequency));
     return {
@@ -129,26 +135,43 @@ export function DsaPanel({
   const totalQuestionCount = allCompany.questions.length;
   const totalSolvedCount = solvedIds.length;
 
+  const isAllView = selectedCompanyId === ALL_ID;
+
   const visibleQuestions = useMemo(() => {
     if (!selectedCompany) return [];
 
     const term = deferredQuestionSearch.trim().toLowerCase();
     const filtered = selectedCompany.questions.filter((q) => {
       const matchesDiff =
-        difficultyFilter === "all" || q.difficulty === difficultyFilter;
-      const matchesShow =
-        showFilter === "all" ||
-        (showFilter === "saved" && bookmarkedIds.includes(q.id)) ||
-        (showFilter === "unsolved" && !solvedIds.includes(q.id));
+        difficultyFilters.size === 0 || difficultyFilters.has(q.difficulty);
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "solved" && solvedIds.includes(q.id)) ||
+        (statusFilter === "todo" && !solvedIds.includes(q.id));
+      const matchesTags =
+        tagFilters.size === 0 ||
+        q.topicTags.some((t) => tagFilters.has(t.slug));
       const matchesSearch =
         !term ||
         q.title.toLowerCase().includes(term) ||
         q.topicTags.some((t) => t.name.toLowerCase().includes(term));
-      return matchesDiff && matchesShow && matchesSearch;
+      const matchesMinCompanies =
+        !isAllView || minCompanies === 0 || (q.companiesAsked ?? 0) >= minCompanies;
+      const matchesCompanyInAll =
+        !isAllView ||
+        companyInAll === "all" ||
+        q.companyFrequencies?.[companyInAll] != null;
+      return (
+        matchesDiff &&
+        matchesStatus &&
+        matchesTags &&
+        matchesSearch &&
+        matchesMinCompanies &&
+        matchesCompanyInAll
+      );
     });
 
     return filtered.sort((a, b) => {
-      if (sortMode === "title") return a.title.localeCompare(b.title);
       if (sortMode === "diff") {
         const rank = { Easy: 0, Medium: 1, Hard: 2 } satisfies Record<
           DsaQuestion["difficulty"],
@@ -157,12 +180,27 @@ export function DsaPanel({
         return rank[a.difficulty] - rank[b.difficulty];
       }
       if (sortMode === "num") return a.number - b.number;
+      if (sortMode === "timeframe") {
+        return (
+          (b.frequency.last30d ?? -1) - (a.frequency.last30d ?? -1) ||
+          effectiveFreq(b.frequency) - effectiveFreq(a.frequency)
+        );
+      }
+      if (sortMode === "companies") {
+        return (
+          (b.companiesAsked ?? 0) - (a.companiesAsked ?? 0) ||
+          effectiveFreq(b.frequency) - effectiveFreq(a.frequency)
+        );
+      }
       return effectiveFreq(b.frequency) - effectiveFreq(a.frequency) || a.number - b.number;
     });
   }, [
-    bookmarkedIds,
-    difficultyFilter,
-    showFilter,
+    difficultyFilters,
+    statusFilter,
+    tagFilters,
+    minCompanies,
+    companyInAll,
+    isAllView,
     deferredQuestionSearch,
     selectedCompany,
     solvedIds,
@@ -199,8 +237,11 @@ export function DsaPanel({
     setCurrentPage(1);
   }, [
     selectedCompanyId,
-    difficultyFilter,
-    showFilter,
+    difficultyFilters,
+    statusFilter,
+    tagFilters,
+    minCompanies,
+    companyInAll,
     deferredQuestionSearch,
     sortMode,
     deferredCompanySearch,
@@ -228,6 +269,37 @@ export function DsaPanel({
     );
   }, [selectedCompany, solvedIds]);
 
+  const availableTags = useMemo(() => {
+    if (!selectedCompany) return [];
+    const seen = new Map<string, string>();
+    for (const q of selectedCompany.questions) {
+      for (const t of q.topicTags) {
+        if (!seen.has(t.slug)) seen.set(t.slug, t.name);
+      }
+    }
+    return Array.from(seen, ([slug, name]) => ({ slug, name })).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  }, [selectedCompany]);
+
+  const toggleDifficulty = (d: Difficulty) => {
+    setDifficultyFilters((cur) => {
+      const next = new Set(cur);
+      if (next.has(d)) next.delete(d);
+      else next.add(d);
+      return next;
+    });
+  };
+
+  const toggleTag = (slug: string) => {
+    setTagFilters((cur) => {
+      const next = new Set(cur);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
+      return next;
+    });
+  };
+
   const toggleSolved = (id: QuestionId) => {
     onSolvedIdsChange((cur) =>
       cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id],
@@ -244,10 +316,13 @@ export function DsaPanel({
     ? Math.round((totalSolvedCount / totalQuestionCount) * 100)
     : 0;
 
-  const defaultSort: SortMode = isPremium ? "freq" : "num";
+  const defaultSort: SortMode = "num";
   const activeFilterCount = [
-    difficultyFilter !== "all",
-    showFilter !== "all",
+    difficultyFilters.size > 0,
+    statusFilter !== "all",
+    tagFilters.size > 0,
+    isAllView && minCompanies > 0,
+    isAllView && companyInAll !== "all",
     sortMode !== defaultSort,
     pageSize !== 50,
   ].filter(Boolean).length;
@@ -482,23 +557,87 @@ export function DsaPanel({
                 <div className="dsa-filter-panel">
                   <div className="dsa-filter-row">
                     <span className="dsa-filter-label">Difficulty</span>
-                    <select className="sort-select dsa-filter-select" value={difficultyFilter}
-                      onChange={(e) => { setDifficultyFilter(e.target.value as DifficultyFilter); setCurrentPage(1); }}>
-                      <option value="all">All</option>
-                      <option value="Easy">Easy</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Hard">Hard</option>
-                    </select>
+                    <div className="dsa-pill-group">
+                      {(["Easy", "Medium", "Hard"] as const).map((d) => (
+                        <button
+                          key={d}
+                          type="button"
+                          className={`dsa-pill dsa-pill--${d}${difficultyFilters.has(d) ? " active" : ""}`}
+                          onClick={() => toggleDifficulty(d)}
+                        >
+                          {d}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Show</span>
-                    <select className="sort-select dsa-filter-select" value={showFilter}
-                      onChange={(e) => { setShowFilter(e.target.value as ShowFilter); setCurrentPage(1); }}>
-                      <option value="all">All</option>
-                      <option value="saved">Saved</option>
-                      <option value="unsolved">Unsolved</option>
-                    </select>
+                    <span className="dsa-filter-label">Status</span>
+                    <div className="dsa-pill-group">
+                      {(["todo", "solved"] as const).map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          className={`dsa-pill${statusFilter === s ? " active" : ""}`}
+                          onClick={() => setStatusFilter((cur) => (cur === s ? "all" : s))}
+                        >
+                          {s === "todo" ? "To-do" : "Solved"}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+                  <div className="dsa-filter-row dsa-filter-row--tags">
+                    <span className="dsa-filter-label">
+                      Tags{tagFilters.size > 0 ? ` (${tagFilters.size})` : ""}
+                    </span>
+                    <button
+                      type="button"
+                      className="dsa-tag-picker-toggle"
+                      onClick={() => setTagPickerOpen((o) => !o)}
+                    >
+                      {tagPickerOpen ? "Hide" : "Choose"}
+                    </button>
+                  </div>
+                  {tagPickerOpen && (
+                    <div className="dsa-tag-picker">
+                      {availableTags.length === 0 ? (
+                        <span className="dsa-tag-picker-empty">No tags available</span>
+                      ) : (
+                        availableTags.map((t) => (
+                          <button
+                            key={t.slug}
+                            type="button"
+                            className={`dsa-pill dsa-pill--tag${tagFilters.has(t.slug) ? " active" : ""}`}
+                            onClick={() => toggleTag(t.slug)}
+                          >
+                            {t.name}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                  {isAllView && (
+                    <>
+                      <div className="dsa-filter-row">
+                        <span className="dsa-filter-label">Companies asked</span>
+                        <select className="sort-select dsa-filter-select" value={minCompanies}
+                          onChange={(e) => setMinCompanies(Number(e.target.value))}>
+                          {MIN_COMPANIES_OPTIONS.map((n) => (
+                            <option key={n} value={n}>{n === 0 ? "Any" : `${n}+`}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="dsa-filter-row">
+                        <span className="dsa-filter-label">Company</span>
+                        <select className="sort-select dsa-filter-select" value={companyInAll}
+                          onChange={(e) => setCompanyInAll(e.target.value)}>
+                          <option value="all">Any</option>
+                          {companies.map((c) => (
+                            <option key={c.id} value={c.name}>{c.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  )}
                   <div className="dsa-filter-row">
                     <span className="dsa-filter-label">Sort</span>
                     <select className="sort-select dsa-filter-select" value={sortMode}
@@ -508,9 +647,10 @@ export function DsaPanel({
                         setSortMode(val);
                       }}>
                       {isPremium && <option value="freq">Frequency</option>}
-                      <option value="num">Number</option>
+                      <option value="num">Question ID</option>
                       <option value="diff">Difficulty</option>
-                      <option value="title">Title</option>
+                      <option value="timeframe">Timeframe (recent first)</option>
+                      {isAllView && <option value="companies">Companies asked</option>}
                       {!isPremium && <option value="freq" disabled>Frequency 🔒</option>}
                     </select>
                   </div>
@@ -580,7 +720,7 @@ export function DsaPanel({
                     <td>
                       {isPremium ? (
                         <div className="freq-bar">
-                          <div className="freq-dots">
+                          <div className="freq-dots" title={`${freq}%`}>
                             {[1, 2, 3, 4, 5].map((i) => (
                               <div
                                 key={i}
@@ -588,7 +728,6 @@ export function DsaPanel({
                               />
                             ))}
                           </div>
-                          <span className="freq-num">{freq}%</span>
                         </div>
                       ) : (
                         <button
