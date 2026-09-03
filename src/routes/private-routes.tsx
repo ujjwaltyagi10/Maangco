@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-
 
 import { AppShell } from "@/components/app-shell";
 import { AuthGateModal } from "@/components/auth-gate-modal";
+import { CompanyKitPage } from "@/components/company-kit-page";
 import { DashboardPanel } from "@/components/dashboard-panel";
 import { PremiumGateModal } from "@/components/premium-gate-modal";
 import { DsaPanel } from "@/components/dsa-panel";
@@ -11,7 +12,7 @@ import { PublicDashboardPreview } from "@/components/public-dashboard-preview";
 import { SystemDesignPanel } from "@/components/system-design-panel";
 import type { AuthSession } from "@/lib/auth-api";
 import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/maangco";
-import { panelFromPath, panelPath, ROUTES } from "./route-paths";
+import { companyKitPath, panelFromPath, panelPath, ROUTES } from "./route-paths";
 
 interface PrivateRoutesProps {
   isPremium: boolean;
@@ -158,7 +159,7 @@ export function PrivateRoutes({
                   totalSystemDesignCount={systemDesignQuestions.length}
                   companies={companies}
                   onOpenDsa={() => navigate(ROUTES.dsa)}
-                  onOpenDsaCompany={(companyId) => navigate(`${ROUTES.dsa}?co=${companyId}`)}
+                  onOpenDsaCompany={(companyId) => navigate(companyKitPath(companyId))}
                   onOpenFrontend={() => navigate(ROUTES.frontend)}
                   onOpenSystemDesign={() => navigate(ROUTES.systemDesign)}
                   isLoading={isQuestionsLoading}
@@ -179,6 +180,21 @@ export function PrivateRoutes({
             path={ROUTES.dsa}
             element={
               <DsaPanel
+                isPremium={isPremium}
+                onBuyPremium={onBuyPremium}
+                companies={companies}
+                solvedIds={solvedIds}
+                bookmarkedIds={bookmarkedIds}
+                onSolvedIdsChange={onSolvedIdsChange}
+                onBookmarkedIdsChange={onBookmarkedIdsChange}
+                isLoading={isQuestionsLoading}
+              />
+            }
+          />
+          <Route
+            path={`${ROUTES.companyKit}/:companyId`}
+            element={
+              <CompanyKitPage
                 isPremium={isPremium}
                 onBuyPremium={onBuyPremium}
                 companies={companies}

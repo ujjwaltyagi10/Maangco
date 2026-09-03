@@ -67,10 +67,12 @@ function AppRouterContent(props: AppRouterProps) {
   const isAppRoute =
     path === "/dashboard" ||
     path === "/dsa" ||
+    path === "/company" ||
     path === "/system-design" ||
     path === "/frontend" ||
     path.startsWith("/dashboard/") ||
     path.startsWith("/dsa/") ||
+    path.startsWith("/company/") ||
     path.startsWith("/system-design/") ||
     path.startsWith("/frontend/");
 

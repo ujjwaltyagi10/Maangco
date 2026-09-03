@@ -24,6 +24,10 @@ interface DsaPanelProps {
   onSolvedIdsChange: Dispatch<SetStateAction<QuestionId[]>>;
   onBookmarkedIdsChange: Dispatch<SetStateAction<QuestionId[]>>;
   isLoading?: boolean;
+  /** When set, locks the view to this company: hides the company sidebar
+   * and the "DSA Practice" identity block, and ignores the ?co= URL param.
+   * Used by the dedicated per-company kit page. */
+  lockedCompanyId?: string;
 }
 
 type DifficultyFilter = "all" | "Easy" | "Medium" | "Hard";
@@ -47,10 +51,11 @@ export function DsaPanel({
   onSolvedIdsChange,
   onBookmarkedIdsChange,
   isLoading,
+  lockedCompanyId,
 }: DsaPanelProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCompanyId, setSelectedCompanyId] = useState(
-    () => searchParams.get("co") ?? ALL_ID,
+    () => lockedCompanyId ?? searchParams.get("co") ?? ALL_ID,
   );
   const [companySearch, setCompanySearch] = useState("");
   const [difficultyFilter, setDifficultyFilter] =
@@ -160,8 +165,10 @@ export function DsaPanel({
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [filtersOpen]);
 
-  // Sync selected company to URL
+  // Sync selected company to URL (skipped when the company is locked via prop —
+  // the kit page already encodes it in the path, not a query param)
   useEffect(() => {
+    if (lockedCompanyId) return;
     setSearchParams(
       (prev) => {
         const next = new URLSearchParams(prev);
@@ -171,7 +178,7 @@ export function DsaPanel({
       },
       { replace: true },
     );
-  }, [selectedCompanyId]);
+  }, [selectedCompanyId, lockedCompanyId]);
 
   // Reset to page 1 whenever filters or selected company change
   useEffect(() => {
@@ -250,29 +257,33 @@ export function DsaPanel({
         <div className="dsa-main">
           {/* Header — same grid as real header */}
           <div className="dsa-progress-header">
-            <div className="dsa-header-identity">
-              <Skeleton w={36} h={36} radius={8} style={{ flexShrink: 0 }} />
-              <div className="dsa-header-title-group">
-                <Skeleton w={130} h={17} style={{ marginBottom: 6 }} />
-                <Skeleton w={220} h={12} />
+            {!lockedCompanyId && (
+              <div className="dsa-header-identity">
+                <Skeleton w={36} h={36} radius={8} style={{ flexShrink: 0 }} />
+                <div className="dsa-header-title-group">
+                  <Skeleton w={130} h={17} style={{ marginBottom: 6 }} />
+                  <Skeleton w={220} h={12} />
+                </div>
               </div>
-            </div>
-            <div className="dsa-progress-card">
-              <Skeleton w={56} h={56} radius={999} style={{ flexShrink: 0 }} />
-              <div className="dsa-progress-info">
-                <Skeleton w={52} h={18} style={{ marginBottom: 5 }} />
-                <Skeleton w={44} h={11} />
+            )}
+            {!lockedCompanyId && (
+              <div className="dsa-progress-card">
+                <Skeleton w={56} h={56} radius={999} style={{ flexShrink: 0 }} />
+                <div className="dsa-progress-info">
+                  <Skeleton w={52} h={18} style={{ marginBottom: 5 }} />
+                  <Skeleton w={44} h={11} />
+                </div>
+                <div className="dsa-progress-sep" />
+                <div className="dsa-diff-stats">
+                  {["Easy","Med.","Hard"].map((l) => (
+                    <div key={l} className="dsa-diff-stat">
+                      <Skeleton w={28} h={11} style={{ marginBottom: 4 }} />
+                      <Skeleton w={32} h={14} />
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="dsa-progress-sep" />
-              <div className="dsa-diff-stats">
-                {["Easy","Med.","Hard"].map((l) => (
-                  <div key={l} className="dsa-diff-stat">
-                    <Skeleton w={28} h={11} style={{ marginBottom: 4 }} />
-                    <Skeleton w={32} h={14} />
-                  </div>
-                ))}
-              </div>
-            </div>
+            )}
             <div className="dsa-header-bottom">
               <Skeleton w="100%" h={36} radius={7} style={{ flex: 1 }} />
               <Skeleton w={90} h={36} radius={7} />
@@ -321,7 +332,8 @@ export function DsaPanel({
           </div>
         </div>
 
-        {/* ── RIGHT: company sidebar skeleton ── */}
+        {/* ── RIGHT: company sidebar skeleton — hidden on the locked kit page ── */}
+        {!lockedCompanyId && (
         <aside className="dsa-sidebar">
           <div className="dsa-sidebar-head">
             <div className="dsa-sidebar-head-row">
@@ -351,6 +363,7 @@ export function DsaPanel({
             </div>
           </div>
         </aside>
+        )}
       </div>
     );
   }
@@ -362,56 +375,62 @@ export function DsaPanel({
         {/* ── Panel Header ── */}
         <div className="dsa-progress-header">
 
-          {/* Grid cell 1: Identity card (col 1, row 1) */}
-          <div className="dsa-header-identity">
-            <div className="dsa-header-icon">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="16 18 22 12 16 6" />
-                <polyline points="8 6 2 12 8 18" />
-              </svg>
+          {/* Grid cell 1: Identity card (col 1, row 1) — hidden on the locked
+              single-company kit page, which renders its own header above this. */}
+          {!lockedCompanyId && (
+            <div className="dsa-header-identity">
+              <div className="dsa-header-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+              </div>
+              <div className="dsa-header-title-group">
+                <h2 className="dsa-header-title">DSA Practice</h2>
+                <span className="dsa-header-sub">Top company questions to level up your skills</span>
+              </div>
             </div>
-            <div className="dsa-header-title-group">
-              <h2 className="dsa-header-title">DSA Practice</h2>
-              <span className="dsa-header-sub">Top company questions to level up your skills</span>
-            </div>
-          </div>
+          )}
 
-          {/* Grid cell 2: Progress strip (col 2, row 1) */}
-          <div className="dsa-progress-card">
-            <div className="dsa-mini-ring">
-              <svg viewBox="0 0 56 56" className="dsa-mini-ring-svg">
-                <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--border2)" strokeWidth="3"
-                  strokeDasharray={`${miniArcLen} ${miniArcGap}`} strokeLinecap="round"
-                  transform="rotate(135, 28, 28)" />
-                <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--accent)" strokeWidth="3"
-                  strokeDasharray={`${miniArcFill} ${miniArcCirc - miniArcFill}`} strokeLinecap="round"
-                  transform="rotate(135, 28, 28)"
-                  style={{ transition: "stroke-dasharray 0.5s ease" }} />
-              </svg>
-              <div className="dsa-mini-ring-label">{visiblePct}%</div>
-            </div>
-            <div className="dsa-progress-info">
-              <span className="dsa-progress-count">
-                {visibleSolvedCount}<span className="dsa-progress-total">/{visibleTotal}</span>
-              </span>
-              <span className="dsa-progress-label">✓ Solved</span>
-            </div>
-            <div className="dsa-progress-sep" />
-            <div className="dsa-diff-stats">
-              <div className="dsa-diff-stat dsa-diff-stat--easy">
-                <span className="dsa-diff-stat-label">Easy</span>
-                <span className="dsa-diff-stat-val">{difficultyCounts.easySolved}/{difficultyCounts.easy}</span>
+          {/* Grid cell 2: Progress strip (col 2, row 1) — hidden on the locked
+              kit page, which already shows these same stats in its own header. */}
+          {!lockedCompanyId && (
+            <div className="dsa-progress-card">
+              <div className="dsa-mini-ring">
+                <svg viewBox="0 0 56 56" className="dsa-mini-ring-svg">
+                  <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--border2)" strokeWidth="3"
+                    strokeDasharray={`${miniArcLen} ${miniArcGap}`} strokeLinecap="round"
+                    transform="rotate(135, 28, 28)" />
+                  <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--accent)" strokeWidth="3"
+                    strokeDasharray={`${miniArcFill} ${miniArcCirc - miniArcFill}`} strokeLinecap="round"
+                    transform="rotate(135, 28, 28)"
+                    style={{ transition: "stroke-dasharray 0.5s ease" }} />
+                </svg>
+                <div className="dsa-mini-ring-label">{visiblePct}%</div>
               </div>
-              <div className="dsa-diff-stat dsa-diff-stat--medium">
-                <span className="dsa-diff-stat-label">Med.</span>
-                <span className="dsa-diff-stat-val">{difficultyCounts.medSolved}/{difficultyCounts.medium}</span>
+              <div className="dsa-progress-info">
+                <span className="dsa-progress-count">
+                  {visibleSolvedCount}<span className="dsa-progress-total">/{visibleTotal}</span>
+                </span>
+                <span className="dsa-progress-label">✓ Solved</span>
               </div>
-              <div className="dsa-diff-stat dsa-diff-stat--hard">
-                <span className="dsa-diff-stat-label">Hard</span>
-                <span className="dsa-diff-stat-val">{difficultyCounts.hardSolved}/{difficultyCounts.hard}</span>
+              <div className="dsa-progress-sep" />
+              <div className="dsa-diff-stats">
+                <div className="dsa-diff-stat dsa-diff-stat--easy">
+                  <span className="dsa-diff-stat-label">Easy</span>
+                  <span className="dsa-diff-stat-val">{difficultyCounts.easySolved}/{difficultyCounts.easy}</span>
+                </div>
+                <div className="dsa-diff-stat dsa-diff-stat--medium">
+                  <span className="dsa-diff-stat-label">Med.</span>
+                  <span className="dsa-diff-stat-val">{difficultyCounts.medSolved}/{difficultyCounts.medium}</span>
+                </div>
+                <div className="dsa-diff-stat dsa-diff-stat--hard">
+                  <span className="dsa-diff-stat-label">Hard</span>
+                  <span className="dsa-diff-stat-val">{difficultyCounts.hardSolved}/{difficultyCounts.hard}</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Grid cell 3: search + filters (col 1, row 2) */}
           <div className="dsa-header-bottom">
@@ -651,7 +670,8 @@ export function DsaPanel({
       </div>
       {/* end .dsa-main */}
 
-      {/* RIGHT: Company Browser Sidebar */}
+      {/* RIGHT: Company Browser Sidebar — hidden on the locked single-company kit page */}
+      {!lockedCompanyId && (
       <aside
         className={`dsa-sidebar${sidebarCollapsed ? " dsa-sidebar--collapsed" : ""}`}
       >
@@ -910,6 +930,7 @@ export function DsaPanel({
           </>
         )}
       </aside>
+      )}
     </div>
   );
 }

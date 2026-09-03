@@ -8,6 +8,7 @@ import citadelLogo from "@/assets/Citadel.png";
 import flipkartLogo from "@/assets/flipkart.png";
 import goldmanLogo from "@/assets/goldman.png";
 import googleLogo from "@/assets/google.png";
+import linkedinLogo from "@/assets/svg/linkedin-tile.svg";
 import metaLogo from "@/assets/meta.png";
 import microsoftLogo from "@/assets/microsoft.png";
 import netflixLogo from "@/assets/netflix.png";
@@ -70,4 +71,5 @@ export const COMPANY_LOGOS: Record<string, string> = {
   Pinterest: pinterestLogo,
   Oracle: oracleLogo,
   Visa: visaLogo,
+  LinkedIn: linkedinLogo,
 };

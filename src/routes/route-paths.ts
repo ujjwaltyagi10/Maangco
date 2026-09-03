@@ -22,9 +22,14 @@ export const ROUTES = {
   contact: "/contact",
   dashboard: "/dashboard",
   dsa: "/dsa",
+  companyKit: "/company",
   systemDesign: "/system-design",
   frontend: "/frontend",
 } as const;
+
+export function companyKitPath(companyId: string) {
+  return `${ROUTES.companyKit}/${companyId}`;
+}
 
 export function authPathForMode(mode: AuthMode, token?: string) {
   switch (mode) {
@@ -60,7 +65,7 @@ export function panelPath(panel: AppPanel) {
 
 export function panelFromPath(pathname: string): AppPanel {
   const path = pathname.toLowerCase();
-  if (path === ROUTES.dsa) return "dsa";
+  if (path === ROUTES.dsa || path.startsWith(`${ROUTES.companyKit}/`)) return "dsa";
   if (path === ROUTES.systemDesign) return "system-design";
   if (path === ROUTES.frontend) return "frontend";
   return "dashboard";
