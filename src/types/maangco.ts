@@ -28,13 +28,26 @@ export interface SystemDesignQuestion {
 
 export type SystemDesignQuestionId = SystemDesignQuestion["id"];
 
+export interface DsaTopicTag {
+  name: string;
+  slug: string;
+}
+
+// A frequency signal split by recency window — either side can be null if
+// the question doesn't currently appear in that window's data.
+export interface DsaFrequencyWindow {
+  last30d: number | null;
+  last3m: number | null;
+}
+
 export interface DsaQuestion {
   id: string;
   number: number;
   title: string;
+  titleSlug: string;
   difficulty: "Easy" | "Medium" | "Hard";
-  frequency: number;
-  tags: string[];
+  topicTags: DsaTopicTag[];
+  frequency: DsaFrequencyWindow;
   url: string;
 }
 
@@ -44,6 +57,23 @@ export interface DsaCompany {
   logo: string;
   accent: string;
   questions: DsaQuestion[];
+}
+
+// The canonical "All companies" catalog entry — one per unique question,
+// carrying the full cross-company breakdown rather than one company's slice.
+export interface DsaAllQuestion {
+  id: string;
+  number: number;
+  title: string;
+  titleSlug: string;
+  difficulty: "Easy" | "Medium" | "Hard";
+  topicTags: DsaTopicTag[];
+  globalFrequency: DsaFrequencyWindow;
+  frequencyData: {
+    companiesAsked: number;
+    companyFrequencies: Record<string, DsaFrequencyWindow>;
+  };
+  url: string;
 }
 
 export interface FrontendQuestion {

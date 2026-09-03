@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import type { DsaCompany, DsaQuestion, QuestionId } from "@/types/maangco";
+import type { DsaAllQuestion, DsaCompany, DsaFrequencyWindow, DsaQuestion, QuestionId } from "@/types/maangco";
 import { CompanyLogo } from "./ui/company-logo";
 import { Skeleton } from "./ui/shimmer";
 
@@ -19,6 +19,9 @@ interface DsaPanelProps {
   isPremium: boolean;
   onBuyPremium: () => void;
   companies: DsaCompany[];
+  /** Precomputed cross-company catalog powering the "All" pseudo-company —
+   * not needed (and not read) when lockedCompanyId is set. */
+  allQuestions?: DsaAllQuestion[];
   solvedIds: QuestionId[];
   bookmarkedIds: QuestionId[];
   onSolvedIdsChange: Dispatch<SetStateAction<QuestionId[]>>;
@@ -34,6 +37,13 @@ type DifficultyFilter = "all" | "Easy" | "Medium" | "Hard";
 type ShowFilter = "all" | "saved" | "unsolved";
 type SortMode = "freq" | "num" | "diff" | "title";
 
+// A question's frequency is split into 30-day/3-month windows; for display,
+// sorting, and the dot-rating, prefer the more recent 30-day signal and fall
+// back to the 3-month one when a question isn't in the latest 30-day data.
+function effectiveFreq(freq: DsaFrequencyWindow): number {
+  return freq.last30d ?? freq.last3m ?? 0;
+}
+
 function freqToDots(freq: number): number {
   if (freq >= 90) return 5;
   if (freq >= 75) return 4;
@@ -46,6 +56,7 @@ export function DsaPanel({
   isPremium,
   onBuyPremium,
   companies,
+  allQuestions,
   solvedIds,
   bookmarkedIds,
   onSolvedIdsChange,
@@ -75,27 +86,30 @@ export function DsaPanel({
   const deferredQuestionSearch = useDeferredValue(questionSearch);
 
   const allCompany = useMemo((): DsaCompany => {
-    // Sort by frequency first so the highest-frequency entry wins the dedup
-    const seen = new Map<number, DsaQuestion>();
-    companies
-      .flatMap((c) => c.questions)
-      .forEach((q) => {
-        const existing = seen.get(q.number);
-        if (!existing || q.frequency > existing.frequency) {
-          seen.set(q.number, q);
-        }
-      });
-    const uniqueQuestions = Array.from(seen.values()).sort(
-      (a, b) => b.frequency - a.frequency,
-    );
+    // Backed by the precomputed cross-company catalog (globalFrequency is
+    // already the sum-normalized score across every company that asks each
+    // question — see LCAuth-Backend's getDsaAll) rather than re-deriving it
+    // client-side from the per-company lists.
+    const questions: DsaQuestion[] = (allQuestions ?? [])
+      .map((q) => ({
+        id: q.id,
+        number: q.number,
+        title: q.title,
+        titleSlug: q.titleSlug,
+        difficulty: q.difficulty,
+        topicTags: q.topicTags,
+        frequency: q.globalFrequency,
+        url: q.url,
+      }))
+      .sort((a, b) => effectiveFreq(b.frequency) - effectiveFreq(a.frequency));
     return {
       id: ALL_ID,
       name: "All",
       logo: "",
       accent: "#6c63ff",
-      questions: uniqueQuestions,
+      questions,
     };
-  }, [companies]);
+  }, [allQuestions]);
 
   const displayCompanies = useMemo((): DsaCompany[] => {
     return [allCompany, ...companies];
@@ -129,7 +143,7 @@ export function DsaPanel({
       const matchesSearch =
         !term ||
         q.title.toLowerCase().includes(term) ||
-        q.tags.some((t) => t.toLowerCase().includes(term));
+        q.topicTags.some((t) => t.name.toLowerCase().includes(term));
       return matchesDiff && matchesShow && matchesSearch;
     });
 
@@ -143,7 +157,7 @@ export function DsaPanel({
         return rank[a.difficulty] - rank[b.difficulty];
       }
       if (sortMode === "num") return a.number - b.number;
-      return b.frequency - a.frequency || a.number - b.number;
+      return effectiveFreq(b.frequency) - effectiveFreq(a.frequency) || a.number - b.number;
     });
   }, [
     bookmarkedIds,
@@ -534,7 +548,8 @@ export function DsaPanel({
               {paginatedQuestions.map((q) => {
                 const isSolved = solvedIds.includes(q.id);
                 const isBookmarked = bookmarkedIds.includes(q.id);
-                const dots = freqToDots(q.frequency);
+                const freq = effectiveFreq(q.frequency);
+                const dots = freqToDots(freq);
 
                 return (
                   <tr
@@ -573,7 +588,7 @@ export function DsaPanel({
                               />
                             ))}
                           </div>
-                          <span className="freq-num">{q.frequency}%</span>
+                          <span className="freq-num">{freq}%</span>
                         </div>
                       ) : (
                         <button
@@ -589,9 +604,9 @@ export function DsaPanel({
                     <td>
                       {isPremium ? (
                         <div className="tag-list">
-                          {q.tags.map((tag) => (
-                            <span key={tag} className="tag">
-                              {tag}
+                          {q.topicTags.map((tag) => (
+                            <span key={tag.slug} className="tag">
+                              {tag.name}
                             </span>
                           ))}
                         </div>

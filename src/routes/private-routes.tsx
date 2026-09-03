@@ -11,7 +11,7 @@ import { FrontendPanel } from "@/components/frontend-panel";
 import { PublicDashboardPreview } from "@/components/public-dashboard-preview";
 import { SystemDesignPanel } from "@/components/system-design-panel";
 import type { AuthSession } from "@/lib/auth-api";
-import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/maangco";
+import type { DsaAllQuestion, DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/maangco";
 import { companyKitPath, panelFromPath, panelPath, ROUTES } from "./route-paths";
 
 interface PrivateRoutesProps {
@@ -30,6 +30,7 @@ interface PrivateRoutesProps {
   solvedIds: QuestionId[];
   bookmarkedIds: QuestionId[];
   companies: DsaCompany[];
+  allQuestions: DsaAllQuestion[];
   questions: FrontendQuestion[];
   roadmapWeeks: RoadmapWeek[];
   systemDesignQuestions: SystemDesignQuestion[];
@@ -70,6 +71,7 @@ export function PrivateRoutes({
   solvedIds,
   bookmarkedIds,
   companies,
+  allQuestions,
   systemDesignQuestions,
   completedSystemDesignIds,
   onCompletedSystemDesignIdsChange,
@@ -183,6 +185,7 @@ export function PrivateRoutes({
                 isPremium={isPremium}
                 onBuyPremium={onBuyPremium}
                 companies={companies}
+                allQuestions={allQuestions}
                 solvedIds={solvedIds}
                 bookmarkedIds={bookmarkedIds}
                 onSolvedIdsChange={onSolvedIdsChange}
