@@ -4,13 +4,15 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ArrowUpDown, Search, SlidersVertical, X } from "lucide-react";
 
 import type { DsaAllQuestion, DsaCompany, DsaFrequencyWindow, DsaQuestion, QuestionId } from "@/types/maangco";
 import { CompanyLogo } from "./ui/company-logo";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/shimmer";
 
 const ALL_ID = "all";
@@ -70,21 +72,18 @@ export function DsaPanel({
     () => lockedCompanyId ?? searchParams.get("co") ?? ALL_ID,
   );
   const [companySearch, setCompanySearch] = useState("");
-  const [difficultyFilters, setDifficultyFilters] = useState<Set<Difficulty>>(
-    () => new Set(),
-  );
+  const [difficultyFilter, setDifficultyFilter] = useState<"all" | Difficulty>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [tagFilters, setTagFilters] = useState<Set<string>>(() => new Set());
+  const [tagFilter, setTagFilter] = useState("all");
   const [minCompanies, setMinCompanies] = useState(0);
   const [companyInAll, setCompanyInAll] = useState("all");
-  const [tagPickerOpen, setTagPickerOpen] = useState(false);
   const [questionSearch, setQuestionSearch] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("num");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const filtersRef = useRef<HTMLDivElement>(null);
+  const [sortOpen, setSortOpen] = useState(false);
 
   const deferredCompanySearch = useDeferredValue(companySearch);
   const deferredQuestionSearch = useDeferredValue(questionSearch);
@@ -143,14 +142,13 @@ export function DsaPanel({
     const term = deferredQuestionSearch.trim().toLowerCase();
     const filtered = selectedCompany.questions.filter((q) => {
       const matchesDiff =
-        difficultyFilters.size === 0 || difficultyFilters.has(q.difficulty);
+        difficultyFilter === "all" || q.difficulty === difficultyFilter;
       const matchesStatus =
         statusFilter === "all" ||
         (statusFilter === "solved" && solvedIds.includes(q.id)) ||
         (statusFilter === "todo" && !solvedIds.includes(q.id));
       const matchesTags =
-        tagFilters.size === 0 ||
-        q.topicTags.some((t) => tagFilters.has(t.slug));
+        tagFilter === "all" || q.topicTags.some((t) => t.slug === tagFilter);
       const matchesSearch =
         !term ||
         q.title.toLowerCase().includes(term) ||
@@ -195,9 +193,9 @@ export function DsaPanel({
       return effectiveFreq(b.frequency) - effectiveFreq(a.frequency) || a.number - b.number;
     });
   }, [
-    difficultyFilters,
+    difficultyFilter,
     statusFilter,
-    tagFilters,
+    tagFilter,
     minCompanies,
     companyInAll,
     isAllView,
@@ -207,15 +205,6 @@ export function DsaPanel({
     sortMode,
   ]);
 
-  useEffect(() => {
-    function handleOutside(e: MouseEvent) {
-      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
-        setFiltersOpen(false);
-      }
-    }
-    if (filtersOpen) document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, [filtersOpen]);
 
   // Sync selected company to URL (skipped when the company is locked via prop —
   // the kit page already encodes it in the path, not a query param)
@@ -237,9 +226,9 @@ export function DsaPanel({
     setCurrentPage(1);
   }, [
     selectedCompanyId,
-    difficultyFilters,
+    difficultyFilter,
     statusFilter,
-    tagFilters,
+    tagFilter,
     minCompanies,
     companyInAll,
     deferredQuestionSearch,
@@ -282,22 +271,17 @@ export function DsaPanel({
     );
   }, [selectedCompany]);
 
-  const toggleDifficulty = (d: Difficulty) => {
-    setDifficultyFilters((cur) => {
-      const next = new Set(cur);
-      if (next.has(d)) next.delete(d);
-      else next.add(d);
-      return next;
-    });
+  const clearAllFilters = () => {
+    setDifficultyFilter("all");
+    setStatusFilter("all");
+    setTagFilter("all");
+    setMinCompanies(0);
+    setCompanyInAll("all");
   };
 
-  const toggleTag = (slug: string) => {
-    setTagFilters((cur) => {
-      const next = new Set(cur);
-      if (next.has(slug)) next.delete(slug);
-      else next.add(slug);
-      return next;
-    });
+  const clearSort = () => {
+    setSortMode(defaultSort);
+    setPageSize(50);
   };
 
   const toggleSolved = (id: QuestionId) => {
@@ -318,11 +302,13 @@ export function DsaPanel({
 
   const defaultSort: SortMode = "num";
   const activeFilterCount = [
-    difficultyFilters.size > 0,
+    difficultyFilter !== "all",
     statusFilter !== "all",
-    tagFilters.size > 0,
+    tagFilter !== "all",
     isAllView && minCompanies > 0,
     isAllView && companyInAll !== "all",
+  ].filter(Boolean).length;
+  const activeSortCount = [
     sortMode !== defaultSort,
     pageSize !== 50,
   ].filter(Boolean).length;
@@ -524,10 +510,7 @@ export function DsaPanel({
           {/* Grid cell 3: search + filters (col 1, row 2) */}
           <div className="dsa-header-bottom">
             <div className="dsa-search-wrap">
-              <svg className="dsa-search-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                <circle cx="6.5" cy="6.5" r="5" />
-                <path d="M10.5 10.5L14 14" />
-              </svg>
+              <Search className="dsa-search-icon" size={14} strokeWidth={1.8} />
               <input
                 className="dsa-search-input"
                 type="text"
@@ -536,136 +519,191 @@ export function DsaPanel({
                 onChange={(e) => { setQuestionSearch(e.target.value); setCurrentPage(1); }}
               />
             </div>
-            <div className="dsa-filter-wrap" ref={filtersRef}>
-              <button
-                type="button"
-                className={`dsa-filter-btn${filtersOpen ? " open" : ""}${activeFilterCount > 0 ? " has-active" : ""}`}
-                onClick={() => setFiltersOpen((o) => !o)}
-              >
-                <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                  <path d="M2 4h12M4 8h8M6 12h4" />
-                </svg>
-                <span className="filter-btn-label">Filters</span>
-                {activeFilterCount > 0 && (
-                  <span className="dsa-filter-badge">{activeFilterCount}</span>
-                )}
-                <svg className="filter-btn-chevron" viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
-                  <path d="M2 4l4 4 4-4H2z" />
-                </svg>
-              </button>
-              {filtersOpen && (
-                <div className="dsa-filter-panel">
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Difficulty</span>
-                    <div className="dsa-pill-group">
-                      {(["Easy", "Medium", "Hard"] as const).map((d) => (
-                        <button
-                          key={d}
-                          type="button"
-                          className={`dsa-pill dsa-pill--${d}${difficultyFilters.has(d) ? " active" : ""}`}
-                          onClick={() => toggleDifficulty(d)}
-                        >
-                          {d}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Status</span>
-                    <div className="dsa-pill-group">
-                      {(["todo", "solved"] as const).map((s) => (
-                        <button
-                          key={s}
-                          type="button"
-                          className={`dsa-pill${statusFilter === s ? " active" : ""}`}
-                          onClick={() => setStatusFilter((cur) => (cur === s ? "all" : s))}
-                        >
-                          {s === "todo" ? "To-do" : "Solved"}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="dsa-filter-row dsa-filter-row--tags">
-                    <span className="dsa-filter-label">
-                      Tags{tagFilters.size > 0 ? ` (${tagFilters.size})` : ""}
-                    </span>
-                    <button
-                      type="button"
-                      className="dsa-tag-picker-toggle"
-                      onClick={() => setTagPickerOpen((o) => !o)}
-                    >
-                      {tagPickerOpen ? "Hide" : "Choose"}
-                    </button>
-                  </div>
-                  {tagPickerOpen && (
-                    <div className="dsa-tag-picker">
-                      {availableTags.length === 0 ? (
-                        <span className="dsa-tag-picker-empty">No tags available</span>
-                      ) : (
-                        availableTags.map((t) => (
-                          <button
-                            key={t.slug}
-                            type="button"
-                            className={`dsa-pill dsa-pill--tag${tagFilters.has(t.slug) ? " active" : ""}`}
-                            onClick={() => toggleTag(t.slug)}
-                          >
-                            {t.name}
-                          </button>
-                        ))
-                      )}
-                    </div>
+
+            <DropdownMenu open={filtersOpen} onOpenChange={setFiltersOpen} modal={false}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className={`dsa-filter-btn${activeFilterCount > 0 ? " has-active" : ""}`}
+                >
+                  <SlidersVertical size={14} strokeWidth={1.8} />
+                  <span className="filter-btn-label">Filters</span>
+                  {activeFilterCount > 0 && (
+                    <span className="dsa-filter-badge">{activeFilterCount}</span>
                   )}
-                  {isAllView && (
-                    <>
-                      <div className="dsa-filter-row">
-                        <span className="dsa-filter-label">Companies asked</span>
-                        <select className="sort-select dsa-filter-select" value={minCompanies}
-                          onChange={(e) => setMinCompanies(Number(e.target.value))}>
-                          {MIN_COMPANIES_OPTIONS.map((n) => (
-                            <option key={n} value={n}>{n === 0 ? "Any" : `${n}+`}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="dsa-filter-row">
-                        <span className="dsa-filter-label">Company</span>
-                        <select className="sort-select dsa-filter-select" value={companyInAll}
-                          onChange={(e) => setCompanyInAll(e.target.value)}>
-                          <option value="all">Any</option>
-                          {companies.map((c) => (
-                            <option key={c.id} value={c.name}>{c.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </>
-                  )}
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Sort</span>
-                    <select className="sort-select dsa-filter-select" value={sortMode}
-                      onChange={(e) => {
-                        const val = e.target.value as SortMode;
-                        if (val === "freq" && !isPremium) { onBuyPremium(); return; }
-                        setSortMode(val);
-                      }}>
-                      {isPremium && <option value="freq">Frequency</option>}
-                      <option value="num">Question ID</option>
-                      <option value="diff">Difficulty</option>
-                      <option value="timeframe">Timeframe (recent first)</option>
-                      {isAllView && <option value="companies">Companies asked</option>}
-                      {!isPremium && <option value="freq" disabled>Frequency 🔒</option>}
-                    </select>
-                  </div>
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Per page</span>
-                    <select className="sort-select dsa-filter-select" value={pageSize}
-                      onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}>
-                      <option value={50}>50</option>
-                      <option value={75}>75</option>
-                      <option value={100}>100</option>
-                    </select>
-                  </div>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="dsa-filter-panel">
+                <div className="dsa-filter-panel-head">
+                  <span className="dsa-filter-panel-title">Filters</span>
+                  <button type="button" className="dsa-filter-panel-close" onClick={() => setFiltersOpen(false)} aria-label="Close">
+                    <X size={14} />
+                  </button>
                 </div>
-              )}
-            </div>
+
+                <div className="dsa-filter-field">
+                  <div className="dsa-filter-field-head">
+                    <span className="dsa-filter-label">Difficulty</span>
+                    {difficultyFilter !== "all" && (
+                      <button type="button" className="dsa-filter-reset" onClick={() => setDifficultyFilter("all")}>Reset</button>
+                    )}
+                  </div>
+                  <Select value={difficultyFilter} onValueChange={(v) => setDifficultyFilter(v as "all" | Difficulty)}>
+                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="Easy">Easy</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="Hard">Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="dsa-filter-field">
+                  <div className="dsa-filter-field-head">
+                    <span className="dsa-filter-label">Status</span>
+                    {statusFilter !== "all" && (
+                      <button type="button" className="dsa-filter-reset" onClick={() => setStatusFilter("all")}>Reset</button>
+                    )}
+                  </div>
+                  <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="todo">To-do</SelectItem>
+                      <SelectItem value="solved">Solved</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="dsa-filter-field">
+                  <div className="dsa-filter-field-head">
+                    <span className="dsa-filter-label">Tags</span>
+                    {tagFilter !== "all" && (
+                      <button type="button" className="dsa-filter-reset" onClick={() => setTagFilter("all")}>Reset</button>
+                    )}
+                  </div>
+                  <Select value={tagFilter} onValueChange={setTagFilter}>
+                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      {availableTags.map((t) => (
+                        <SelectItem key={t.slug} value={t.slug}>{t.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {isAllView && (
+                  <>
+                    <div className="dsa-filter-field">
+                      <div className="dsa-filter-field-head">
+                        <span className="dsa-filter-label">Companies asked</span>
+                        {minCompanies !== 0 && (
+                          <button type="button" className="dsa-filter-reset" onClick={() => setMinCompanies(0)}>Reset</button>
+                        )}
+                      </div>
+                      <Select value={String(minCompanies)} onValueChange={(v) => setMinCompanies(Number(v))}>
+                        <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {MIN_COMPANIES_OPTIONS.map((n) => (
+                            <SelectItem key={n} value={String(n)}>{n === 0 ? "Any" : `${n}+`}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="dsa-filter-field">
+                      <div className="dsa-filter-field-head">
+                        <span className="dsa-filter-label">Company</span>
+                        {companyInAll !== "all" && (
+                          <button type="button" className="dsa-filter-reset" onClick={() => setCompanyInAll("all")}>Reset</button>
+                        )}
+                      </div>
+                      <Select value={companyInAll} onValueChange={setCompanyInAll}>
+                        <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Any</SelectItem>
+                          {companies.map((c) => (
+                            <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
+
+                <div className="dsa-filter-panel-foot">
+                  <button type="button" className="dsa-filter-clear-all" onClick={clearAllFilters}>Clear all</button>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu open={sortOpen} onOpenChange={setSortOpen} modal={false}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className={`dsa-filter-btn${activeSortCount > 0 ? " has-active" : ""}`}
+                >
+                  <ArrowUpDown size={14} strokeWidth={1.8} />
+                  <span className="filter-btn-label">Sort</span>
+                  {activeSortCount > 0 && (
+                    <span className="dsa-filter-badge">{activeSortCount}</span>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="dsa-filter-panel">
+                <div className="dsa-filter-panel-head">
+                  <span className="dsa-filter-panel-title">Sort</span>
+                  <button type="button" className="dsa-filter-panel-close" onClick={() => setSortOpen(false)} aria-label="Close">
+                    <X size={14} />
+                  </button>
+                </div>
+
+                <div className="dsa-filter-field">
+                  <div className="dsa-filter-field-head">
+                    <span className="dsa-filter-label">Sort by</span>
+                    {sortMode !== defaultSort && (
+                      <button type="button" className="dsa-filter-reset" onClick={() => setSortMode(defaultSort)}>Reset</button>
+                    )}
+                  </div>
+                  <Select
+                    value={sortMode}
+                    onValueChange={(v) => setSortMode(v as SortMode)}
+                  >
+                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {isPremium && <SelectItem value="freq">Frequency</SelectItem>}
+                      <SelectItem value="num">Question ID</SelectItem>
+                      <SelectItem value="diff">Difficulty</SelectItem>
+                      <SelectItem value="timeframe">Timeframe (recent first)</SelectItem>
+                      {isAllView && <SelectItem value="companies">Companies asked</SelectItem>}
+                      {!isPremium && <SelectItem value="freq" disabled>Frequency 🔒</SelectItem>}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="dsa-filter-field">
+                  <div className="dsa-filter-field-head">
+                    <span className="dsa-filter-label">Per page</span>
+                    {pageSize !== 50 && (
+                      <button type="button" className="dsa-filter-reset" onClick={() => setPageSize(50)}>Reset</button>
+                    )}
+                  </div>
+                  <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setCurrentPage(1); }}>
+                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="75">75</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="dsa-filter-panel-foot">
+                  <button type="button" className="dsa-filter-clear-all" onClick={clearSort}>Clear all</button>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
         </div>

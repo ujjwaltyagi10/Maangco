@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* Aliases so shadcn/ui components resolve against the theme tokens below
+   instead of shadcns defaults, which were never defined here. */
+@theme {
+  --color-popover: var(--surface2);
+  --color-popover-foreground: var(--text1);
+  --color-muted-foreground: var(--muted);
+  --color-border: var(--border2);
+  --color-input: var(--border2);
+  --color-ring: var(--accent);
+  --color-accent: var(--surface3);
+  --color-accent-foreground: var(--text1);
+  --color-destructive: var(--hard);
+  --color-foreground: var(--text1);
+}
+
 /* ── THEME TOKENS ── */
 :root {
   --sidebar-w: 220px;
@@ -219,7 +234,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
 }
-
+ 
 .sidebar.collapsed .sidebar-section-label {
   opacity: 0;
   height: 0;
@@ -1981,13 +1996,14 @@ body {
   color: var(--hard);
 }
 
-/* Cell 3: search + filters — full width, row 2 */
+/* Cell 3: search + filters — row 2, capped so it doesn't stretch full width */
 .dsa-header-bottom {
   grid-column: 1 / -1;
   grid-row: 2;
   display: flex;
   align-items: stretch;
   gap: 10px;
+  max-width: 71%;
 }
 
 .dsa-search-wrap {
@@ -1999,7 +2015,7 @@ body {
 
 .dsa-search-icon {
   position: absolute;
-  left: 13px;
+  left: 15px;
   color: var(--muted);
   pointer-events: none;
 }
@@ -2026,11 +2042,6 @@ body {
   color: var(--muted);
 }
 
-.dsa-filter-wrap {
-  position: relative;
-  flex-shrink: 0;
-}
-
 .dsa-filter-btn {
   display: flex;
   align-items: center;
@@ -2050,7 +2061,7 @@ body {
 }
 
 .dsa-filter-btn:hover,
-.dsa-filter-btn.open {
+.dsa-filter-btn[data-state="open"] {
   background: var(--surface3);
   border-color: var(--border2);
   color: var(--text1);
@@ -2072,97 +2083,70 @@ body {
 }
 
 .dsa-filter-panel {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 1000;
-  background: var(--surface2);
+  background: var(--surface);
   border: 1px solid var(--border2);
-  border-radius: 10px;
-  padding: 10px 12px;
-  min-width: 210px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  border-radius: 14px;
+  padding: 14px;
+  width: 300px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 
-.dsa-filter-row {
+.dsa-filter-panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  padding-bottom: 12px;
+  margin-bottom: -4px;
+  border-bottom: 1px solid var(--border);
 }
 
-.dsa-filter-label {
-  font-size: 11px;
-  color: var(--muted);
-  white-space: nowrap;
-  min-width: 56px;
+.dsa-filter-panel-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text1);
 }
 
-.dsa-filter-select {
-  flex: 1;
-  font-size: 12px;
-}
-
-.dsa-pill-group {
+.dsa-filter-panel-close {
   display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  flex: 1;
-}
-
-.dsa-pill {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 20px;
-  border: 1px solid var(--border2);
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: none;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
-  font-family: inherit;
-  transition: all 0.15s;
-  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
 }
 
-.dsa-pill:hover {
-  border-color: var(--accent);
-  color: var(--text1);
-}
-
-.dsa-pill.active {
-  border-color: transparent;
-  color: var(--text1);
+.dsa-filter-panel-close:hover {
   background: var(--surface3);
+  color: var(--text1);
 }
 
-.dsa-pill--Easy.active {
-  background: var(--easy-bg);
-  color: var(--easy);
+.dsa-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.dsa-pill--Medium.active {
-  background: var(--med-bg);
-  color: var(--med);
-}
-
-.dsa-pill--Hard.active {
-  background: var(--hard-bg);
-  color: var(--hard);
-}
-
-.dsa-pill--tag {
-  margin: 2px;
-}
-
-.dsa-filter-row--tags {
+.dsa-filter-field-head {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
-.dsa-tag-picker-toggle {
+.dsa-filter-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text1);
+}
+
+.dsa-filter-reset {
   font-size: 11px;
   font-weight: 600;
   color: var(--accent);
@@ -2173,21 +2157,66 @@ body {
   padding: 0;
 }
 
-.dsa-tag-picker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  max-height: 140px;
-  overflow-y: auto;
-  padding: 6px 2px;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+.dsa-filter-reset:hover {
+  text-decoration: underline;
 }
 
-.dsa-tag-picker-empty {
-  font-size: 11px;
-  color: var(--muted);
-  padding: 4px 0;
+.dsa-filter-panel-foot {
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dsa-filter-clear-all {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 6px 0 0;
+}
+
+.dsa-filter-clear-all:hover {
+  color: var(--text1);
+  text-decoration: underline;
+}
+
+.dsa-select-trigger {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  height: 38px !important;
+  padding: 0 12px !important;
+  font-size: 13px;
+  line-height: 1.2 !important;
+  border-radius: 8px !important;
+  background: var(--surface2) !important;
+  border-color: var(--border2) !important;
+  color: var(--text1) !important;
+}
+
+/* Shadcn Select's open listbox — applied globally via data-slot so every
+   Select in the app (not just DSA's) gets the same spacious, boxed look
+   instead of the default compact/cramped list. */
+[data-slot="select-content"] {
+  border-radius: 12px !important;
+  border: 1px solid var(--border2) !important;
+  padding: 6px !important;
+}
+
+[data-slot="select-item"] {
+  padding: 10px 30px 10px 10px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+[data-slot="select-item"]:focus,
+[data-slot="select-item"][data-highlighted] {
+  background: var(--surface3) !important;
 }
 
 /* ── DSA TABLE ── */
@@ -3240,9 +3269,8 @@ body {
     padding-bottom: 0;
   }
 
-  /* Filter: hide label + chevron, fixed-size square icon button */
-  .filter-btn-label,
-  .filter-btn-chevron {
+  /* Filter/Sort: hide label, fixed-size square icon button */
+  .filter-btn-label {
     display: none;
   }
 

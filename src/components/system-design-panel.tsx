@@ -4,10 +4,10 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Search, SlidersVertical, X } from "lucide-react";
 
 import adobeLogo from "@/assets/adobe.png";
 import airbnbLogo from "@/assets/airbnb.png";
@@ -42,6 +42,8 @@ import type {
 } from "@/types/maangco";
 
 import { CompanyLogo } from "./ui/company-logo";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/shimmer";
 
 interface SystemDesignPanelProps {
@@ -148,21 +150,16 @@ export function SystemDesignPanel({
   const [currentPage, setCurrentPage] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
-  const filtersRef = useRef<HTMLDivElement>(null);
   const pageSize = 50;
 
   const deferredSearch = useDeferredValue(search);
   const deferredCompanySearch = useDeferredValue(companySearch);
 
-  useEffect(() => {
-    function handleOutside(e: MouseEvent) {
-      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
-        setFiltersOpen(false);
-      }
-    }
-    if (filtersOpen) document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, [filtersOpen]);
+  const clearAllFilters = () => {
+    setFreqFilter("All");
+    setSelectedCat(ALL_CAT);
+    setLevelFilter("All");
+  };
 
   // Sync company + category to URL
   useEffect(() => {
@@ -432,10 +429,7 @@ export function SystemDesignPanel({
 
           <div className="dsa-header-bottom">
             <div className="dsa-search-wrap">
-              <svg className="dsa-search-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                <circle cx="6.5" cy="6.5" r="5" />
-                <path d="M10.5 10.5L14 14" />
-              </svg>
+              <Search className="dsa-search-icon" size={14} strokeWidth={1.8} />
               <input
                 className="dsa-search-input"
                 type="text"
@@ -444,53 +438,82 @@ export function SystemDesignPanel({
                 onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
               />
             </div>
-            <div className="dsa-filter-wrap" ref={filtersRef}>
-              <button
-                type="button"
-                className={`dsa-filter-btn${filtersOpen ? " open" : ""}${activeFilterCount > 0 ? " has-active" : ""}`}
-                onClick={() => setFiltersOpen((o) => !o)}
-              >
-                <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                  <path d="M2 4h12M4 8h8M6 12h4" />
-                </svg>
-                <span className="filter-btn-label">Filters</span>
-                {activeFilterCount > 0 && <span className="dsa-filter-badge">{activeFilterCount}</span>}
-                <svg className="filter-btn-chevron" viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
-                  <path d="M2 4l4 4 4-4H2z" />
-                </svg>
-              </button>
-              {filtersOpen && (
-                <div className="dsa-filter-panel">
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Frequency</span>
-                    <select className="sort-select dsa-filter-select" value={freqFilter}
-                      onChange={(e) => { startTransition(() => { setFreqFilter(e.target.value as "All" | SystemDesignFrequency); setCurrentPage(1); }); }}>
-                      <option value="All">All</option>
-                      <option value="High">High</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Low">Low</option>
-                    </select>
-                  </div>
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Category</span>
-                    <select className="sort-select dsa-filter-select" value={selectedCat}
-                      onChange={(e) => { startTransition(() => { setSelectedCat(e.target.value as typeof ALL_CAT | SystemDesignCategory); setCurrentPage(1); }); }}>
-                      {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
-                    </select>
-                  </div>
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Level</span>
-                    <select className="sort-select dsa-filter-select" value={levelFilter}
-                      onChange={(e) => { startTransition(() => { setLevelFilter(e.target.value as "All" | "HLD" | "LLD" | "Both"); setCurrentPage(1); }); }}>
-                      <option value="All">All levels</option>
-                      <option value="HLD">HLD only</option>
-                      <option value="LLD">LLD only</option>
-                      <option value="Both">Both (HLD + LLD)</option>
-                    </select>
-                  </div>
+
+            <DropdownMenu open={filtersOpen} onOpenChange={setFiltersOpen} modal={false}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className={`dsa-filter-btn${activeFilterCount > 0 ? " has-active" : ""}`}
+                >
+                  <SlidersVertical size={14} strokeWidth={1.8} />
+                  <span className="filter-btn-label">Filters</span>
+                  {activeFilterCount > 0 && <span className="dsa-filter-badge">{activeFilterCount}</span>}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="dsa-filter-panel">
+                <div className="dsa-filter-panel-head">
+                  <span className="dsa-filter-panel-title">Filters</span>
+                  <button type="button" className="dsa-filter-panel-close" onClick={() => setFiltersOpen(false)} aria-label="Close">
+                    <X size={14} />
+                  </button>
                 </div>
-              )}
-            </div>
+
+                <div className="dsa-filter-field">
+                  <div className="dsa-filter-field-head">
+                    <span className="dsa-filter-label">Frequency</span>
+                    {freqFilter !== "All" && (
+                      <button type="button" className="dsa-filter-reset" onClick={() => setFreqFilter("All")}>Reset</button>
+                    )}
+                  </div>
+                  <Select value={freqFilter} onValueChange={(v) => { startTransition(() => { setFreqFilter(v as "All" | SystemDesignFrequency); setCurrentPage(1); }); }}>
+                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="All">All</SelectItem>
+                      <SelectItem value="High">High</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="Low">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="dsa-filter-field">
+                  <div className="dsa-filter-field-head">
+                    <span className="dsa-filter-label">Category</span>
+                    {selectedCat !== ALL_CAT && (
+                      <button type="button" className="dsa-filter-reset" onClick={() => setSelectedCat(ALL_CAT)}>Reset</button>
+                    )}
+                  </div>
+                  <Select value={selectedCat} onValueChange={(v) => { startTransition(() => { setSelectedCat(v as typeof ALL_CAT | SystemDesignCategory); setCurrentPage(1); }); }}>
+                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="dsa-filter-field">
+                  <div className="dsa-filter-field-head">
+                    <span className="dsa-filter-label">Level</span>
+                    {levelFilter !== "All" && (
+                      <button type="button" className="dsa-filter-reset" onClick={() => setLevelFilter("All")}>Reset</button>
+                    )}
+                  </div>
+                  <Select value={levelFilter} onValueChange={(v) => { startTransition(() => { setLevelFilter(v as "All" | "HLD" | "LLD" | "Both"); setCurrentPage(1); }); }}>
+                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="All">All levels</SelectItem>
+                      <SelectItem value="HLD">HLD only</SelectItem>
+                      <SelectItem value="LLD">LLD only</SelectItem>
+                      <SelectItem value="Both">Both (HLD + LLD)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="dsa-filter-panel-foot">
+                  <button type="button" className="dsa-filter-clear-all" onClick={clearAllFilters}>Clear all</button>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
