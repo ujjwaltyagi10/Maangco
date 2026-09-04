@@ -558,19 +558,19 @@ export function SystemDesignPanel({
                       <td className="q-num">{q.number}</td>
                       <td className="q-title">{q.title}</td>
                       <td>
-                        <span className="diff-badge" style={{ background: fc.bg, color: fc.text }}>
+                        <span className="diff-badge" style={{ background: fc.bg, color: fc.text, border: `1px solid ${fc.text}` }}>
                           {q.frequency}
                         </span>
                       </td>
                       <td>
-                        <span className="diff-badge" style={{ background: lc.bg, color: lc.text }}>
+                        <span className="diff-badge" style={{ background: lc.bg, color: lc.text, border: `1px solid ${lc.text}` }}>
                           {q.designLevel}
                         </span>
                       </td>
                       <td style={{ whiteSpace: "nowrap" }}>
                         <span
                           className="diff-badge"
-                          style={{ background: CAT_COLORS[q.category] + "18", color: CAT_COLORS[q.category], whiteSpace: "nowrap" }}
+                          style={{ background: CAT_COLORS[q.category] + "18", color: CAT_COLORS[q.category], border: `1px solid ${CAT_COLORS[q.category]}`, whiteSpace: "nowrap" }}
                         >
                           {q.category}
                         </span>

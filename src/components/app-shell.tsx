@@ -24,8 +24,8 @@ interface AppShellProps {
 
 const navItems = [
   { id: "dashboard" as AppPanel, label: "Dashboard", icon: LayoutDashboard },
-  { id: "dsa" as AppPanel, label: "DSA Practice", icon: Code2, badge: "LC" },
-  { id: "system-design" as AppPanel, label: "System Design", icon: Server, badge: "150" },
+  { id: "dsa" as AppPanel, label: "DSA Practice", icon: Code2 },
+  { id: "system-design" as AppPanel, label: "System Design", icon: Server },
   // { id: "frontend" as AppPanel, label: "Frontend Prep", icon: Layers, badge: "45d" },
 ];
 
@@ -113,7 +113,6 @@ export function AppShell({
           >
             <div className="nav-icon"><item.icon size={16} strokeWidth={1.8} /></div>
             <span className="nav-label">{item.label}</span>
-            {item.badge ? <span className="nav-badge">{item.badge}</span> : null}
           </button>
         ))}
 

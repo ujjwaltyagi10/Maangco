@@ -20,7 +20,7 @@
   --sidebar-w: 220px;
 
   --bg: #f5f3ee;
-  --surface: #ffffff;
+  --surface: #faf8f3;
   --surface2: #f0ede6;
   --surface3: #e8e4db;
   --border: #e0dad0;
@@ -29,13 +29,15 @@
   --text2: #5a5548;
   --text3: #9c9485;
   --muted: #9c9485;
-  --sidebar-bg: #f7f4ec;
+  --sidebar-bg: #ffffff;
   --sidebar-border: #ddd5c8;
   --sidebar-text: #2f2a23;
   --sidebar-muted: #6f685c;
   --sidebar-active-bg: #e4dccd;
   --sidebar-active-text: #15130f;
-  --sidebar-hover-bg: #f1ece2;
+  --sidebar-hover-bg: #f4f3f0;
+  --row-card-bg: var(--surface);
+  --panel-bg: #ffffff;
 
   --green: #c87c4a;
   --green-bg: #f9efe8;
@@ -80,6 +82,8 @@
   --sidebar-active-bg: #141414;
   --sidebar-active-text: #e5e7eb;
   --sidebar-hover-bg: #0f0f0f;
+  --row-card-bg: #1a1a1a;
+  --panel-bg: #000000;
 
   /* Theme accent */
   --green: #c87c4a;
@@ -237,7 +241,7 @@ body {
  
 .sidebar.collapsed .sidebar-section-label {
   opacity: 0;
-  height: 0;
+  height: 10px;
   padding: 0;
 }
 
@@ -247,40 +251,67 @@ body {
   gap: 10px;
   padding: 0.6rem 1rem;
   cursor: pointer;
-  border-top: none;
-  border-right: none;
-  border-bottom: none;
-  border-left: 3px solid transparent;
+  border: none;
+  border-radius: 10px;
   background: transparent;
   width: 100%;
   text-align: left;
   transition:
     background 0.15s,
-    border-color 0.15s;
+    box-shadow 0.15s;
   overflow: hidden;
   text-decoration: none;
+  box-shadow: inset 0 0 0 1.5px transparent;
 }
 
-.nav-item:hover {
+.nav-item:hover:not(.active) {
   background: var(--sidebar-hover-bg);
+  box-shadow: none;
 }
 
 .nav-item.active {
-  background: var(--sidebar-active-bg);
-  border-left-color: #c87c4a;
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.sidebar:not(.collapsed) .nav-item {
+  width: auto;
+  margin: 0.2rem 0.85rem;
+  padding-left: 0.15rem;
+}
+
+.nav-item.active .nav-icon {
+  color: var(--accent);
 }
 
 .sidebar.collapsed .nav-item {
   justify-content: center;
   gap: 0;
-  margin: 0 0.35rem;
+  margin: 0;
   padding: 0.55rem 0;
-  border-left-color: transparent !important;
-  border-radius: 12px;
+  border-left: none !important;
+  border-radius: 0;
 }
 
 .sidebar.collapsed .nav-item.active {
-  box-shadow: inset 3px 0 0 #c87c4a;
+  background: transparent;
+  box-shadow: none;
+}
+
+.sidebar.collapsed .nav-item.active .nav-icon {
+  border: 1.5px solid var(--accent);
+  background: rgba(200, 124, 74, 0.12);
+  color: var(--accent);
+}
+
+.sidebar.collapsed .nav-item:hover:not(.active) {
+  background: transparent;
+  box-shadow: none;
+}
+
+.sidebar.collapsed .nav-item:hover:not(.active) .nav-icon {
+  background: var(--sidebar-hover-bg);
+  border-radius: 8px;
 }
 
 .nav-icon {
@@ -534,7 +565,10 @@ body {
 
 /* ── TOP NAV ── */
 .topnav {
-  background: var(--bg);
+  /* Shares the sidebar's chrome color (same token — identical in dark mode
+     already, and now a proper white in light mode) rather than the content
+     area's --bg, so the nav shell reads as distinct from the page content. */
+  background: var(--sidebar-bg);
   border-bottom: 1px solid var(--border);
   padding: 0 0.65rem;
   height: 60px;
@@ -672,7 +706,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  background: var(--bg);
+  background: var(--panel-bg, var(--bg));
 }
 
 /* ── DASHBOARD ── */
@@ -1268,7 +1302,7 @@ body {
   display: flex;
   flex-direction: row;
   overflow: hidden;
-  background: var(--bg);
+  background: var(--panel-bg, var(--bg));
   min-height: 0;
 }
 
@@ -1371,11 +1405,15 @@ body {
   border-radius: 6px;
 }
 
-.co-logo-all-icon--pill {
+.co-logo-all-icon.co-logo-all-icon--pill {
   color: var(--text2);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.dsa-logo-pill.active .co-logo-all-icon.co-logo-all-icon--pill {
+  color: var(--accent);
 }
 
 /* ── Collapsed: footer with ratio ── */
@@ -2230,7 +2268,8 @@ body {
 
 .q-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 8px;
 }
 
 .q-table th {
@@ -2239,23 +2278,21 @@ body {
   color: var(--muted);
   font-family: "DM Mono", monospace;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--border);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 400;
   position: sticky;
   top: 0;
-  background: var(--bg);
+  background: var(--panel-bg, var(--bg));
 }
 
 .q-row {
-  border-bottom: 1px solid var(--border);
   transition: background 0.15s;
   cursor: pointer;
 }
 
-.q-row:hover {
-  background: var(--surface2);
+.q-row:hover td {
+  background: var(--surface3);
 }
 
 .q-row.solved td:first-child {
@@ -2270,10 +2307,29 @@ body {
   color: var(--muted);
 }
 
+/* Each row reads as its own card — blends with the page (--surface2, same
+   tone the rest of the app uses for cards) while staying visually distinct
+   via its own border and rounded ends, rather than a flat table row. */
 .q-row td {
-  padding: 0.65rem 0.75rem;
+  padding: 0.75rem 0.85rem;
   font-size: 13px;
   vertical-align: middle;
+  background: var(--row-card-bg, var(--surface2));
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.q-row td:first-child {
+  border-left: 1px solid var(--border);
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.q-row td:last-child {
+  border-right: 1px solid var(--border);
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 
 .q-cb {
@@ -2329,16 +2385,19 @@ body {
 .diff-badge.Easy {
   background: var(--easy-bg);
   color: var(--easy);
+  border: 1px solid var(--easy);
 }
 
 .diff-badge.Medium {
   background: var(--med-bg);
   color: var(--med);
+  border: 1px solid var(--med);
 }
 
 .diff-badge.Hard {
   background: var(--hard-bg);
   color: var(--hard);
+  border: 1px solid var(--hard);
 }
 
 .freq-bar {
@@ -3564,7 +3623,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--text2);
 }
 
 .co-item--locked {
@@ -4445,7 +4504,7 @@ body {
   display: flex;
   flex-direction: row;
   overflow: hidden;
-  background: var(--bg);
+  background: var(--panel-bg, var(--bg));
   min-height: 0;
 }
 
