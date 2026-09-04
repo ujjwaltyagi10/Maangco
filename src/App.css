@@ -5115,8 +5115,8 @@ a.lbtn-lg {
 }
 
 .dp-module-icon {
-  font-size: 20px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
 .dp-module-tag {

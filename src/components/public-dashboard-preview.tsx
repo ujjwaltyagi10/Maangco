@@ -1,3 +1,5 @@
+import { Boxes, Database } from "lucide-react";
+
 import { COMPANY_LOGOS } from "@/lib/company-logos";
 import { CompanyLogo } from "./ui/company-logo";
 
@@ -16,7 +18,7 @@ const LOCKED_KIT_COMPANIES = [
 
 const features = [
   {
-    icon: "⚡",
+    icon: Boxes,
     name: "DSA Practice",
     desc: "Company-wise sheets with frequency, topic tags, bookmarks, and solve tracking.",
     statA: "730+",
@@ -26,7 +28,7 @@ const features = [
     accent: "var(--green)",
   },
   {
-    icon: "🏗️",
+    icon: Database,
     name: "System Design",
     desc: "A 150-question roadmap with HLD + LLD depth, categories, and study tracking.",
     statA: "150",
@@ -135,13 +137,12 @@ export function PublicDashboardPreview({
               className="pd-video-icon"
               style={{ background: "var(--green-bg)", color: "var(--green)" }}
             >
-              ⚡
+              <Boxes size={16} strokeWidth={1.8} />
             </div>
             <div>
               <div className="pd-video-name">DSA Practice</div>
               <div className="pd-video-hint">Company-wise sheets, frequency &amp; tags</div>
             </div>
-            <div className="pd-live-badge">Live</div>
           </div>
           <div className="pd-video-frame">
             <video autoPlay loop muted playsInline preload="metadata" key={dsaVid}>
@@ -156,13 +157,12 @@ export function PublicDashboardPreview({
               className="pd-video-icon"
               style={{ background: "var(--amber-bg)", color: "var(--amber)" }}
             >
-              🏗️
+              <Database size={16} strokeWidth={1.8} />
             </div>
             <div>
               <div className="pd-video-name">System Design</div>
               <div className="pd-video-hint">150-question roadmap with depth &amp; tracking</div>
             </div>
-            <div className="pd-live-badge">Live</div>
           </div>
           <div className="pd-video-frame">
             <video autoPlay loop muted playsInline preload="metadata" key={sdVid}>
@@ -181,7 +181,7 @@ export function PublicDashboardPreview({
                 className="pd-feature-icon"
                 style={{ background: `${f.accent}18`, color: f.accent }}
               >
-                {f.icon}
+                <f.icon size={19} strokeWidth={1.8} />
               </div>
               <div>
                 <div className="pd-feature-name">{f.name}</div>

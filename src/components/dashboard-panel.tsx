@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Boxes, Database } from "lucide-react";
 import type { DsaCompany } from "@/types/maangco";
 import { CompanyKitsModal } from "./company-kits-modal";
 import { CompanyLogo } from "./ui/company-logo";
@@ -120,7 +121,7 @@ export function DashboardPanel({
   const modules = [
     {
       key: "dsa",
-      icon: "⚡",
+      icon: Boxes,
       label: "DSA Practice",
       tag: "Company-wise",
       desc: "LeetCode questions sorted by company, frequency & topic tags.",
@@ -137,7 +138,7 @@ export function DashboardPanel({
     },
     {
       key: "sd",
-      icon: "🏗️",
+      icon: Database,
       label: "System Design",
       tag: "HLD + LLD",
       desc: "150-question roadmap with deep dives into distributed systems.",
@@ -217,7 +218,7 @@ export function DashboardPanel({
             onKeyDown={(e) => e.key === "Enter" && m.onClick()}
           >
             <div className="dp-module-top">
-              <div className="dp-module-icon">{m.icon}</div>
+              <div className="dp-module-icon" style={{ color: m.color }}><m.icon size={20} strokeWidth={1.8} /></div>
               <span className="dp-module-tag">{m.tag}</span>
               {m.locked && (
                 <span className="dp-module-lock-pill">
