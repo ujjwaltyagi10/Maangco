@@ -289,8 +289,8 @@ body {
 
 .sidebar:not(.collapsed) .nav-item {
   width: auto;
-  margin: 0.2rem 0.85rem;
-  padding-left: 0.15rem;
+  margin: 0.2rem 1rem;
+  padding-left: 0;
 }
 
 .nav-item.active .nav-icon {

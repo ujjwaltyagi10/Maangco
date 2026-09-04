@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { BookOpen, Code2, ExternalLink, LayoutDashboard, /* Layers, */ Server } from "lucide-react";
+import { BookOpen, Boxes, Database, ExternalLink, LayoutDashboard /* Layers */ } from "lucide-react";
 
 import type { AppPanel } from "@/types/maangco";
 
@@ -26,8 +26,8 @@ interface AppShellProps {
 
 const navItems = [
   { id: "dashboard" as AppPanel, label: "Dashboard", icon: LayoutDashboard },
-  { id: "dsa" as AppPanel, label: "DSA Practice", icon: Code2 },
-  { id: "system-design" as AppPanel, label: "System Design", icon: Server },
+  { id: "dsa" as AppPanel, label: "DSA Practice", icon: Boxes },
+  { id: "system-design" as AppPanel, label: "System Design", icon: Database },
   // { id: "frontend" as AppPanel, label: "Frontend Prep", icon: Layers, badge: "45d" },
 ];
 
