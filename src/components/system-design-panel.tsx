@@ -9,30 +9,6 @@ import {
 import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 
-import adobeLogo from "@/assets/adobe.png";
-import airbnbLogo from "@/assets/airbnb.png";
-import amazonLogo from "@/assets/Amazon.png";
-import appleLogo from "@/assets/apple.png";
-import atlassianLogo from "@/assets/atlassian.png";
-import bloombergLogo from "@/assets/bloomberg.png";
-import citadelLogo from "@/assets/Citadel.png";
-import flipkartLogo from "@/assets/flipkart.png";
-import goldmanLogo from "@/assets/goldman.png";
-import googleLogo from "@/assets/google.png";
-import metaLogo from "@/assets/meta.png";
-import microsoftLogo from "@/assets/microsoft.png";
-import netflixLogo from "@/assets/netflix.png";
-import nvidiaLogo from "@/assets/nvidia.png";
-import oracleLogo from "@/assets/Oracle.png";
-import pinterestLogo from "@/assets/pinterest.png";
-import salesforceLogo from "@/assets/Salesforce.png";
-import snowflakeLogo from "@/assets/Snowflake.png";
-import tcsLogo from "@/assets/TCS.png";
-import tiktokLogo from "@/assets/tiktok.png";
-import uberLogo from "@/assets/uber.png";
-import visaLogo from "@/assets/visa.png";
-import walmartLogo from "@/assets/Walmart.png";
-
 import type {
   SystemDesignCategory,
   SystemDesignFrequency,
@@ -41,6 +17,7 @@ import type {
   SystemDesignQuestionId,
 } from "@/types/maangco";
 
+import { COMPANY_LOGOS } from "@/lib/company-logos";
 import { CompanyLogo } from "./ui/company-logo";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import { Skeleton } from "./ui/shimmer";
@@ -102,32 +79,6 @@ function initialColor(name: string): string {
   for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
   return INITIAL_PALETTE[Math.abs(h) % INITIAL_PALETTE.length];
 }
-
-const COMPANY_LOGOS: Record<string, string> = {
-  Adobe: adobeLogo,
-  Airbnb: airbnbLogo,
-  Amazon: amazonLogo,
-  Apple: appleLogo,
-  Atlassian: atlassianLogo,
-  Bloomberg: bloombergLogo,
-  Citadel: citadelLogo,
-  Flipkart: flipkartLogo,
-  "Goldman Sachs": goldmanLogo,
-  Google: googleLogo,
-  Meta: metaLogo,
-  Microsoft: microsoftLogo,
-  Netflix: netflixLogo,
-  Nvidia: nvidiaLogo,
-  Oracle: oracleLogo,
-  Pinterest: pinterestLogo,
-  Salesforce: salesforceLogo,
-  Snowflake: snowflakeLogo,
-  TCS: tcsLogo,
-  TikTok: tiktokLogo,
-  Uber: uberLogo,
-  Visa: visaLogo,
-  Walmart: walmartLogo,
-};
 
 export function SystemDesignPanel({
   questions,
@@ -229,9 +180,15 @@ export function SystemDesignPanel({
     return result;
   }, [safePage, totalPages]);
 
-  // Frequency breakdown
+  // Frequency breakdown — scoped to the selected company only (not the
+  // other filters), matching the DSA panel's difficultyCounts pattern.
+  const companyQuestions = useMemo(
+    () => (selectedCompany === ALL_CO ? questions : questions.filter((q) => q.companies.includes(selectedCompany))),
+    [questions, selectedCompany],
+  );
+
   const freqCounts = useMemo(() => {
-    return questions.reduce(
+    return companyQuestions.reduce(
       (acc, q) => {
         const done = completedIds.includes(q.id);
         if (q.frequency === "High") { acc.high++; if (done) acc.highDone++; }
@@ -241,7 +198,7 @@ export function SystemDesignPanel({
       },
       { high: 0, med: 0, low: 0, highDone: 0, medDone: 0, lowDone: 0 },
     );
-  }, [questions, completedIds]);
+  }, [companyQuestions, completedIds]);
 
   const visibleDoneCount = filtered.filter((q) => completedIds.includes(q.id)).length;
   const visibleTotal = filtered.length;
@@ -378,11 +335,6 @@ export function SystemDesignPanel({
         {/* Header card */}
         <div className="dsa-header-card">
           <div className="dsa-header-left">
-            <div className="dsa-header-meta">
-              <span className="dsa-header-badge">Core Track</span>
-              <span className="dsa-header-meta-dot">•</span>
-              <span className="dsa-header-meta-text">Updated today</span>
-            </div>
             <h2 className="dsa-header-title">System Design</h2>
             <span className="dsa-header-sub">150 questions sourced from Glassdoor, Blind &amp; Exponent (2021–2026)</span>
           </div>

@@ -447,11 +447,6 @@ export function DsaPanel({
         {!lockedCompanyId && (
             <div className="dsa-header-card">
               <div className="dsa-header-left">
-                <div className="dsa-header-meta">
-                  <span className="dsa-header-badge">Core Track</span>
-                  <span className="dsa-header-meta-dot">•</span>
-                  <span className="dsa-header-meta-text">Updated today</span>
-                </div>
                 <h2 className="dsa-header-title">DSA Practice</h2>
                 <span className="dsa-header-sub">Top company questions to level up your skills</span>
               </div>

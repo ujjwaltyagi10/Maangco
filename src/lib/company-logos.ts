@@ -1,3 +1,26 @@
+import akamaiLogo from "@/assets/svg/akamai.svg";
+import bookingLogo from "@/assets/svg/bookingdotcom.svg";
+import boxLogo from "@/assets/svg/boxy-svg.svg";
+import capitalOneLogo from "@/assets/svg/capital-one.svg";
+import ciscoLogo from "@/assets/svg/cisco-light.svg";
+import cloudflareLogo from "@/assets/svg/cloudflare.svg";
+import coinbaseLogo from "@/assets/svg/coinbase.svg";
+import datadogLogo from "@/assets/svg/datadog.svg";
+import dropboxLogo from "@/assets/svg/dropbox.svg";
+import ebayLogo from "@/assets/svg/ebay.svg";
+import figmaLogo from "@/assets/svg/figma.svg";
+import ibmLogo from "@/assets/svg/ibm.svg";
+import notionLogo from "@/assets/svg/notion.svg";
+import paypalLogo from "@/assets/svg/paypal.svg";
+import snapLogo from "@/assets/svg/snap.svg";
+import spotifyLogo from "@/assets/svg/spotify.svg";
+import stripeLogo from "@/assets/svg/stripe.svg";
+import twilioLogo from "@/assets/svg/twilio.svg";
+import vmwareLogo from "@/assets/svg/vmware.svg";
+import waymoLogo from "@/assets/svg/waymo.svg";
+import youtubeLogo from "@/assets/svg/youtube.svg";
+import zoomLogo from "@/assets/svg/zoom.svg";
+
 import adobeLogo from "@/assets/adobe.png";
 import airbnbLogo from "@/assets/airbnb.png";
 import amazonLogo from "@/assets/Amazon.png";
@@ -72,4 +95,26 @@ export const COMPANY_LOGOS: Record<string, string> = {
   Oracle: oracleLogo,
   Visa: visaLogo,
   LinkedIn: linkedinLogo,
+  Akamai: akamaiLogo,
+  "Booking.com": bookingLogo,
+  Box: boxLogo,
+  "Capital One": capitalOneLogo,
+  Cisco: ciscoLogo,
+  Cloudflare: cloudflareLogo,
+  Coinbase: coinbaseLogo,
+  Datadog: datadogLogo,
+  Dropbox: dropboxLogo,
+  eBay: ebayLogo,
+  Figma: figmaLogo,
+  IBM: ibmLogo,
+  Notion: notionLogo,
+  PayPal: paypalLogo,
+  Snap: snapLogo,
+  Spotify: spotifyLogo,
+  Stripe: stripeLogo,
+  Twilio: twilioLogo,
+  VMware: vmwareLogo,
+  Waymo: waymoLogo,
+  YouTube: youtubeLogo,
+  Zoom: zoomLogo,
 };
