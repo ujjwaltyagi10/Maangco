@@ -5026,6 +5026,55 @@ a.lbtn-lg {
   color: var(--kit-accent, var(--green));
 }
 
+/* ── Locked kit card (logged-in, non-premium preview) ── */
+.dp-kit-card--locked {
+  cursor: pointer;
+}
+
+.dp-kit-card--locked .dp-kit-logo,
+.dp-kit-card--locked .dp-kit-name {
+  opacity: 0.45;
+  filter: grayscale(60%);
+}
+
+.dp-kit-lock {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+}
+
+.dp-kit-card--locked .dp-kit-cta,
+.dp-kit-card--locked:hover .dp-kit-cta {
+  color: var(--text2);
+}
+
+.dp-kit-card--locked:hover {
+  border-color: var(--border2);
+}
+
+.dp-kit-card--locked:hover .dp-kit-lock {
+  border-color: var(--border2);
+  color: var(--text1);
+}
+
+.pd-premium-kits-row {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.pd-premium-kits-row .dp-kit-card {
+  padding: 14px;
+  gap: 8px;
+}
+
 /* ── Module cards ── */
 .dp-modules {
   display: grid;
