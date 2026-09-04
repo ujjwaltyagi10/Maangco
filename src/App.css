@@ -4950,7 +4950,7 @@ a.lbtn-lg {
 .dp-kit-card {
   position: relative;
   z-index: 0;
-  background: var(--surface2);
+  background: var(--header-card-bg, var(--surface2));
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 20px;
@@ -4972,8 +4972,8 @@ a.lbtn-lg {
   inset: 0;
   z-index: -1;
   background-image:
-    repeating-linear-gradient(0deg, var(--border) 0 1px, transparent 1px 18px),
-    repeating-linear-gradient(90deg, var(--border) 0 1px, transparent 1px 18px);
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--border) 45%, transparent) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--border) 45%, transparent) 0 1px, transparent 1px 32px);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 42%, black 70%, black 100%);
   mask-image: linear-gradient(to right, transparent 0%, transparent 42%, black 70%, black 100%);
   pointer-events: none;
@@ -5034,9 +5034,8 @@ a.lbtn-lg {
 }
 
 .dp-module-card {
-  background: var(--surface2);
+  background: var(--header-card-bg, var(--surface2));
   border: 1px solid var(--border);
-  border-top: 3px solid var(--module-color, var(--green));
   border-radius: 16px;
   padding: 22px;
   display: flex;
@@ -5243,7 +5242,7 @@ a.lbtn-lg {
 }
 
 .dp-tip {
-  background: var(--surface2);
+  background: var(--header-card-bg, var(--surface2));
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px;

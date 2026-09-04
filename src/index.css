@@ -1312,15 +1312,28 @@ body {
   min-height: 0;
 }
 
-.dsa-main {
+/* Non-scrolling wrapper — header card + search/filter card stay fixed;
+   only .dsa-main (the table area below) scrolls. Matches System Design's
+   .sd-content / .sd-main split. */
+.dsa-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  padding-top: 16px;
+}
+
+.dsa-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   min-width: 0;
   min-height: 0;
-  padding: 16px 0;
+  padding-bottom: 16px;
 }
 
 /* ── DSA SIDEBAR (Company Browser) ── */
@@ -1420,7 +1433,11 @@ body {
 }
 
 .dsa-logo-pill.active .co-logo-all-icon.co-logo-all-icon--pill {
-  color: var(--accent);
+  color: #000;
+}
+
+[data-theme="dark"] .dsa-logo-pill.active .co-logo-all-icon.co-logo-all-icon--pill {
+  color: #fff;
 }
 
 /* ── Collapsed: footer with ratio ── */

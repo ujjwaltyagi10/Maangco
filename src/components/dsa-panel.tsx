@@ -440,7 +440,7 @@ export function DsaPanel({
   return (
     <div className="dsa-panel">
       {/* LEFT: Progress + Table + Pagination */}
-      <div className="dsa-main">
+      <div className="dsa-content">
         {/* ── Panel Header ── */}
         {/* Identity card — hidden on the locked single-company kit page,
             which renders its own header above this. */}
@@ -669,6 +669,9 @@ export function DsaPanel({
             </DropdownMenu>
           </div>
 
+        {/* Table area — the only part of the panel that scrolls; header
+            card and search/filter card above stay fixed in place. */}
+        <div className="dsa-main">
         {/* Question Table card */}
         <div className="table-wrap">
           <div className="q-table-card">
@@ -846,8 +849,9 @@ export function DsaPanel({
           )}
           </div>
         </div>
+        </div>
       </div>
-      {/* end .dsa-main */}
+      {/* end .dsa-content */}
 
       {/* RIGHT: Company Browser Sidebar — hidden on the locked single-company kit page */}
       {!lockedCompanyId && (
