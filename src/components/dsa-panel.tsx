@@ -108,7 +108,7 @@ export function DsaPanel({
       .sort((a, b) => effectiveFreq(b.frequency) - effectiveFreq(a.frequency));
     return {
       id: ALL_ID,
-      name: "All",
+      name: "All Companies",
       logo: "",
       accent: "#6c63ff",
       questions,
@@ -972,7 +972,7 @@ export function DsaPanel({
               </div>
               <input
                 className="co-search co-search--sidebar"
-                placeholder="Search..."
+                placeholder="Search companies..."
                 value={companySearch}
                 onChange={(e) => {
                   const v = e.target.value;
