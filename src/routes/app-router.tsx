@@ -2,7 +2,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { BrowserRouter, useLocation } from "react-router-dom";
 
 import type { AuthSession } from "@/lib/auth-api";
-import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/maangco";
+import type { DsaAllQuestion, DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "@/types/maangco";
 import type { AuthSubmitResult } from "./route-paths";
 import { PrivateRoutes } from "./private-routes";
 import { PublicRoutes } from "./public-routes";
@@ -26,6 +26,7 @@ export interface AppRouterProps {
   solvedIds: QuestionId[];
   bookmarkedIds: QuestionId[];
   companies: DsaCompany[];
+  allQuestions: DsaAllQuestion[];
   systemDesignQuestions: SystemDesignQuestion[];
   completedSystemDesignIds: SystemDesignQuestionId[];
   onCompletedSystemDesignIdsChange: Dispatch<SetStateAction<SystemDesignQuestionId[]>>;
@@ -67,10 +68,12 @@ function AppRouterContent(props: AppRouterProps) {
   const isAppRoute =
     path === "/dashboard" ||
     path === "/dsa" ||
+    path === "/company" ||
     path === "/system-design" ||
     path === "/frontend" ||
     path.startsWith("/dashboard/") ||
     path.startsWith("/dsa/") ||
+    path.startsWith("/company/") ||
     path.startsWith("/system-design/") ||
     path.startsWith("/frontend/");
 
@@ -102,6 +105,7 @@ function AppRouterContent(props: AppRouterProps) {
           solvedIds={props.solvedIds}
           bookmarkedIds={props.bookmarkedIds}
           companies={props.companies}
+          allQuestions={props.allQuestions}
           systemDesignQuestions={props.systemDesignQuestions}
           completedSystemDesignIds={props.completedSystemDesignIds}
           onCompletedSystemDesignIdsChange={props.onCompletedSystemDesignIdsChange}

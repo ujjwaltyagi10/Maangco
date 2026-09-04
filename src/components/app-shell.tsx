@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { BookOpen, Code2, ExternalLink, LayoutDashboard, /* Layers, */ Server } from "lucide-react";
+import { BookOpen, Boxes, Database, ExternalLink, LayoutDashboard /* Layers */ } from "lucide-react";
 
 import type { AppPanel } from "@/types/maangco";
 
@@ -10,6 +10,8 @@ interface AppShellProps {
   theme: "light" | "dark";
   onThemeChange: () => void;
   isAuthenticated: boolean;
+  isPremium?: boolean;
+  onBuyPremium?: () => void;
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
   userLabel: string;
@@ -24,8 +26,8 @@ interface AppShellProps {
 
 const navItems = [
   { id: "dashboard" as AppPanel, label: "Dashboard", icon: LayoutDashboard },
-  { id: "dsa" as AppPanel, label: "DSA Practice", icon: Code2, badge: "LC" },
-  { id: "system-design" as AppPanel, label: "System Design", icon: Server, badge: "150" },
+  { id: "dsa" as AppPanel, label: "DSA Practice", icon: Boxes },
+  { id: "system-design" as AppPanel, label: "System Design", icon: Database },
   // { id: "frontend" as AppPanel, label: "Frontend Prep", icon: Layers, badge: "45d" },
 ];
 
@@ -43,6 +45,8 @@ export function AppShell({
   theme,
   onThemeChange,
   isAuthenticated,
+  isPremium,
+  onBuyPremium,
   isSidebarCollapsed,
   onToggleSidebar,
   userLabel,
@@ -55,7 +59,9 @@ export function AppShell({
   children,
 }: AppShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [premiumBannerDismissed, setPremiumBannerDismissed] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const showPremiumBanner = isAuthenticated && !isPremium && !premiumBannerDismissed;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -80,9 +86,45 @@ export function AppShell({
   return (
     <div
       className={isLocked ? "app-shell app-shell--locked" : "app-shell"}
-      style={{ display: "flex", height: "100vh", overflow: "hidden", width: "100%" }}
+      style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", width: "100%" }}
       aria-hidden={isLocked ? true : undefined}
     >
+      {/* PREMIUM UPSELL BANNER */}
+      {showPremiumBanner && (
+        <div className="premium-banner">
+          <span />
+          <div className="premium-banner-center">
+            <div className="premium-banner-crown" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+                <path d="M2.5 6.5 6 9l4-5.5L14 9l3.5-2.5L16.2 15H3.8L2.5 6.5Z" />
+              </svg>
+            </div>
+            <span className="premium-banner-title">Unlock Premium</span>
+            <span className="premium-banner-sep">|</span>
+            <span className="premium-banner-text">
+              Get complete access to DSA sheets, System Design roadmap, company-wise questions and more.
+            </span>
+            <button type="button" className="premium-banner-cta" onClick={onBuyPremium}>
+              Upgrade to Premium
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="13" height="13">
+                <path d="M3 8h10M9 4l4 4-4 4" />
+              </svg>
+            </button>
+          </div>
+          <button
+            type="button"
+            className="premium-banner-close"
+            onClick={() => setPremiumBannerDismissed(true)}
+            aria-label="Dismiss"
+          >
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" width="11" height="11">
+              <path d="M1 1l10 10M11 1L1 11" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      <div className="app-shell-body" style={{ display: "flex", flex: 1, overflow: "hidden", minHeight: 0, width: "100%" }}>
       {/* SIDEBAR */}
       <aside className={`sidebar${isSidebarCollapsed ? " collapsed" : ""}`}>
         <div
@@ -113,7 +155,6 @@ export function AppShell({
           >
             <div className="nav-icon"><item.icon size={16} strokeWidth={1.8} /></div>
             <span className="nav-label">{item.label}</span>
-            {item.badge ? <span className="nav-badge">{item.badge}</span> : null}
           </button>
         ))}
 
@@ -347,6 +388,7 @@ export function AppShell({
         </div>
 
         <div className="content-area">{children}</div>
+      </div>
       </div>
 
       {/* BOTTOM NAV — mobile only */}

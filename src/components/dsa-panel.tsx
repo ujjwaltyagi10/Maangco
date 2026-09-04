@@ -4,12 +4,15 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ArrowUpDown, Search, SlidersVertical, X } from "lucide-react";
 
-import type { DsaCompany, DsaQuestion, QuestionId } from "@/types/maangco";
+import type { DsaAllQuestion, DsaCompany, DsaFrequencyWindow, DsaQuestion, QuestionId } from "@/types/maangco";
+import { CompanyLogo } from "./ui/company-logo";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/shimmer";
 
 const ALL_ID = "all";
@@ -18,16 +21,31 @@ interface DsaPanelProps {
   isPremium: boolean;
   onBuyPremium: () => void;
   companies: DsaCompany[];
+  /** Precomputed cross-company catalog powering the "All" pseudo-company —
+   * not needed (and not read) when lockedCompanyId is set. */
+  allQuestions?: DsaAllQuestion[];
   solvedIds: QuestionId[];
   bookmarkedIds: QuestionId[];
   onSolvedIdsChange: Dispatch<SetStateAction<QuestionId[]>>;
   onBookmarkedIdsChange: Dispatch<SetStateAction<QuestionId[]>>;
   isLoading?: boolean;
+  /** When set, locks the view to this company: hides the company sidebar
+   * and the "DSA Practice" identity block, and ignores the ?co= URL param.
+   * Used by the dedicated per-company kit page. */
+  lockedCompanyId?: string;
 }
 
-type DifficultyFilter = "all" | "Easy" | "Medium" | "Hard";
-type ShowFilter = "all" | "saved" | "unsolved";
-type SortMode = "freq" | "num" | "diff" | "title";
+type Difficulty = "Easy" | "Medium" | "Hard";
+type StatusFilter = "all" | "todo" | "solved";
+type SortMode = "freq" | "num" | "diff" | "timeframe" | "companies";
+const MIN_COMPANIES_OPTIONS = [0, 2, 3, 5, 10] as const;
+
+// A question's frequency is split into 30-day/3-month windows; for display,
+// sorting, and the dot-rating, prefer the more recent 30-day signal and fall
+// back to the 3-month one when a question isn't in the latest 30-day data.
+function effectiveFreq(freq: DsaFrequencyWindow): number {
+  return freq.last30d ?? freq.last3m ?? 0;
+}
 
 function freqToDots(freq: number): number {
   if (freq >= 90) return 5;
@@ -41,55 +59,61 @@ export function DsaPanel({
   isPremium,
   onBuyPremium,
   companies,
+  allQuestions,
   solvedIds,
   bookmarkedIds,
   onSolvedIdsChange,
   onBookmarkedIdsChange,
   isLoading,
+  lockedCompanyId,
 }: DsaPanelProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCompanyId, setSelectedCompanyId] = useState(
-    () => searchParams.get("co") ?? ALL_ID,
+    () => lockedCompanyId ?? searchParams.get("co") ?? ALL_ID,
   );
   const [companySearch, setCompanySearch] = useState("");
-  const [difficultyFilter, setDifficultyFilter] =
-    useState<DifficultyFilter>("all");
-  const [showFilter, setShowFilter] = useState<ShowFilter>("all");
+  const [difficultyFilter, setDifficultyFilter] = useState<"all" | Difficulty>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [tagFilter, setTagFilter] = useState("all");
+  const [minCompanies, setMinCompanies] = useState(0);
   const [questionSearch, setQuestionSearch] = useState("");
-  const [sortMode, setSortMode] = useState<SortMode>(
-    isPremium ? "freq" : "num",
-  );
+  const [sortMode, setSortMode] = useState<SortMode>("num");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const filtersRef = useRef<HTMLDivElement>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [tagsOpen, setTagsOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
 
   const deferredCompanySearch = useDeferredValue(companySearch);
   const deferredQuestionSearch = useDeferredValue(questionSearch);
 
   const allCompany = useMemo((): DsaCompany => {
-    // Sort by frequency first so the highest-frequency entry wins the dedup
-    const seen = new Map<number, DsaQuestion>();
-    companies
-      .flatMap((c) => c.questions)
-      .forEach((q) => {
-        const existing = seen.get(q.number);
-        if (!existing || q.frequency > existing.frequency) {
-          seen.set(q.number, q);
-        }
-      });
-    const uniqueQuestions = Array.from(seen.values()).sort(
-      (a, b) => b.frequency - a.frequency,
-    );
+    // Backed by the precomputed cross-company catalog (globalFrequency is
+    // already the sum-normalized score across every company that asks each
+    // question — see LCAuth-Backend's getDsaAll) rather than re-deriving it
+    // client-side from the per-company lists.
+    const questions: DsaQuestion[] = (allQuestions ?? [])
+      .map((q) => ({
+        id: q.id,
+        number: q.number,
+        title: q.title,
+        titleSlug: q.titleSlug,
+        difficulty: q.difficulty,
+        topicTags: q.topicTags,
+        frequency: q.globalFrequency,
+        url: q.url,
+        companiesAsked: q.frequencyData.companiesAsked,
+        companyFrequencies: q.frequencyData.companyFrequencies,
+      }))
+      .sort((a, b) => effectiveFreq(b.frequency) - effectiveFreq(a.frequency));
     return {
       id: ALL_ID,
-      name: "All",
+      name: "All Companies",
       logo: "",
       accent: "#6c63ff",
-      questions: uniqueQuestions,
+      questions,
     };
-  }, [companies]);
+  }, [allQuestions]);
 
   const displayCompanies = useMemo((): DsaCompany[] => {
     return [allCompany, ...companies];
@@ -109,6 +133,8 @@ export function DsaPanel({
   const totalQuestionCount = allCompany.questions.length;
   const totalSolvedCount = solvedIds.length;
 
+  const isAllView = selectedCompanyId === ALL_ID;
+
   const visibleQuestions = useMemo(() => {
     if (!selectedCompany) return [];
 
@@ -116,19 +142,28 @@ export function DsaPanel({
     const filtered = selectedCompany.questions.filter((q) => {
       const matchesDiff =
         difficultyFilter === "all" || q.difficulty === difficultyFilter;
-      const matchesShow =
-        showFilter === "all" ||
-        (showFilter === "saved" && bookmarkedIds.includes(q.id)) ||
-        (showFilter === "unsolved" && !solvedIds.includes(q.id));
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "solved" && solvedIds.includes(q.id)) ||
+        (statusFilter === "todo" && !solvedIds.includes(q.id));
+      const matchesTags =
+        tagFilter === "all" || q.topicTags.some((t) => t.slug === tagFilter);
       const matchesSearch =
         !term ||
         q.title.toLowerCase().includes(term) ||
-        q.tags.some((t) => t.toLowerCase().includes(term));
-      return matchesDiff && matchesShow && matchesSearch;
+        q.topicTags.some((t) => t.name.toLowerCase().includes(term));
+      const matchesMinCompanies =
+        !isAllView || minCompanies === 0 || (q.companiesAsked ?? 0) >= minCompanies;
+      return (
+        matchesDiff &&
+        matchesStatus &&
+        matchesTags &&
+        matchesSearch &&
+        matchesMinCompanies
+      );
     });
 
     return filtered.sort((a, b) => {
-      if (sortMode === "title") return a.title.localeCompare(b.title);
       if (sortMode === "diff") {
         const rank = { Easy: 0, Medium: 1, Hard: 2 } satisfies Record<
           DsaQuestion["difficulty"],
@@ -137,30 +172,37 @@ export function DsaPanel({
         return rank[a.difficulty] - rank[b.difficulty];
       }
       if (sortMode === "num") return a.number - b.number;
-      return b.frequency - a.frequency || a.number - b.number;
+      if (sortMode === "timeframe") {
+        return (
+          (b.frequency.last30d ?? -1) - (a.frequency.last30d ?? -1) ||
+          effectiveFreq(b.frequency) - effectiveFreq(a.frequency)
+        );
+      }
+      if (sortMode === "companies") {
+        return (
+          (b.companiesAsked ?? 0) - (a.companiesAsked ?? 0) ||
+          effectiveFreq(b.frequency) - effectiveFreq(a.frequency)
+        );
+      }
+      return effectiveFreq(b.frequency) - effectiveFreq(a.frequency) || a.number - b.number;
     });
   }, [
-    bookmarkedIds,
     difficultyFilter,
-    showFilter,
+    statusFilter,
+    tagFilter,
+    minCompanies,
+    isAllView,
     deferredQuestionSearch,
     selectedCompany,
     solvedIds,
     sortMode,
   ]);
 
-  useEffect(() => {
-    function handleOutside(e: MouseEvent) {
-      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
-        setFiltersOpen(false);
-      }
-    }
-    if (filtersOpen) document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, [filtersOpen]);
 
-  // Sync selected company to URL
+  // Sync selected company to URL (skipped when the company is locked via prop —
+  // the kit page already encodes it in the path, not a query param)
   useEffect(() => {
+    if (lockedCompanyId) return;
     setSearchParams(
       (prev) => {
         const next = new URLSearchParams(prev);
@@ -170,7 +212,7 @@ export function DsaPanel({
       },
       { replace: true },
     );
-  }, [selectedCompanyId]);
+  }, [selectedCompanyId, lockedCompanyId]);
 
   // Reset to page 1 whenever filters or selected company change
   useEffect(() => {
@@ -178,7 +220,9 @@ export function DsaPanel({
   }, [
     selectedCompanyId,
     difficultyFilter,
-    showFilter,
+    statusFilter,
+    tagFilter,
+    minCompanies,
     deferredQuestionSearch,
     sortMode,
     deferredCompanySearch,
@@ -190,6 +234,19 @@ export function DsaPanel({
     (safePage - 1) * pageSize,
     safePage * pageSize,
   );
+  const rangeStart = visibleQuestions.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, visibleQuestions.length);
+
+  const pageNumbers = useMemo((): (number | "…")[] => {
+    const pages = new Set<number>([1, totalPages, safePage - 1, safePage, safePage + 1]);
+    const sorted = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+    const result: (number | "…")[] = [];
+    sorted.forEach((p, i) => {
+      if (i > 0 && p - sorted[i - 1] > 1) result.push("…");
+      result.push(p);
+    });
+    return result;
+  }, [safePage, totalPages]);
 
   const difficultyCounts = useMemo(() => {
     if (!selectedCompany)
@@ -205,6 +262,24 @@ export function DsaPanel({
       { easy: 0, medium: 0, hard: 0, easySolved: 0, medSolved: 0, hardSolved: 0 },
     );
   }, [selectedCompany, solvedIds]);
+
+  const availableTags = useMemo(() => {
+    if (!selectedCompany) return [];
+    const seen = new Map<string, string>();
+    for (const q of selectedCompany.questions) {
+      for (const t of q.topicTags) {
+        if (!seen.has(t.slug)) seen.set(t.slug, t.name);
+      }
+    }
+    return Array.from(seen, ([slug, name]) => ({ slug, name })).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  }, [selectedCompany]);
+
+  const clearSort = () => {
+    setSortMode(defaultSort);
+    setPageSize(50);
+  };
 
   const toggleSolved = (id: QuestionId) => {
     onSolvedIdsChange((cur) =>
@@ -222,13 +297,15 @@ export function DsaPanel({
     ? Math.round((totalSolvedCount / totalQuestionCount) * 100)
     : 0;
 
-  const defaultSort: SortMode = isPremium ? "freq" : "num";
-  const activeFilterCount = [
-    difficultyFilter !== "all",
-    showFilter !== "all",
-    sortMode !== defaultSort,
-    pageSize !== 50,
-  ].filter(Boolean).length;
+  const defaultSort: SortMode = "num";
+  const SORT_LABELS: Record<SortMode, string> = {
+    freq: "Frequency",
+    num: "Question ID",
+    diff: "Difficulty",
+    timeframe: "Recent",
+    companies: "Companies asked",
+  };
+  const sortLabel = SORT_LABELS[sortMode];
 
   // Filtered progress (respects difficulty / show / search filters)
   const visibleSolvedCount = visibleQuestions.filter((q) => solvedIds.includes(q.id)).length;
@@ -249,29 +326,33 @@ export function DsaPanel({
         <div className="dsa-main">
           {/* Header — same grid as real header */}
           <div className="dsa-progress-header">
-            <div className="dsa-header-identity">
-              <Skeleton w={36} h={36} radius={8} style={{ flexShrink: 0 }} />
-              <div className="dsa-header-title-group">
-                <Skeleton w={130} h={17} style={{ marginBottom: 6 }} />
-                <Skeleton w={220} h={12} />
+            {!lockedCompanyId && (
+              <div className="dsa-header-identity">
+                <Skeleton w={36} h={36} radius={8} style={{ flexShrink: 0 }} />
+                <div className="dsa-header-title-group">
+                  <Skeleton w={130} h={17} style={{ marginBottom: 6 }} />
+                  <Skeleton w={220} h={12} />
+                </div>
               </div>
-            </div>
-            <div className="dsa-progress-card">
-              <Skeleton w={56} h={56} radius={999} style={{ flexShrink: 0 }} />
-              <div className="dsa-progress-info">
-                <Skeleton w={52} h={18} style={{ marginBottom: 5 }} />
-                <Skeleton w={44} h={11} />
+            )}
+            {!lockedCompanyId && (
+              <div className="dsa-progress-card">
+                <Skeleton w={56} h={56} radius={999} style={{ flexShrink: 0 }} />
+                <div className="dsa-progress-info">
+                  <Skeleton w={52} h={18} style={{ marginBottom: 5 }} />
+                  <Skeleton w={44} h={11} />
+                </div>
+                <div className="dsa-progress-sep" />
+                <div className="dsa-diff-stats">
+                  {["Easy","Med.","Hard"].map((l) => (
+                    <div key={l} className="dsa-diff-stat">
+                      <Skeleton w={28} h={11} style={{ marginBottom: 4 }} />
+                      <Skeleton w={32} h={14} />
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="dsa-progress-sep" />
-              <div className="dsa-diff-stats">
-                {["Easy","Med.","Hard"].map((l) => (
-                  <div key={l} className="dsa-diff-stat">
-                    <Skeleton w={28} h={11} style={{ marginBottom: 4 }} />
-                    <Skeleton w={32} h={14} />
-                  </div>
-                ))}
-              </div>
-            </div>
+            )}
             <div className="dsa-header-bottom">
               <Skeleton w="100%" h={36} radius={7} style={{ flex: 1 }} />
               <Skeleton w={90} h={36} radius={7} />
@@ -320,7 +401,8 @@ export function DsaPanel({
           </div>
         </div>
 
-        {/* ── RIGHT: company sidebar skeleton ── */}
+        {/* ── RIGHT: company sidebar skeleton — hidden on the locked kit page ── */}
+        {!lockedCompanyId && (
         <aside className="dsa-sidebar">
           <div className="dsa-sidebar-head">
             <div className="dsa-sidebar-head-row">
@@ -350,6 +432,7 @@ export function DsaPanel({
             </div>
           </div>
         </aside>
+        )}
       </div>
     );
   }
@@ -359,66 +442,84 @@ export function DsaPanel({
       {/* LEFT: Progress + Table + Pagination */}
       <div className="dsa-main">
         {/* ── Panel Header ── */}
-        <div className="dsa-progress-header">
-
-          {/* Grid cell 1: Identity card (col 1, row 1) */}
-          <div className="dsa-header-identity">
-            <div className="dsa-header-icon">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="16 18 22 12 16 6" />
-                <polyline points="8 6 2 12 8 18" />
-              </svg>
-            </div>
-            <div className="dsa-header-title-group">
-              <h2 className="dsa-header-title">DSA Practice</h2>
-              <span className="dsa-header-sub">Top company questions to level up your skills</span>
-            </div>
-          </div>
-
-          {/* Grid cell 2: Progress strip (col 2, row 1) */}
-          <div className="dsa-progress-card">
-            <div className="dsa-mini-ring">
-              <svg viewBox="0 0 56 56" className="dsa-mini-ring-svg">
-                <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--border2)" strokeWidth="3"
-                  strokeDasharray={`${miniArcLen} ${miniArcGap}`} strokeLinecap="round"
-                  transform="rotate(135, 28, 28)" />
-                <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--accent)" strokeWidth="3"
-                  strokeDasharray={`${miniArcFill} ${miniArcCirc - miniArcFill}`} strokeLinecap="round"
-                  transform="rotate(135, 28, 28)"
-                  style={{ transition: "stroke-dasharray 0.5s ease" }} />
-              </svg>
-              <div className="dsa-mini-ring-label">{visiblePct}%</div>
-            </div>
-            <div className="dsa-progress-info">
-              <span className="dsa-progress-count">
-                {visibleSolvedCount}<span className="dsa-progress-total">/{visibleTotal}</span>
-              </span>
-              <span className="dsa-progress-label">✓ Solved</span>
-            </div>
-            <div className="dsa-progress-sep" />
-            <div className="dsa-diff-stats">
-              <div className="dsa-diff-stat dsa-diff-stat--easy">
-                <span className="dsa-diff-stat-label">Easy</span>
-                <span className="dsa-diff-stat-val">{difficultyCounts.easySolved}/{difficultyCounts.easy}</span>
+        {/* Identity card — hidden on the locked single-company kit page,
+            which renders its own header above this. */}
+        {!lockedCompanyId && (
+            <div className="dsa-header-card">
+              <div className="dsa-header-left">
+                <h2 className="dsa-header-title">DSA Practice</h2>
+                <span className="dsa-header-sub">Top company questions to level up your skills</span>
               </div>
-              <div className="dsa-diff-stat dsa-diff-stat--medium">
-                <span className="dsa-diff-stat-label">Med.</span>
-                <span className="dsa-diff-stat-val">{difficultyCounts.medSolved}/{difficultyCounts.medium}</span>
-              </div>
-              <div className="dsa-diff-stat dsa-diff-stat--hard">
-                <span className="dsa-diff-stat-label">Hard</span>
-                <span className="dsa-diff-stat-val">{difficultyCounts.hardSolved}/{difficultyCounts.hard}</span>
+
+              <div className="dsa-header-right">
+                <div className="dsa-mini-ring">
+                  <svg viewBox="0 0 56 56" className="dsa-mini-ring-svg">
+                    <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--border2)" strokeWidth="3"
+                      strokeDasharray={`${miniArcLen} ${miniArcGap}`} strokeLinecap="round"
+                      transform="rotate(135, 28, 28)" />
+                    <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--accent)" strokeWidth="3"
+                      strokeDasharray={`${miniArcFill} ${miniArcCirc - miniArcFill}`} strokeLinecap="round"
+                      transform="rotate(135, 28, 28)"
+                      style={{ transition: "stroke-dasharray 0.5s ease" }} />
+                  </svg>
+                  <div className="dsa-mini-ring-label">{visiblePct}%</div>
+                </div>
+                <div className="dsa-progress-info">
+                  <span className="dsa-progress-count">
+                    {visibleSolvedCount}<span className="dsa-progress-total">/{visibleTotal}</span>
+                  </span>
+                  <span className="dsa-progress-label">✓ Solved Total</span>
+                </div>
+                <div className="dsa-progress-sep" />
+                <div className="dsa-diff-stats">
+                  <div className="dsa-diff-stat dsa-diff-stat--easy">
+                    <div className="dsa-diff-stat-head">
+                      <span className="dsa-diff-stat-label">Easy</span>
+                      <span className="dsa-diff-stat-dot" />
+                    </div>
+                    <span className="dsa-diff-stat-val">{difficultyCounts.easySolved}/{difficultyCounts.easy}</span>
+                    <div className="dsa-diff-stat-bar">
+                      <div
+                        className="dsa-diff-stat-bar-fill"
+                        style={{ width: `${difficultyCounts.easy ? (difficultyCounts.easySolved / difficultyCounts.easy) * 100 : 0}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="dsa-diff-stat dsa-diff-stat--medium">
+                    <div className="dsa-diff-stat-head">
+                      <span className="dsa-diff-stat-label">Med.</span>
+                      <span className="dsa-diff-stat-dot" />
+                    </div>
+                    <span className="dsa-diff-stat-val">{difficultyCounts.medSolved}/{difficultyCounts.medium}</span>
+                    <div className="dsa-diff-stat-bar">
+                      <div
+                        className="dsa-diff-stat-bar-fill"
+                        style={{ width: `${difficultyCounts.medium ? (difficultyCounts.medSolved / difficultyCounts.medium) * 100 : 0}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="dsa-diff-stat dsa-diff-stat--hard">
+                    <div className="dsa-diff-stat-head">
+                      <span className="dsa-diff-stat-label">Hard</span>
+                      <span className="dsa-diff-stat-dot" />
+                    </div>
+                    <span className="dsa-diff-stat-val">{difficultyCounts.hardSolved}/{difficultyCounts.hard}</span>
+                    <div className="dsa-diff-stat-bar">
+                      <div
+                        className="dsa-diff-stat-bar-fill"
+                        style={{ width: `${difficultyCounts.hard ? (difficultyCounts.hardSolved / difficultyCounts.hard) * 100 : 0}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+        )}
 
-          {/* Grid cell 3: search + filters (col 1, row 2) */}
-          <div className="dsa-header-bottom">
+        {/* Search + filters card */}
+        <div className="dsa-header-bottom">
             <div className="dsa-search-wrap">
-              <svg className="dsa-search-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                <circle cx="6.5" cy="6.5" r="5" />
-                <path d="M10.5 10.5L14 14" />
-              </svg>
+              <Search className="dsa-search-icon" size={14} strokeWidth={1.8} />
               <input
                 className="dsa-search-input"
                 type="text"
@@ -427,94 +528,191 @@ export function DsaPanel({
                 onChange={(e) => { setQuestionSearch(e.target.value); setCurrentPage(1); }}
               />
             </div>
-            <div className="dsa-filter-wrap" ref={filtersRef}>
-              <button
-                type="button"
-                className={`dsa-filter-btn${filtersOpen ? " open" : ""}${activeFilterCount > 0 ? " has-active" : ""}`}
-                onClick={() => setFiltersOpen((o) => !o)}
-              >
-                <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                  <path d="M2 4h12M4 8h8M6 12h4" />
-                </svg>
-                <span className="filter-btn-label">Filters</span>
-                {activeFilterCount > 0 && (
-                  <span className="dsa-filter-badge">{activeFilterCount}</span>
-                )}
-                <svg className="filter-btn-chevron" viewBox="0 0 12 12" width="10" height="10" fill="currentColor" style={{ marginLeft: 2, opacity: 0.6, transform: filtersOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
-                  <path d="M2 4l4 4 4-4H2z" />
-                </svg>
-              </button>
-              {filtersOpen && (
-                <div className="dsa-filter-panel">
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Difficulty</span>
-                    <select className="sort-select dsa-filter-select" value={difficultyFilter}
-                      onChange={(e) => { setDifficultyFilter(e.target.value as DifficultyFilter); setCurrentPage(1); }}>
-                      <option value="all">All</option>
-                      <option value="Easy">Easy</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Hard">Hard</option>
-                    </select>
-                  </div>
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Show</span>
-                    <select className="sort-select dsa-filter-select" value={showFilter}
-                      onChange={(e) => { setShowFilter(e.target.value as ShowFilter); setCurrentPage(1); }}>
-                      <option value="all">All</option>
-                      <option value="saved">Saved</option>
-                      <option value="unsolved">Unsolved</option>
-                    </select>
-                  </div>
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Sort</span>
-                    <select className="sort-select dsa-filter-select" value={sortMode}
-                      onChange={(e) => {
-                        const val = e.target.value as SortMode;
-                        if (val === "freq" && !isPremium) { onBuyPremium(); return; }
-                        setSortMode(val);
-                      }}>
-                      {isPremium && <option value="freq">Frequency</option>}
-                      <option value="num">Number</option>
-                      <option value="diff">Difficulty</option>
-                      <option value="title">Title</option>
-                      {!isPremium && <option value="freq" disabled>Frequency 🔒</option>}
-                    </select>
-                  </div>
-                  <div className="dsa-filter-row">
-                    <span className="dsa-filter-label">Per page</span>
-                    <select className="sort-select dsa-filter-select" value={pageSize}
-                      onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}>
-                      <option value={50}>50</option>
-                      <option value={75}>75</option>
-                      <option value={100}>100</option>
-                    </select>
-                  </div>
+
+            <Select value={difficultyFilter} onValueChange={(v) => setDifficultyFilter(v as "all" | Difficulty)}>
+              <SelectTrigger className="dsa-pill-trigger">
+                <span className="dsa-pill-label">Difficulty: <strong>{difficultyFilter === "all" ? "All" : difficultyFilter}</strong></span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="Easy">Easy</SelectItem>
+                <SelectItem value="Medium">Medium</SelectItem>
+                <SelectItem value="Hard">Hard</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+              <SelectTrigger className="dsa-pill-trigger">
+                <span className="dsa-pill-label">Status: <strong>{statusFilter === "all" ? "All" : statusFilter === "solved" ? "Solved" : "To-do"}</strong></span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="todo">To-do</SelectItem>
+                <SelectItem value="solved">Solved</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <DropdownMenu open={isPremium && tagsOpen} onOpenChange={(open) => isPremium && setTagsOpen(open)} modal={false}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className={`dsa-filter-btn${tagFilter !== "all" ? " has-active" : ""}${!isPremium ? " dsa-filter-btn--locked" : ""}`}
+                  disabled={!isPremium}
+                  title={!isPremium ? "Unlock Premium to filter by topic tags" : undefined}
+                >
+                  <SlidersVertical size={14} strokeWidth={1.8} />
+                  <span className="filter-btn-label">Tags</span>
+                  {!isPremium && <span className="dsa-filter-lock" aria-hidden="true">🔒</span>}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="dsa-tags-panel">
+                <button
+                  type="button"
+                  className={`dsa-tags-item${tagFilter === "all" ? " active" : ""}`}
+                  onClick={() => { setTagFilter("all"); setTagsOpen(false); }}
+                >
+                  All
+                </button>
+                {availableTags.map((t) => (
+                  <button
+                    key={t.slug}
+                    type="button"
+                    className={`dsa-tags-item${tagFilter === t.slug ? " active" : ""}`}
+                    onClick={() => { setTagFilter(t.slug); setTagsOpen(false); }}
+                  >
+                    {t.name}
+                  </button>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu open={sortOpen} onOpenChange={setSortOpen} modal={false}>
+              <DropdownMenuTrigger asChild>
+                <button type="button" className="dsa-filter-btn">
+                  <ArrowUpDown size={14} strokeWidth={1.8} />
+                  <span className="filter-btn-label">Sort: {sortLabel}</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="dsa-filter-panel">
+                <div className="dsa-filter-panel-head">
+                  <span className="dsa-filter-panel-title">Sort</span>
+                  <button type="button" className="dsa-filter-panel-close" onClick={() => setSortOpen(false)} aria-label="Close">
+                    <X size={14} />
+                  </button>
                 </div>
-              )}
-            </div>
+
+                <div className="dsa-filter-field">
+                  <div className="dsa-filter-field-head">
+                    <span className="dsa-filter-label">Sort by</span>
+                    {sortMode !== defaultSort && (
+                      <button type="button" className="dsa-filter-reset" onClick={() => setSortMode(defaultSort)}>Reset</button>
+                    )}
+                  </div>
+                  <Select
+                    value={sortMode}
+                    onValueChange={(v) => setSortMode(v as SortMode)}
+                  >
+                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="num">Question ID</SelectItem>
+                      <SelectItem value="diff">Difficulty</SelectItem>
+                      {isPremium ? (
+                        <SelectItem value="freq">Frequency</SelectItem>
+                      ) : (
+                        <SelectItem value="freq" disabled>Frequency 🔒</SelectItem>
+                      )}
+                      {isPremium ? (
+                        <SelectItem value="timeframe">Timeframe (recent first)</SelectItem>
+                      ) : (
+                        <SelectItem value="timeframe" disabled>Timeframe (recent first) 🔒</SelectItem>
+                      )}
+                      {isAllView && (
+                        isPremium ? (
+                          <SelectItem value="companies">Companies asked</SelectItem>
+                        ) : (
+                          <SelectItem value="companies" disabled>Companies asked 🔒</SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="dsa-filter-field">
+                  <div className="dsa-filter-field-head">
+                    <span className="dsa-filter-label">Per page</span>
+                    {pageSize !== 50 && (
+                      <button type="button" className="dsa-filter-reset" onClick={() => setPageSize(50)}>Reset</button>
+                    )}
+                  </div>
+                  <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setCurrentPage(1); }}>
+                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="75">75</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {isAllView && (
+                  <div className="dsa-filter-field">
+                    <div className="dsa-filter-field-head">
+                      <span className="dsa-filter-label">
+                        Min. companies asked
+                        {!isPremium && <span className="dsa-filter-lock" aria-hidden="true"> 🔒</span>}
+                      </span>
+                      {isPremium && minCompanies !== 0 && (
+                        <button type="button" className="dsa-filter-reset" onClick={() => setMinCompanies(0)}>Reset</button>
+                      )}
+                    </div>
+                    <Select value={String(minCompanies)} onValueChange={(v) => setMinCompanies(Number(v))} disabled={!isPremium}>
+                      <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {MIN_COMPANIES_OPTIONS.map((n) => (
+                          <SelectItem key={n} value={String(n)}>{n === 0 ? "Any" : `${n}+`}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="dsa-filter-panel-foot">
+                  <button type="button" className="dsa-filter-clear-all" onClick={clearSort}>Clear all</button>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
-        </div>
-
-        {/* Question Table */}
+        {/* Question Table card */}
         <div className="table-wrap">
-          <table className="q-table">
+          <div className="q-table-card">
+          <table className="q-table q-table--dsa">
+            <colgroup>
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "27%" }} />
+              <col style={{ width: "11%" }} />
+              <col style={{ width: "14%" }} />
+              <col style={{ width: "32%" }} />
+              <col style={{ width: "6%" }} />
+            </colgroup>
             <thead>
               <tr>
                 <th style={{ width: 36 }} />
                 <th>#</th>
-                <th>Title</th>
+                <th>Problem Title</th>
                 <th>Difficulty</th>
-                <th>Frequency</th>
-                <th>Tags</th>
-                <th style={{ textAlign: "right" }}>★</th>
+                <th>Interview Freq</th>
+                <th>Topic Tags</th>
+                <th style={{ textAlign: "right" }}>Save</th>
               </tr>
             </thead>
             <tbody>
               {paginatedQuestions.map((q) => {
                 const isSolved = solvedIds.includes(q.id);
                 const isBookmarked = bookmarkedIds.includes(q.id);
-                const dots = freqToDots(q.frequency);
+                const freq = effectiveFreq(q.frequency);
+                const dots = freqToDots(freq);
 
                 return (
                   <tr
@@ -545,7 +743,7 @@ export function DsaPanel({
                     <td>
                       {isPremium ? (
                         <div className="freq-bar">
-                          <div className="freq-dots">
+                          <div className="freq-dots" title={`${freq}%`}>
                             {[1, 2, 3, 4, 5].map((i) => (
                               <div
                                 key={i}
@@ -553,7 +751,6 @@ export function DsaPanel({
                               />
                             ))}
                           </div>
-                          <span className="freq-num">{q.frequency}%</span>
                         </div>
                       ) : (
                         <button
@@ -569,9 +766,9 @@ export function DsaPanel({
                     <td>
                       {isPremium ? (
                         <div className="tag-list">
-                          {q.tags.map((tag) => (
-                            <span key={tag} className="tag">
-                              {tag}
+                          {q.topicTags.map((tag) => (
+                            <span key={tag.slug} className="tag">
+                              {tag.name}
                             </span>
                           ))}
                         </div>
@@ -618,39 +815,56 @@ export function DsaPanel({
               )}
             </tbody>
           </table>
-        </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="pagination">
-            <button
-              type="button"
-              className="page-btn"
-              disabled={safePage <= 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            >
-              ← Prev
-            </button>
-            <div className="page-info">
-              Page {safePage} of {totalPages}
-              <span className="page-count">
-                · {visibleQuestions.length} questions
-              </span>
+          {/* Pagination — inside the same card as the table */}
+          {visibleQuestions.length > 0 && (
+            <div className="q-pagination">
+              <div className="q-page-info">
+                Showing <strong>{rangeStart}-{rangeEnd}</strong> of <strong>{visibleQuestions.length}</strong> items
+              </div>
+              {totalPages > 1 && (
+                <div className="q-page-nums">
+                  <button
+                    type="button"
+                    className="q-page-btn"
+                    disabled={safePage <= 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  >
+                    Prev
+                  </button>
+                  {pageNumbers.map((p, i) =>
+                    p === "…" ? (
+                      <span key={`ellipsis-${i}`} className="q-page-ellipsis">…</span>
+                    ) : (
+                      <button
+                        key={p}
+                        type="button"
+                        className={`q-page-num${p === safePage ? " active" : ""}`}
+                        onClick={() => setCurrentPage(p)}
+                      >
+                        {p}
+                      </button>
+                    ),
+                  )}
+                  <button
+                    type="button"
+                    className="q-page-btn"
+                    disabled={safePage >= totalPages}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
-            <button
-              type="button"
-              className="page-btn"
-              disabled={safePage >= totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            >
-              Next →
-            </button>
+          )}
           </div>
-        )}
+        </div>
       </div>
       {/* end .dsa-main */}
 
-      {/* RIGHT: Company Browser Sidebar */}
+      {/* RIGHT: Company Browser Sidebar — hidden on the locked single-company kit page */}
+      {!lockedCompanyId && (
       <aside
         className={`dsa-sidebar${sidebarCollapsed ? " dsa-sidebar--collapsed" : ""}`}
       >
@@ -728,7 +942,7 @@ export function DsaPanel({
                           </svg>
                         </span>
                       ) : (
-                        <img src={company.logo} alt={company.name} />
+                        <CompanyLogo name={company.name} src={company.logo} alt={company.name} />
                       )}
                     </button>
                   );
@@ -772,7 +986,7 @@ export function DsaPanel({
               </div>
               <input
                 className="co-search co-search--sidebar"
-                placeholder="Search..."
+                placeholder="Search companies..."
                 value={companySearch}
                 onChange={(e) => {
                   const v = e.target.value;
@@ -881,7 +1095,7 @@ export function DsaPanel({
                           tabIndex={!isPremium ? -1 : undefined}
                         >
                           <div className="co-logo">
-                            <img src={company.logo} alt={company.name} />
+                            <CompanyLogo name={company.name} src={company.logo} alt={company.name} />
                           </div>
                           <div className="co-info">
                             <div className="co-name">{company.name}</div>
@@ -909,6 +1123,7 @@ export function DsaPanel({
           </>
         )}
       </aside>
+      )}
     </div>
   );
 }

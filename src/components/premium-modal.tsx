@@ -163,7 +163,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
             <li className="pm-feat-item">
               <div className="pm-feat-check">{CHECK_ICON}</div>
               <div className="pm-feat-info">
-                <span className="pm-feat-name">840+ DSA Questions</span>
+                <span className="pm-feat-name">730+ DSA Questions</span>
                 <span className="pm-feat-desc">Company sheets with frequency &amp; topic tags</span>
               </div>
             </li>

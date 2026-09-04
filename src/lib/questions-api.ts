@@ -1,6 +1,12 @@
 import { AUTH_API_BASE_URL } from "./auth-api";
-import type { DsaQuestion, SystemDesignQuestion, FrontendQuestion, RoadmapWeek } from "@/types/maangco";
+import type { DsaAllQuestion, DsaQuestion, SystemDesignQuestion, FrontendQuestion, RoadmapWeek } from "@/types/maangco";
 import { COMPANY_LOGOS } from "./company-logos";
+
+// LeetCode URLs are derived from titleSlug rather than stored, so there's a
+// single source of truth — see DsaQuestion.titleSlug.
+function leetcodeUrl(titleSlug: string) {
+  return `https://leetcode.com/problems/${titleSlug}/`;
+}
 
 const BASE = AUTH_API_BASE_URL;
 
@@ -35,8 +41,20 @@ export async function fetchDsaGrouped(): Promise<DsaCompanyWithQuestions[]> {
   const res = await fetch(`${BASE}/api/questions/dsa/grouped`);
   if (!res.ok) throw new Error("Failed to load DSA data");
   const data = await res.json() as { success: boolean; companies: DsaCompanyWithQuestions[] };
-  // Attach static logo assets (images can't be served from the backend)
-  return data.companies.map((c) => ({ ...c, logo: COMPANY_LOGOS[c.name] ?? "" }));
+  // Attach static logo assets (images can't be served from the backend) and
+  // derive each question's LeetCode URL from its titleSlug.
+  return data.companies.map((c) => ({
+    ...c,
+    logo: COMPANY_LOGOS[c.name] ?? "",
+    questions: c.questions.map((q) => ({ ...q, url: leetcodeUrl(q.titleSlug) })),
+  }));
+}
+
+export async function fetchDsaAll(): Promise<DsaAllQuestion[]> {
+  const res = await fetch(`${BASE}/api/questions/dsa/all`);
+  if (!res.ok) throw new Error("Failed to load DSA catalog");
+  const data = await res.json() as { success: boolean; questions: DsaAllQuestion[] };
+  return data.questions.map((q) => ({ ...q, url: leetcodeUrl(q.titleSlug) }));
 }
 
 export async function fetchDsaQuestions(params: {

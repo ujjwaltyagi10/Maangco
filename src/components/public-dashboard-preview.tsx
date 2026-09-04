@@ -1,21 +1,34 @@
+import { Boxes, Database } from "lucide-react";
+
+import { COMPANY_LOGOS } from "@/lib/company-logos";
+import { CompanyLogo } from "./ui/company-logo";
+
 const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url).href;
 const DSADarkVid = new URL("../assets/Video/DSADark.webm", import.meta.url).href;
 const SDLightVid = new URL("../assets/Video/SDLight.webm", import.meta.url).href;
 const SDDarkVid = new URL("../assets/Video/SDDark.webm", import.meta.url).href;
 
+const LOCKED_KIT_COMPANIES = [
+  { name: "Google", accent: "#4285F4" },
+  { name: "Amazon", accent: "#FF9900" },
+  { name: "Meta", accent: "#0866FF" },
+  { name: "Microsoft", accent: "#00A4EF" },
+  { name: "Uber", accent: "#06C167" },
+];
+
 const features = [
   {
-    icon: "⚡",
+    icon: Boxes,
     name: "DSA Practice",
     desc: "Company-wise sheets with frequency, topic tags, bookmarks, and solve tracking.",
-    statA: "840+",
+    statA: "730+",
     labelA: "Questions",
     statB: "25+",
     labelB: "Companies",
     accent: "var(--green)",
   },
   {
-    icon: "🏗️",
+    icon: Database,
     name: "System Design",
     desc: "A 150-question roadmap with HLD + LLD depth, categories, and study tracking.",
     statA: "150",
@@ -55,51 +68,45 @@ export function PublicDashboardPreview({
     <div className="dashboard dashboard--public">
       {/* Hero */}
       {isPremiumMode ? (
-        <section className="pd-premium-hero">
-
-          {/* Left — headline + features */}
-          <div className="pd-premium-left">
-            <h2 className="pd-premium-title">
-              Everything you need to<br />
-              <span className="pd-premium-title-accent">crack any MAANG interview.</span>
-            </h2>
-            <div className="pd-premium-features">
-              <div className="pd-premium-feat">
-                <span className="pd-premium-feat-num">840+</span>
-                <span className="pd-premium-feat-label">DSA Questions</span>
-              </div>
-              <div className="pd-premium-feat-divider" />
-              <div className="pd-premium-feat">
-                <span className="pd-premium-feat-num">150</span>
-                <span className="pd-premium-feat-label">System Design</span>
-              </div>
-              <div className="pd-premium-feat-divider" />
-              <div className="pd-premium-feat">
-                <span className="pd-premium-feat-num">275</span>
-                <span className="pd-premium-feat-label">Frontend Qs</span>
-              </div>
-              <div className="pd-premium-feat-divider" />
-              <div className="pd-premium-feat">
-                <span className="pd-premium-feat-num">25+</span>
-                <span className="pd-premium-feat-label">Companies</span>
-              </div>
+        <div className="dp-kits">
+          <div className="dp-kits-head">
+            <div className="dp-kits-head-text">
+              <div className="dp-kits-eyebrow">Start here</div>
+              <h1 className="dp-kits-title">Popular company sheets</h1>
             </div>
-          </div>
-
-          {/* Divider */}
-          <div className="pd-premium-divider" />
-
-          {/* Right — pricing + CTA */}
-          <div className="pd-premium-right">
-            <button type="button" className="pd-premium-cta" onClick={onBuyPremium}>
-              Upgrade to Premium
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="13" height="13">
-                <path d="M3 8h10M9 4l4 4-4 4"/>
+            <button type="button" className="dp-kits-viewall" onClick={onBuyPremium}>
+              <span>View all companies</span>
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11">
+                <path d="M2 6h8M6 2l4 4-4 4" />
               </svg>
             </button>
-            <p className="pd-premium-note">Cancel anytime · Instant access</p>
           </div>
-        </section>
+          <div className="dp-kits-row pd-premium-kits-row">
+          {LOCKED_KIT_COMPANIES.map((c) => (
+            <div
+              key={c.name}
+              className="dp-kit-card dp-kit-card--locked"
+              style={{ "--kit-accent": c.accent } as React.CSSProperties}
+              onClick={onBuyPremium}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === "Enter" && onBuyPremium?.()}
+            >
+              <div className="dp-kit-lock" aria-hidden="true">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                  <rect x="3" y="9" width="14" height="10" rx="2" />
+                  <path d="M7 9V6a3 3 0 0 1 6 0v3" />
+                </svg>
+              </div>
+              <div className="dp-kit-logo">
+                <CompanyLogo name={c.name} src={COMPANY_LOGOS[c.name]} alt={c.name} />
+              </div>
+              <div className="dp-kit-name">{c.name}</div>
+              <div className="dp-kit-cta">Unlock</div>
+            </div>
+          ))}
+          </div>
+        </div>
       ) : (
         <section className="pd-hero-card">
           <div className="pd-hero-inner">
@@ -130,13 +137,12 @@ export function PublicDashboardPreview({
               className="pd-video-icon"
               style={{ background: "var(--green-bg)", color: "var(--green)" }}
             >
-              ⚡
+              <Boxes size={16} strokeWidth={1.8} />
             </div>
             <div>
               <div className="pd-video-name">DSA Practice</div>
               <div className="pd-video-hint">Company-wise sheets, frequency &amp; tags</div>
             </div>
-            <div className="pd-live-badge">Live</div>
           </div>
           <div className="pd-video-frame">
             <video autoPlay loop muted playsInline preload="metadata" key={dsaVid}>
@@ -151,13 +157,12 @@ export function PublicDashboardPreview({
               className="pd-video-icon"
               style={{ background: "var(--amber-bg)", color: "var(--amber)" }}
             >
-              🏗️
+              <Database size={16} strokeWidth={1.8} />
             </div>
             <div>
               <div className="pd-video-name">System Design</div>
               <div className="pd-video-hint">150-question roadmap with depth &amp; tracking</div>
             </div>
-            <div className="pd-live-badge">Live</div>
           </div>
           <div className="pd-video-frame">
             <video autoPlay loop muted playsInline preload="metadata" key={sdVid}>
@@ -176,7 +181,7 @@ export function PublicDashboardPreview({
                 className="pd-feature-icon"
                 style={{ background: `${f.accent}18`, color: f.accent }}
               >
-                {f.icon}
+                <f.icon size={19} strokeWidth={1.8} />
               </div>
               <div>
                 <div className="pd-feature-name">{f.name}</div>

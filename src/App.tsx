@@ -5,10 +5,10 @@ import { PremiumModal } from "./components/premium-modal";
 import { AppRouter } from "./routes/app-router";
 import { changePassword, getAuthErrorMessage, getCurrentUser, getPasswordPolicyMessage, isStrongPassword, logoutUser, refreshAccessToken, verifyOtp, AuthExpiredError, type AuthSession, type AuthUser } from "./lib/auth-api";
 import { fetchProgress, toggleProgress, emptyProgress, type ProgressState } from "./lib/progress-api";
-import { fetchDsaGrouped, fetchSystemDesignQuestions, fetchFrontendQuestions, fetchRoadmap } from "./lib/questions-api";
+import { fetchDsaGrouped, fetchDsaAll, fetchSystemDesignQuestions, fetchFrontendQuestions, fetchRoadmap } from "./lib/questions-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
 import { useGoogleOneTap } from "./hooks/useGoogleOneTap";
-import type { DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "./types/maangco";
+import type { DsaAllQuestion, DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "./types/maangco";
 import { ROUTES, type AuthSubmitResult } from "./routes/route-paths";
 import "./App.css";
 
@@ -124,6 +124,7 @@ function App() {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [premiumModalDefaultPlan, setPremiumModalDefaultPlan] = useState<"monthly" | "yearly">("monthly");
   const [dsaCompanies, setDsaCompanies] = useState<DsaCompany[]>([]);
+  const [dsaAllQuestions, setDsaAllQuestions] = useState<DsaAllQuestion[]>([]);
   const [systemDesignQuestions, setSystemDesignQuestions] = useState<SystemDesignQuestion[]>([]);
   const [frontendQuestions, setFrontendQuestions] = useState<FrontendQuestion[]>([]);
   const [roadmapWeeks, setRoadmapWeeks] = useState<RoadmapWeek[]>([]);
@@ -169,6 +170,7 @@ function App() {
     // Load question data from API — track loading state for skeleton UIs
     void Promise.allSettled([
       fetchDsaGrouped().then((companies) => setDsaCompanies(companies as DsaCompany[])),
+      fetchDsaAll().then(setDsaAllQuestions),
       fetchSystemDesignQuestions({}).then(({ data }) => setSystemDesignQuestions(data)),
       Promise.all([fetchFrontendQuestions({}), fetchRoadmap()]).then(([feRes, weeks]) => {
         setFrontendQuestions(feRes.data);
@@ -450,6 +452,7 @@ function App() {
         solvedIds={solvedDsaIds}
         bookmarkedIds={bookmarkedDsaIds}
         companies={dsaCompanies}
+        allQuestions={dsaAllQuestions}
         systemDesignQuestions={systemDesignQuestions}
         completedSystemDesignIds={completedSystemDesignIds}
         onCompletedSystemDesignIdsChange={handleCompletedSdChange}

@@ -1,4 +1,11 @@
+import { useState } from "react";
+import { Boxes, Database } from "lucide-react";
+import type { DsaCompany } from "@/types/maangco";
+import { CompanyKitsModal } from "./company-kits-modal";
+import { CompanyLogo } from "./ui/company-logo";
 import { Skeleton } from "./ui/shimmer";
+
+const FEATURED_COMPANY_NAMES = ["Google", "Amazon", "Meta", "Microsoft", "Uber"];
 
 interface DashboardPanelProps {
   isPremium: boolean;
@@ -16,7 +23,9 @@ interface DashboardPanelProps {
   totalRoadmapDays: number;
   completedSystemDesignCount: number;
   totalSystemDesignCount: number;
+  companies: DsaCompany[];
   onOpenDsa: () => void;
+  onOpenDsaCompany: (companyId: string) => void;
   onOpenFrontend: () => void;
   onOpenSystemDesign: () => void;
 }
@@ -30,58 +39,44 @@ const tips = [
   // { icon: "📐", title: "System design matters", copy: "Autocomplete and infinite scroll are the most common frontend SD questions." },
 ];
 
-function ProgressRing({ pct, color, size = 72 }: { pct: number; color: string; size?: number }) {
-  const r = (size - 10) / 2;
-  const circ = 2 * Math.PI * r;
-  const offset = circ - (pct / 100) * circ;
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: "rotate(-90deg)" }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--border)" strokeWidth={6} />
-      <circle
-        cx={size / 2} cy={size / 2} r={r}
-        fill="none" stroke={color} strokeWidth={6}
-        strokeLinecap="round"
-        strokeDasharray={circ}
-        strokeDashoffset={offset}
-        style={{ transition: "stroke-dashoffset 0.6s ease" }}
-      />
-    </svg>
-  );
-}
-
 export function DashboardPanel({
   isPremium,
   onBuyPremium,
   dsaProgress,
   frontendProgress: _frontendProgress,
   systemDesignProgress,
-  overallProgress,
   solvedDsaCount,
-  completedFrontendCount,
-  completedRoadmapDays,
   totalRoadmapDays: _totalRoadmapDays,
   completedSystemDesignCount,
   totalSystemDesignCount,
+  companies,
   onOpenDsa,
+  onOpenDsaCompany,
   onOpenFrontend: _onOpenFrontend,
   onOpenSystemDesign,
   isLoading,
 }: DashboardPanelProps) {
+  const [kitsModalOpen, setKitsModalOpen] = useState(false);
+
   if (isLoading) {
     return (
       <div className="dp-root">
-        <div className="dp-hero">
-          <div className="dp-hero-left" style={{ flex: 1 }}>
-            <Skeleton w={80} h={12} style={{ marginBottom: 12 }} />
-            <Skeleton w="70%" h={28} style={{ marginBottom: 10 }} />
-            <Skeleton w="50%" h={14} />
-          </div>
-          <div className="dp-hero-stats">
-            <Skeleton w={80} h={80} radius={999} />
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginLeft: 16 }}>
-              <Skeleton w={90} h={36} />
-              <Skeleton w={90} h={36} />
+        <div className="dp-kits">
+          <div className="dp-kits-head">
+            <div className="dp-kits-head-text">
+              <Skeleton w={70} h={11} style={{ marginBottom: 10 }} />
+              <Skeleton w={220} h={24} />
             </div>
+            <Skeleton w={130} h={13} />
+          </div>
+          <div className="dp-kits-row">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div key={i} className="dp-kit-card" style={{ pointerEvents: "none" }}>
+                <Skeleton w={44} h={44} radius={10} />
+                <Skeleton w="70%" h={16} />
+                <Skeleton w={60} h={12} />
+              </div>
+            ))}
           </div>
         </div>
         <div className="dp-modules">
@@ -119,12 +114,14 @@ export function DashboardPanel({
       </div>
     );
   }
-  const totalSolved = solvedDsaCount + completedFrontendCount + completedSystemDesignCount;
+  const featuredCompanies = FEATURED_COMPANY_NAMES
+    .map((name) => companies.find((c) => c.name === name))
+    .filter((c): c is DsaCompany => Boolean(c));
 
   const modules = [
     {
       key: "dsa",
-      icon: "⚡",
+      icon: Boxes,
       label: "DSA Practice",
       tag: "Company-wise",
       desc: "LeetCode questions sorted by company, frequency & topic tags.",
@@ -133,7 +130,7 @@ export function DashboardPanel({
       colorBg: "var(--green-bg)",
       stats: [
         { val: solvedDsaCount, lbl: "Solved" },
-        { val: "840+", lbl: "Questions" },
+        { val: "730+", lbl: "Questions" },
         { val: "25+", lbl: "Companies" },
       ],
       onClick: onOpenDsa,
@@ -141,7 +138,7 @@ export function DashboardPanel({
     },
     {
       key: "sd",
-      icon: "🏗️",
+      icon: Database,
       label: "System Design",
       tag: "HLD + LLD",
       desc: "150-question roadmap with deep dives into distributed systems.",
@@ -165,38 +162,46 @@ export function DashboardPanel({
   ];
 
   return (
-    <div className="dp-root">
+    <>
+      <div className="dp-root">
 
-      {/* ── HERO ── */}
-      <div className="dp-hero">
-        <div className="dp-hero-left">
-          <div className="dp-hero-eyebrow">Your prep hub</div>
-          <h1 className="dp-hero-title">
-            Welcome back —{" "}
-            <span className="dp-hero-accent">let&apos;s keep the streak alive.</span>
-          </h1>
-          <p className="dp-hero-sub">
-            Track DSA and System Design progress all in one place.
-          </p>
+      {/* ── POPULAR COMPANY KITS ── */}
+      <div className="dp-kits">
+        <div className="dp-kits-head">
+          <div className="dp-kits-head-text">
+            <div className="dp-kits-eyebrow">Start here</div>
+            <h1 className="dp-kits-title">Popular company sheets</h1>
+          </div>
+          <button type="button" className="dp-kits-viewall" onClick={() => setKitsModalOpen(true)}>
+            <span>View all companies</span>
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11">
+              <path d="M2 6h8M6 2l4 4-4 4" />
+            </svg>
+          </button>
         </div>
-        <div className="dp-hero-stats">
-          <div className="dp-hero-ring">
-            <ProgressRing pct={overallProgress} color="var(--green)" size={80} />
-            <div className="dp-ring-inner">
-              <div className="dp-ring-pct">{overallProgress}%</div>
-              <div className="dp-ring-lbl">overall</div>
+        <div className="dp-kits-row">
+          {featuredCompanies.map((c) => (
+            <div
+              key={c.id}
+              className="dp-kit-card"
+              style={{ "--kit-accent": c.accent } as React.CSSProperties}
+              onClick={() => onOpenDsaCompany(c.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === "Enter" && onOpenDsaCompany(c.id)}
+            >
+              <div className="dp-kit-logo">
+                <CompanyLogo name={c.name} src={c.logo} alt={c.name} />
+              </div>
+              <div className="dp-kit-name">{c.name}</div>
+              <div className="dp-kit-cta">
+                Open 
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="10" height="10">
+                  <path d="M2 6h8M6 2l4 4-4 4" />
+                </svg>
+              </div>
             </div>
-          </div>
-          <div className="dp-hero-counters">
-            <div className="dp-counter">
-              <div className="dp-counter-val">{totalSolved}</div>
-              <div className="dp-counter-lbl">problems solved</div>
-            </div>
-            <div className="dp-counter">
-              <div className="dp-counter-val">{completedRoadmapDays}</div>
-              <div className="dp-counter-lbl">roadmap days done</div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -213,7 +218,7 @@ export function DashboardPanel({
             onKeyDown={(e) => e.key === "Enter" && m.onClick()}
           >
             <div className="dp-module-top">
-              <div className="dp-module-icon">{m.icon}</div>
+              <div className="dp-module-icon" style={{ color: m.color }}><m.icon size={20} strokeWidth={1.8} /></div>
               <span className="dp-module-tag">{m.tag}</span>
               {m.locked && (
                 <span className="dp-module-lock-pill">
@@ -287,6 +292,14 @@ export function DashboardPanel({
         ))}
       </div>
 
-    </div>
+      </div>
+
+      <CompanyKitsModal
+        open={kitsModalOpen}
+        onClose={() => setKitsModalOpen(false)}
+        companies={companies}
+        onSelectCompany={onOpenDsaCompany}
+      />
+    </>
   );
 }
