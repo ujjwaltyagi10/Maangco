@@ -128,6 +128,8 @@ export function PrivateRoutes({
         theme={theme}
         onThemeChange={onThemeChange}
         isAuthenticated={isAuthenticated}
+        isPremium={isPremium}
+        onBuyPremium={() => onBuyPremium()}
         isSidebarCollapsed={isSidebarCollapsed}
         onToggleSidebar={onToggleSidebar}
 

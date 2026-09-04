@@ -552,14 +552,17 @@ export function DsaPanel({
               </SelectContent>
             </Select>
 
-            <DropdownMenu open={tagsOpen} onOpenChange={setTagsOpen} modal={false}>
+            <DropdownMenu open={isPremium && tagsOpen} onOpenChange={(open) => isPremium && setTagsOpen(open)} modal={false}>
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className={`dsa-filter-btn${tagFilter !== "all" ? " has-active" : ""}`}
+                  className={`dsa-filter-btn${tagFilter !== "all" ? " has-active" : ""}${!isPremium ? " dsa-filter-btn--locked" : ""}`}
+                  disabled={!isPremium}
+                  title={!isPremium ? "Unlock Premium to filter by topic tags" : undefined}
                 >
                   <SlidersVertical size={14} strokeWidth={1.8} />
                   <span className="filter-btn-label">Tags</span>
+                  {!isPremium && <span className="dsa-filter-lock" aria-hidden="true">🔒</span>}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="dsa-tags-panel">
@@ -611,12 +614,25 @@ export function DsaPanel({
                   >
                     <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {isPremium && <SelectItem value="freq">Frequency</SelectItem>}
                       <SelectItem value="num">Question ID</SelectItem>
                       <SelectItem value="diff">Difficulty</SelectItem>
-                      <SelectItem value="timeframe">Timeframe (recent first)</SelectItem>
-                      {isAllView && <SelectItem value="companies">Companies asked</SelectItem>}
-                      {!isPremium && <SelectItem value="freq" disabled>Frequency 🔒</SelectItem>}
+                      {isPremium ? (
+                        <SelectItem value="freq">Frequency</SelectItem>
+                      ) : (
+                        <SelectItem value="freq" disabled>Frequency 🔒</SelectItem>
+                      )}
+                      {isPremium ? (
+                        <SelectItem value="timeframe">Timeframe (recent first)</SelectItem>
+                      ) : (
+                        <SelectItem value="timeframe" disabled>Timeframe (recent first) 🔒</SelectItem>
+                      )}
+                      {isAllView && (
+                        isPremium ? (
+                          <SelectItem value="companies">Companies asked</SelectItem>
+                        ) : (
+                          <SelectItem value="companies" disabled>Companies asked 🔒</SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -641,12 +657,15 @@ export function DsaPanel({
                 {isAllView && (
                   <div className="dsa-filter-field">
                     <div className="dsa-filter-field-head">
-                      <span className="dsa-filter-label">Companies asked</span>
-                      {minCompanies !== 0 && (
+                      <span className="dsa-filter-label">
+                        Min. companies asked
+                        {!isPremium && <span className="dsa-filter-lock" aria-hidden="true"> 🔒</span>}
+                      </span>
+                      {isPremium && minCompanies !== 0 && (
                         <button type="button" className="dsa-filter-reset" onClick={() => setMinCompanies(0)}>Reset</button>
                       )}
                     </div>
-                    <Select value={String(minCompanies)} onValueChange={(v) => setMinCompanies(Number(v))}>
+                    <Select value={String(minCompanies)} onValueChange={(v) => setMinCompanies(Number(v))} disabled={!isPremium}>
                       <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {MIN_COMPANIES_OPTIONS.map((n) => (
