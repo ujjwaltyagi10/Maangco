@@ -8,7 +8,7 @@ const features = [
     icon: "⚡",
     name: "DSA Practice",
     desc: "Company-wise sheets with frequency, topic tags, bookmarks, and solve tracking.",
-    statA: "840+",
+    statA: "730+",
     labelA: "Questions",
     statB: "25+",
     labelB: "Companies",
@@ -65,7 +65,7 @@ export function PublicDashboardPreview({
             </h2>
             <div className="pd-premium-features">
               <div className="pd-premium-feat">
-                <span className="pd-premium-feat-num">840+</span>
+                <span className="pd-premium-feat-num">730+</span>
                 <span className="pd-premium-feat-label">DSA Questions</span>
               </div>
               <div className="pd-premium-feat-divider" />

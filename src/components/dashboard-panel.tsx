@@ -129,7 +129,7 @@ export function DashboardPanel({
       colorBg: "var(--green-bg)",
       stats: [
         { val: solvedDsaCount, lbl: "Solved" },
-        { val: "840+", lbl: "Questions" },
+        { val: "730+", lbl: "Questions" },
         { val: "25+", lbl: "Companies" },
       ],
       onClick: onOpenDsa,

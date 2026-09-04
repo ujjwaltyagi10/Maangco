@@ -48,7 +48,7 @@ interface LandingPageProps {
 }
 
 const PLAN_FEATURES = [
-  "840+ company-wise DSA questions",
+  "730+ company-wise DSA questions",
   "150 company-wise System Design questions",
   "Unified progress dashboard",
   "Questions refreshed every single day",
@@ -99,7 +99,7 @@ const testimonials = [
 const faqs = [
   {
     q: "What's included in a MAANGco subscription?",
-    a: "Everything FAANG interviews actually test: 840+ company-wise DSA problems, 150 company-wise System Design questions with HLD + LLD breakdowns, a unified dashboard, and daily question updates. Not a single extra topic you won't need.",
+    a: "Everything FAANG interviews actually test: 730+ company-wise DSA problems, 150 company-wise System Design questions with HLD + LLD breakdowns, a unified dashboard, and daily question updates. Not a single extra topic you won't need.",
   },
   {
     q: "How often are questions updated?",
@@ -801,7 +801,7 @@ export function LandingPage({
           </p>
           <div className="lstat-chips sr-child" style={{ "--sr-delay": "0.44s" } as React.CSSProperties}>
             <div className="lstat-chip">
-              <div className="lstat-chip-val">840+</div>
+              <div className="lstat-chip-val">730+</div>
               <div className="lstat-chip-lbl">DSA problems</div>
             </div>
             <div className="lstat-chip-divider" />
@@ -877,7 +877,7 @@ export function LandingPage({
                 <div className="lfsp-panel-text">
                   <div className="lfsp-panel-title sr-child" style={{ "--sr-delay": "0s" } as React.CSSProperties}>DSA Practice</div>
                   <p className="lfsp-panel-sub sr-child" style={{ "--sr-delay": "0.15s" } as React.CSSProperties}>
-                    840+ company-tagged problems across 23 companies, sorted by
+                    730+ company-tagged problems across 23 companies, sorted by
                     real interview frequency.
                   </p>
                   <div className="sr-child" style={{ "--sr-delay": "0.3s" } as React.CSSProperties}>

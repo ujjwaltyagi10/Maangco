@@ -36,9 +36,11 @@
   --sidebar-active-bg: #e4dccd;
   --sidebar-active-text: #15130f;
   --sidebar-hover-bg: #f4f3f0;
-  --row-card-bg: var(--surface);
-  --panel-bg: #ffffff;
+  --row-card-bg: #ffffff;
+  --panel-bg: var(--bg);
   --header-card-bg: #ffffff;
+  --table-header-bg: #f9f8f4;
+  --row-hover-bg: #f7f5f0;
 
   --green: #c87c4a;
   --green-bg: #f9efe8;
@@ -86,6 +88,8 @@
   --row-card-bg: #000000;
   --panel-bg: oklch(14.1% 0.005 285.823);
   --header-card-bg: #000000;
+  --table-header-bg: oklch(14.1% 0.005 285.823);
+  --row-hover-bg: #1a1a1a;
 
   /* Theme accent */
   --green: #c87c4a;
@@ -2495,7 +2499,7 @@ body {
 .q-table th {
   text-align: left;
   font-size: 10px;
-  color: var(--muted);
+  color: var(--text2);
   font-family: "DM Mono", monospace;
   padding: 0.7rem 0.85rem;
   text-transform: uppercase;
@@ -2503,7 +2507,7 @@ body {
   font-weight: 400;
   position: sticky;
   top: 0;
-  background: var(--panel-bg, #fff);
+  background: var(--table-header-bg, #fff);
   border-bottom: 1px solid var(--border);
 }
 
@@ -2513,7 +2517,7 @@ body {
 }
 
 .q-row:hover td {
-  background: var(--surface3);
+  background: var(--row-hover-bg, var(--surface3));
 }
 
 .q-row + .q-row td {

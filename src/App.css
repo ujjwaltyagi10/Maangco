@@ -5449,7 +5449,7 @@ a.lbtn-lg {
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: var(--surface3);
+  background: var(--row-card-bg, var(--surface3));
   cursor: pointer;
   font-family: inherit;
   text-align: left;
