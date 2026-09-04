@@ -38,6 +38,7 @@
   --sidebar-hover-bg: #f4f3f0;
   --row-card-bg: var(--surface);
   --panel-bg: #ffffff;
+  --header-card-bg: #ffffff;
 
   --green: #c87c4a;
   --green-bg: #f9efe8;
@@ -82,8 +83,9 @@
   --sidebar-active-bg: #141414;
   --sidebar-active-text: #e5e7eb;
   --sidebar-hover-bg: #0f0f0f;
-  --row-card-bg: #1a1a1a;
-  --panel-bg: #000000;
+  --row-card-bg: #000000;
+  --panel-bg: oklch(14.1% 0.005 285.823);
+  --header-card-bg: #000000;
 
   /* Theme accent */
   --green: #c87c4a;
@@ -1310,9 +1312,11 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 14px;
   overflow-y: auto;
   min-width: 0;
   min-height: 0;
+  padding: 16px 0;
 }
 
 /* ── DSA SIDEBAR (Company Browser) ── */
@@ -1883,7 +1887,10 @@ body {
   box-shadow: 0 1px 0 var(--border);
 }
 
-/* Cell 1: identity card — col 1, row 1 */
+/* Shared identity/progress card classes — used by System Design, Frontend
+   Prep, and the company-kit page headers (NOT by the DSA panel, which uses
+   its own merged .dsa-header-card below). Each sits in its own grid cell:
+   identity in col 1, progress card in col 2, both row 1. */
 .dsa-header-identity {
   grid-column: 1;
   grid-row: 1;
@@ -1915,6 +1922,66 @@ body {
   gap: 4px;
 }
 
+.dsa-progress-card {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 14px;
+}
+
+/* DSA panel's unified header card — a standalone floating card (NOT a grid
+   cell — the DSA panel no longer uses .dsa-progress-header as a wrapper). */
+.dsa-header-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--header-card-bg, #fff);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 20px;
+  margin: 0 1rem;
+  flex-shrink: 0;
+}
+
+.dsa-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dsa-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dsa-header-badge {
+  background: rgba(200, 124, 74, 0.14);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.dsa-header-meta-dot {
+  color: var(--text3);
+  font-size: 10px;
+}
+
+.dsa-header-meta-text {
+  font-size: 11px;
+  color: var(--muted);
+}
+
 .dsa-header-title {
   font-size: 17px;
   font-weight: 700;
@@ -1928,17 +1995,15 @@ body {
   color: var(--muted);
 }
 
-/* Cell 2: progress strip — col 2, row 1 only */
-.dsa-progress-card {
-  grid-column: 2;
-  grid-row: 1;
+.dsa-header-card .dsa-header-title {
+  font-size: 19px;
+}
+
+.dsa-header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0 14px;
+  gap: 14px;
+  flex-shrink: 0;
 }
 
 .dsa-mini-ring {
@@ -2008,40 +2073,83 @@ body {
 .dsa-diff-stat {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 44px;
+  gap: 4px;
+  min-width: 56px;
+}
+
+.dsa-diff-stat-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dsa-diff-stat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .dsa-diff-stat-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
 }
 
 .dsa-diff-stat-val {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   font-family: "DM Mono", monospace;
   color: var(--text1);
 }
 
+.dsa-diff-stat-bar {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.dsa-diff-stat-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
 .dsa-diff-stat--easy .dsa-diff-stat-label {
   color: var(--easy);
 }
+.dsa-diff-stat--easy .dsa-diff-stat-dot,
+.dsa-diff-stat--easy .dsa-diff-stat-bar-fill {
+  background: var(--easy);
+}
+
 .dsa-diff-stat--medium .dsa-diff-stat-label {
   color: var(--med);
 }
+.dsa-diff-stat--medium .dsa-diff-stat-dot,
+.dsa-diff-stat--medium .dsa-diff-stat-bar-fill {
+  background: var(--med);
+}
+
 .dsa-diff-stat--hard .dsa-diff-stat-label {
   color: var(--hard);
 }
+.dsa-diff-stat--hard .dsa-diff-stat-dot,
+.dsa-diff-stat--hard .dsa-diff-stat-bar-fill {
+  background: var(--hard);
+}
 
-/* Cell 3: search + filters — row 2, capped so it doesn't stretch full width */
+/* DSA panel's search + filters — a standalone floating card. */
 .dsa-header-bottom {
-  grid-column: 1 / -1;
-  grid-row: 2;
   display: flex;
   align-items: stretch;
   gap: 10px;
-  max-width: 71%;
+  background: var(--header-card-bg, #fff);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+  margin: 0 1rem;
+  flex-shrink: 0;
 }
 
 .dsa-search-wrap {
@@ -2118,6 +2226,77 @@ body {
   padding: 1px 6px;
   font-weight: 700;
   line-height: 1.4;
+}
+
+/* ── Inline pill selects (Difficulty / Status) ── */
+.dsa-pill-trigger {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  padding: 0 1.1rem !important;
+  color: var(--text2) !important;
+  font-size: 12px !important;
+  font-family: "DM Mono", monospace;
+  height: 100% !important;
+  width: auto !important;
+}
+
+.dsa-pill-trigger:hover,
+.dsa-pill-trigger[data-state="open"] {
+  background: var(--surface3) !important;
+  border-color: var(--border2) !important;
+  color: var(--text1) !important;
+}
+
+.dsa-pill-label {
+  white-space: nowrap;
+}
+
+.dsa-pill-label strong {
+  font-weight: 700;
+  color: var(--text1);
+}
+
+/* ── Tags dropdown: flat scrollable list of clickable chips ── */
+.dsa-tags-panel {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 8px;
+  width: 220px;
+  max-height: 320px;
+  overflow-y: auto;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dsa-tags-item {
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.dsa-tags-item:hover {
+  background: var(--surface3);
+  color: var(--text1);
+}
+
+.dsa-tags-item.active {
+  background: var(--green-bg);
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .dsa-filter-panel {
@@ -2266,10 +2445,29 @@ body {
   flex-direction: column;
 }
 
+.q-table-card {
+  background: var(--row-card-bg, #fff);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
 .q-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 8px;
+  border-collapse: collapse;
+}
+
+/* DSA panel's table only — fixed column widths (via <colgroup>) so columns
+   stay evenly distributed regardless of variable tag/title content, instead
+   of the browser's default auto-layout reflowing per row. */
+.q-table--dsa {
+  table-layout: fixed;
+}
+
+.q-table--dsa .q-title,
+.q-table--dsa .q-title a {
+  white-space: normal;
+  word-break: break-word;
 }
 
 .q-table th {
@@ -2277,13 +2475,14 @@ body {
   font-size: 10px;
   color: var(--muted);
   font-family: "DM Mono", monospace;
-  padding: 0.5rem 0.75rem;
+  padding: 0.7rem 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 400;
   position: sticky;
   top: 0;
-  background: var(--panel-bg, var(--bg));
+  background: var(--panel-bg, #fff);
+  border-bottom: 1px solid var(--border);
 }
 
 .q-row {
@@ -2293,6 +2492,10 @@ body {
 
 .q-row:hover td {
   background: var(--surface3);
+}
+
+.q-row + .q-row td {
+  border-top: 1px solid var(--border);
 }
 
 .q-row.solved td:first-child {
@@ -2307,29 +2510,11 @@ body {
   color: var(--muted);
 }
 
-/* Each row reads as its own card — blends with the page (--surface2, same
-   tone the rest of the app uses for cards) while staying visually distinct
-   via its own border and rounded ends, rather than a flat table row. */
 .q-row td {
-  padding: 0.75rem 0.85rem;
+  padding: 0.85rem;
   font-size: 13px;
   vertical-align: middle;
-  background: var(--row-card-bg, var(--surface2));
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
   transition: background 0.15s;
-}
-
-.q-row td:first-child {
-  border-left: 1px solid var(--border);
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
-}
-
-.q-row td:last-child {
-  border-right: 1px solid var(--border);
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
 }
 
 .q-cb {
@@ -2431,13 +2616,28 @@ body {
 .tag-list {
   display: flex;
   gap: 4px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  max-width: 100%;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+
+.tag-list::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tag-list::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 2px;
 }
 
 .tag {
+  flex-shrink: 0;
   font-size: 10px;
-  padding: 1px 7px;
-  border-radius: 20px;
+  padding: 3px 9px;
+  border-radius: 6px;
   background: var(--surface3);
   color: var(--muted);
   border: 1px solid var(--border);
@@ -3244,7 +3444,8 @@ body {
     display: none !important;
   }
 
-  /* ── Header: hide identity card (title in top navbar) ── */
+  /* ── Header: hide identity block/card (title in top navbar) ── */
+  .dsa-header-left,
   .dsa-header-identity {
     display: none;
   }
@@ -3262,13 +3463,13 @@ body {
     padding: 8px 12px;
   }
 
-  .dsa-diff-stats {
-    gap: 8px;
+  .dsa-header-card {
+    padding: 8px 12px;
+    justify-content: center;
   }
 
-  .dsa-header-bottom {
-    grid-column: 1;
-    grid-row: 2;
+  .dsa-diff-stats {
+    gap: 8px;
   }
 
   /* ── DSA table: hide Frequency + Tags on mobile ── */
@@ -3749,6 +3950,81 @@ body {
 .page-count {
   color: var(--text3);
   font-size: 12px;
+}
+
+/* ── DSA-only pagination (dedicated classes so this doesn't affect
+   System Design's shared .pagination/.page-btn/.page-info) ── */
+.q-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0.85rem;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+}
+
+.q-page-info {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 500;
+}
+
+.q-page-info strong {
+  color: var(--text1);
+  font-weight: 700;
+}
+
+.q-page-nums {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.q-page-btn,
+.q-page-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 32px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  background: var(--row-card-bg, var(--surface2));
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.q-page-btn:hover:not(:disabled),
+.q-page-num:hover:not(.active) {
+  background: var(--surface3);
+  color: var(--text1);
+  border-color: var(--border2);
+}
+
+.q-page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.q-page-num.active {
+  background: var(--text1);
+  border-color: var(--text1);
+  color: var(--panel-bg, #fff);
+}
+
+.q-page-ellipsis {
+  color: var(--text3);
+  font-size: 13px;
+  padding: 0 2px;
 }
 
 /* ─────────────────────────────────────────

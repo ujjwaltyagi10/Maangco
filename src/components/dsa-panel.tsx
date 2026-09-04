@@ -76,13 +76,12 @@ export function DsaPanel({
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [tagFilter, setTagFilter] = useState("all");
   const [minCompanies, setMinCompanies] = useState(0);
-  const [companyInAll, setCompanyInAll] = useState("all");
   const [questionSearch, setQuestionSearch] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("num");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [tagsOpen, setTagsOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
 
   const deferredCompanySearch = useDeferredValue(companySearch);
@@ -155,17 +154,12 @@ export function DsaPanel({
         q.topicTags.some((t) => t.name.toLowerCase().includes(term));
       const matchesMinCompanies =
         !isAllView || minCompanies === 0 || (q.companiesAsked ?? 0) >= minCompanies;
-      const matchesCompanyInAll =
-        !isAllView ||
-        companyInAll === "all" ||
-        q.companyFrequencies?.[companyInAll] != null;
       return (
         matchesDiff &&
         matchesStatus &&
         matchesTags &&
         matchesSearch &&
-        matchesMinCompanies &&
-        matchesCompanyInAll
+        matchesMinCompanies
       );
     });
 
@@ -197,7 +191,6 @@ export function DsaPanel({
     statusFilter,
     tagFilter,
     minCompanies,
-    companyInAll,
     isAllView,
     deferredQuestionSearch,
     selectedCompany,
@@ -230,7 +223,6 @@ export function DsaPanel({
     statusFilter,
     tagFilter,
     minCompanies,
-    companyInAll,
     deferredQuestionSearch,
     sortMode,
     deferredCompanySearch,
@@ -242,6 +234,19 @@ export function DsaPanel({
     (safePage - 1) * pageSize,
     safePage * pageSize,
   );
+  const rangeStart = visibleQuestions.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, visibleQuestions.length);
+
+  const pageNumbers = useMemo((): (number | "…")[] => {
+    const pages = new Set<number>([1, totalPages, safePage - 1, safePage, safePage + 1]);
+    const sorted = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+    const result: (number | "…")[] = [];
+    sorted.forEach((p, i) => {
+      if (i > 0 && p - sorted[i - 1] > 1) result.push("…");
+      result.push(p);
+    });
+    return result;
+  }, [safePage, totalPages]);
 
   const difficultyCounts = useMemo(() => {
     if (!selectedCompany)
@@ -271,14 +276,6 @@ export function DsaPanel({
     );
   }, [selectedCompany]);
 
-  const clearAllFilters = () => {
-    setDifficultyFilter("all");
-    setStatusFilter("all");
-    setTagFilter("all");
-    setMinCompanies(0);
-    setCompanyInAll("all");
-  };
-
   const clearSort = () => {
     setSortMode(defaultSort);
     setPageSize(50);
@@ -301,17 +298,14 @@ export function DsaPanel({
     : 0;
 
   const defaultSort: SortMode = "num";
-  const activeFilterCount = [
-    difficultyFilter !== "all",
-    statusFilter !== "all",
-    tagFilter !== "all",
-    isAllView && minCompanies > 0,
-    isAllView && companyInAll !== "all",
-  ].filter(Boolean).length;
-  const activeSortCount = [
-    sortMode !== defaultSort,
-    pageSize !== 50,
-  ].filter(Boolean).length;
+  const SORT_LABELS: Record<SortMode, string> = {
+    freq: "Frequency",
+    num: "Question ID",
+    diff: "Difficulty",
+    timeframe: "Recent",
+    companies: "Companies asked",
+  };
+  const sortLabel = SORT_LABELS[sortMode];
 
   // Filtered progress (respects difficulty / show / search filters)
   const visibleSolvedCount = visibleQuestions.filter((q) => solvedIds.includes(q.id)).length;
@@ -448,67 +442,87 @@ export function DsaPanel({
       {/* LEFT: Progress + Table + Pagination */}
       <div className="dsa-main">
         {/* ── Panel Header ── */}
-        <div className="dsa-progress-header">
-
-          {/* Grid cell 1: Identity card (col 1, row 1) — hidden on the locked
-              single-company kit page, which renders its own header above this. */}
-          {!lockedCompanyId && (
-            <div className="dsa-header-identity">
-              <div className="dsa-header-icon">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="16 18 22 12 16 6" />
-                  <polyline points="8 6 2 12 8 18" />
-                </svg>
-              </div>
-              <div className="dsa-header-title-group">
+        {/* Identity card — hidden on the locked single-company kit page,
+            which renders its own header above this. */}
+        {!lockedCompanyId && (
+            <div className="dsa-header-card">
+              <div className="dsa-header-left">
+                <div className="dsa-header-meta">
+                  <span className="dsa-header-badge">Core Track</span>
+                  <span className="dsa-header-meta-dot">•</span>
+                  <span className="dsa-header-meta-text">Updated today</span>
+                </div>
                 <h2 className="dsa-header-title">DSA Practice</h2>
                 <span className="dsa-header-sub">Top company questions to level up your skills</span>
               </div>
-            </div>
-          )}
 
-          {/* Grid cell 2: Progress strip (col 2, row 1) — hidden on the locked
-              kit page, which already shows these same stats in its own header. */}
-          {!lockedCompanyId && (
-            <div className="dsa-progress-card">
-              <div className="dsa-mini-ring">
-                <svg viewBox="0 0 56 56" className="dsa-mini-ring-svg">
-                  <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--border2)" strokeWidth="3"
-                    strokeDasharray={`${miniArcLen} ${miniArcGap}`} strokeLinecap="round"
-                    transform="rotate(135, 28, 28)" />
-                  <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--accent)" strokeWidth="3"
-                    strokeDasharray={`${miniArcFill} ${miniArcCirc - miniArcFill}`} strokeLinecap="round"
-                    transform="rotate(135, 28, 28)"
-                    style={{ transition: "stroke-dasharray 0.5s ease" }} />
-                </svg>
-                <div className="dsa-mini-ring-label">{visiblePct}%</div>
-              </div>
-              <div className="dsa-progress-info">
-                <span className="dsa-progress-count">
-                  {visibleSolvedCount}<span className="dsa-progress-total">/{visibleTotal}</span>
-                </span>
-                <span className="dsa-progress-label">✓ Solved</span>
-              </div>
-              <div className="dsa-progress-sep" />
-              <div className="dsa-diff-stats">
-                <div className="dsa-diff-stat dsa-diff-stat--easy">
-                  <span className="dsa-diff-stat-label">Easy</span>
-                  <span className="dsa-diff-stat-val">{difficultyCounts.easySolved}/{difficultyCounts.easy}</span>
+              <div className="dsa-header-right">
+                <div className="dsa-mini-ring">
+                  <svg viewBox="0 0 56 56" className="dsa-mini-ring-svg">
+                    <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--border2)" strokeWidth="3"
+                      strokeDasharray={`${miniArcLen} ${miniArcGap}`} strokeLinecap="round"
+                      transform="rotate(135, 28, 28)" />
+                    <circle cx="28" cy="28" r={miniArcR} fill="none" stroke="var(--accent)" strokeWidth="3"
+                      strokeDasharray={`${miniArcFill} ${miniArcCirc - miniArcFill}`} strokeLinecap="round"
+                      transform="rotate(135, 28, 28)"
+                      style={{ transition: "stroke-dasharray 0.5s ease" }} />
+                  </svg>
+                  <div className="dsa-mini-ring-label">{visiblePct}%</div>
                 </div>
-                <div className="dsa-diff-stat dsa-diff-stat--medium">
-                  <span className="dsa-diff-stat-label">Med.</span>
-                  <span className="dsa-diff-stat-val">{difficultyCounts.medSolved}/{difficultyCounts.medium}</span>
+                <div className="dsa-progress-info">
+                  <span className="dsa-progress-count">
+                    {visibleSolvedCount}<span className="dsa-progress-total">/{visibleTotal}</span>
+                  </span>
+                  <span className="dsa-progress-label">✓ Solved Total</span>
                 </div>
-                <div className="dsa-diff-stat dsa-diff-stat--hard">
-                  <span className="dsa-diff-stat-label">Hard</span>
-                  <span className="dsa-diff-stat-val">{difficultyCounts.hardSolved}/{difficultyCounts.hard}</span>
+                <div className="dsa-progress-sep" />
+                <div className="dsa-diff-stats">
+                  <div className="dsa-diff-stat dsa-diff-stat--easy">
+                    <div className="dsa-diff-stat-head">
+                      <span className="dsa-diff-stat-label">Easy</span>
+                      <span className="dsa-diff-stat-dot" />
+                    </div>
+                    <span className="dsa-diff-stat-val">{difficultyCounts.easySolved}/{difficultyCounts.easy}</span>
+                    <div className="dsa-diff-stat-bar">
+                      <div
+                        className="dsa-diff-stat-bar-fill"
+                        style={{ width: `${difficultyCounts.easy ? (difficultyCounts.easySolved / difficultyCounts.easy) * 100 : 0}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="dsa-diff-stat dsa-diff-stat--medium">
+                    <div className="dsa-diff-stat-head">
+                      <span className="dsa-diff-stat-label">Med.</span>
+                      <span className="dsa-diff-stat-dot" />
+                    </div>
+                    <span className="dsa-diff-stat-val">{difficultyCounts.medSolved}/{difficultyCounts.medium}</span>
+                    <div className="dsa-diff-stat-bar">
+                      <div
+                        className="dsa-diff-stat-bar-fill"
+                        style={{ width: `${difficultyCounts.medium ? (difficultyCounts.medSolved / difficultyCounts.medium) * 100 : 0}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="dsa-diff-stat dsa-diff-stat--hard">
+                    <div className="dsa-diff-stat-head">
+                      <span className="dsa-diff-stat-label">Hard</span>
+                      <span className="dsa-diff-stat-dot" />
+                    </div>
+                    <span className="dsa-diff-stat-val">{difficultyCounts.hardSolved}/{difficultyCounts.hard}</span>
+                    <div className="dsa-diff-stat-bar">
+                      <div
+                        className="dsa-diff-stat-bar-fill"
+                        style={{ width: `${difficultyCounts.hard ? (difficultyCounts.hardSolved / difficultyCounts.hard) * 100 : 0}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          )}
+        )}
 
-          {/* Grid cell 3: search + filters (col 1, row 2) */}
-          <div className="dsa-header-bottom">
+        {/* Search + filters card */}
+        <div className="dsa-header-bottom">
             <div className="dsa-search-wrap">
               <Search className="dsa-search-icon" size={14} strokeWidth={1.8} />
               <input
@@ -520,135 +534,65 @@ export function DsaPanel({
               />
             </div>
 
-            <DropdownMenu open={filtersOpen} onOpenChange={setFiltersOpen} modal={false}>
+            <Select value={difficultyFilter} onValueChange={(v) => setDifficultyFilter(v as "all" | Difficulty)}>
+              <SelectTrigger className="dsa-pill-trigger">
+                <span className="dsa-pill-label">Difficulty: <strong>{difficultyFilter === "all" ? "All" : difficultyFilter}</strong></span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="Easy">Easy</SelectItem>
+                <SelectItem value="Medium">Medium</SelectItem>
+                <SelectItem value="Hard">Hard</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+              <SelectTrigger className="dsa-pill-trigger">
+                <span className="dsa-pill-label">Status: <strong>{statusFilter === "all" ? "All" : statusFilter === "solved" ? "Solved" : "To-do"}</strong></span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="todo">To-do</SelectItem>
+                <SelectItem value="solved">Solved</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <DropdownMenu open={tagsOpen} onOpenChange={setTagsOpen} modal={false}>
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className={`dsa-filter-btn${activeFilterCount > 0 ? " has-active" : ""}`}
+                  className={`dsa-filter-btn${tagFilter !== "all" ? " has-active" : ""}`}
                 >
                   <SlidersVertical size={14} strokeWidth={1.8} />
-                  <span className="filter-btn-label">Filters</span>
-                  {activeFilterCount > 0 && (
-                    <span className="dsa-filter-badge">{activeFilterCount}</span>
-                  )}
+                  <span className="filter-btn-label">Tags</span>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="dsa-filter-panel">
-                <div className="dsa-filter-panel-head">
-                  <span className="dsa-filter-panel-title">Filters</span>
-                  <button type="button" className="dsa-filter-panel-close" onClick={() => setFiltersOpen(false)} aria-label="Close">
-                    <X size={14} />
+              <DropdownMenuContent align="start" className="dsa-tags-panel">
+                <button
+                  type="button"
+                  className={`dsa-tags-item${tagFilter === "all" ? " active" : ""}`}
+                  onClick={() => { setTagFilter("all"); setTagsOpen(false); }}
+                >
+                  All
+                </button>
+                {availableTags.map((t) => (
+                  <button
+                    key={t.slug}
+                    type="button"
+                    className={`dsa-tags-item${tagFilter === t.slug ? " active" : ""}`}
+                    onClick={() => { setTagFilter(t.slug); setTagsOpen(false); }}
+                  >
+                    {t.name}
                   </button>
-                </div>
-
-                <div className="dsa-filter-field">
-                  <div className="dsa-filter-field-head">
-                    <span className="dsa-filter-label">Difficulty</span>
-                    {difficultyFilter !== "all" && (
-                      <button type="button" className="dsa-filter-reset" onClick={() => setDifficultyFilter("all")}>Reset</button>
-                    )}
-                  </div>
-                  <Select value={difficultyFilter} onValueChange={(v) => setDifficultyFilter(v as "all" | Difficulty)}>
-                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="Easy">Easy</SelectItem>
-                      <SelectItem value="Medium">Medium</SelectItem>
-                      <SelectItem value="Hard">Hard</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="dsa-filter-field">
-                  <div className="dsa-filter-field-head">
-                    <span className="dsa-filter-label">Status</span>
-                    {statusFilter !== "all" && (
-                      <button type="button" className="dsa-filter-reset" onClick={() => setStatusFilter("all")}>Reset</button>
-                    )}
-                  </div>
-                  <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
-                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="todo">To-do</SelectItem>
-                      <SelectItem value="solved">Solved</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="dsa-filter-field">
-                  <div className="dsa-filter-field-head">
-                    <span className="dsa-filter-label">Tags</span>
-                    {tagFilter !== "all" && (
-                      <button type="button" className="dsa-filter-reset" onClick={() => setTagFilter("all")}>Reset</button>
-                    )}
-                  </div>
-                  <Select value={tagFilter} onValueChange={setTagFilter}>
-                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      {availableTags.map((t) => (
-                        <SelectItem key={t.slug} value={t.slug}>{t.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {isAllView && (
-                  <>
-                    <div className="dsa-filter-field">
-                      <div className="dsa-filter-field-head">
-                        <span className="dsa-filter-label">Companies asked</span>
-                        {minCompanies !== 0 && (
-                          <button type="button" className="dsa-filter-reset" onClick={() => setMinCompanies(0)}>Reset</button>
-                        )}
-                      </div>
-                      <Select value={String(minCompanies)} onValueChange={(v) => setMinCompanies(Number(v))}>
-                        <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {MIN_COMPANIES_OPTIONS.map((n) => (
-                            <SelectItem key={n} value={String(n)}>{n === 0 ? "Any" : `${n}+`}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="dsa-filter-field">
-                      <div className="dsa-filter-field-head">
-                        <span className="dsa-filter-label">Company</span>
-                        {companyInAll !== "all" && (
-                          <button type="button" className="dsa-filter-reset" onClick={() => setCompanyInAll("all")}>Reset</button>
-                        )}
-                      </div>
-                      <Select value={companyInAll} onValueChange={setCompanyInAll}>
-                        <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Any</SelectItem>
-                          {companies.map((c) => (
-                            <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </>
-                )}
-
-                <div className="dsa-filter-panel-foot">
-                  <button type="button" className="dsa-filter-clear-all" onClick={clearAllFilters}>Clear all</button>
-                </div>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
             <DropdownMenu open={sortOpen} onOpenChange={setSortOpen} modal={false}>
               <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className={`dsa-filter-btn${activeSortCount > 0 ? " has-active" : ""}`}
-                >
+                <button type="button" className="dsa-filter-btn">
                   <ArrowUpDown size={14} strokeWidth={1.8} />
-                  <span className="filter-btn-label">Sort</span>
-                  {activeSortCount > 0 && (
-                    <span className="dsa-filter-badge">{activeSortCount}</span>
-                  )}
+                  <span className="filter-btn-label">Sort: {sortLabel}</span>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="dsa-filter-panel">
@@ -699,6 +643,25 @@ export function DsaPanel({
                   </Select>
                 </div>
 
+                {isAllView && (
+                  <div className="dsa-filter-field">
+                    <div className="dsa-filter-field-head">
+                      <span className="dsa-filter-label">Companies asked</span>
+                      {minCompanies !== 0 && (
+                        <button type="button" className="dsa-filter-reset" onClick={() => setMinCompanies(0)}>Reset</button>
+                      )}
+                    </div>
+                    <Select value={String(minCompanies)} onValueChange={(v) => setMinCompanies(Number(v))}>
+                      <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {MIN_COMPANIES_OPTIONS.map((n) => (
+                          <SelectItem key={n} value={String(n)}>{n === 0 ? "Any" : `${n}+`}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 <div className="dsa-filter-panel-foot">
                   <button type="button" className="dsa-filter-clear-all" onClick={clearSort}>Clear all</button>
                 </div>
@@ -706,20 +669,28 @@ export function DsaPanel({
             </DropdownMenu>
           </div>
 
-        </div>
-
-        {/* Question Table */}
+        {/* Question Table card */}
         <div className="table-wrap">
-          <table className="q-table">
+          <div className="q-table-card">
+          <table className="q-table q-table--dsa">
+            <colgroup>
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "27%" }} />
+              <col style={{ width: "11%" }} />
+              <col style={{ width: "14%" }} />
+              <col style={{ width: "32%" }} />
+              <col style={{ width: "6%" }} />
+            </colgroup>
             <thead>
               <tr>
                 <th style={{ width: 36 }} />
                 <th>#</th>
-                <th>Title</th>
+                <th>Problem Title</th>
                 <th>Difficulty</th>
-                <th>Frequency</th>
-                <th>Tags</th>
-                <th style={{ textAlign: "right" }}>★</th>
+                <th>Interview Freq</th>
+                <th>Topic Tags</th>
+                <th style={{ textAlign: "right" }}>Save</th>
               </tr>
             </thead>
             <tbody>
@@ -830,35 +801,51 @@ export function DsaPanel({
               )}
             </tbody>
           </table>
-        </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="pagination">
-            <button
-              type="button"
-              className="page-btn"
-              disabled={safePage <= 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            >
-              ← Prev
-            </button>
-            <div className="page-info">
-              Page {safePage} of {totalPages}
-              <span className="page-count">
-                · {visibleQuestions.length} questions
-              </span>
+          {/* Pagination — inside the same card as the table */}
+          {visibleQuestions.length > 0 && (
+            <div className="q-pagination">
+              <div className="q-page-info">
+                Showing <strong>{rangeStart}-{rangeEnd}</strong> of <strong>{visibleQuestions.length}</strong> items
+              </div>
+              {totalPages > 1 && (
+                <div className="q-page-nums">
+                  <button
+                    type="button"
+                    className="q-page-btn"
+                    disabled={safePage <= 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  >
+                    Prev
+                  </button>
+                  {pageNumbers.map((p, i) =>
+                    p === "…" ? (
+                      <span key={`ellipsis-${i}`} className="q-page-ellipsis">…</span>
+                    ) : (
+                      <button
+                        key={p}
+                        type="button"
+                        className={`q-page-num${p === safePage ? " active" : ""}`}
+                        onClick={() => setCurrentPage(p)}
+                      >
+                        {p}
+                      </button>
+                    ),
+                  )}
+                  <button
+                    type="button"
+                    className="q-page-btn"
+                    disabled={safePage >= totalPages}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
-            <button
-              type="button"
-              className="page-btn"
-              disabled={safePage >= totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            >
-              Next →
-            </button>
+          )}
           </div>
-        )}
+        </div>
       </div>
       {/* end .dsa-main */}
 
