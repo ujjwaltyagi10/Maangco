@@ -490,8 +490,7 @@ export function SystemDesignPanel({
         </div>
 
         {/* Table */}
-        <div className="sd-main">
-          <div className="table-wrap">
+        <div className="table-wrap">
           <div className="q-table-card">
             <table className="q-table q-table--sd">
               <colgroup>
@@ -618,7 +617,6 @@ export function SystemDesignPanel({
           </div>
           </div>
         </div>
-      </div>
       {/* end .sd-content */}
 
       {/* ── RIGHT: Company sidebar ── */}
