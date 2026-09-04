@@ -31,7 +31,7 @@ export function CompanyKitsModal({ open, onClose, companies, onSelectCompany }: 
                 <path d="M7 7V4.5A1.5 1.5 0 0 1 8.5 3h3A1.5 1.5 0 0 1 13 4.5V7" />
               </svg>
             </span>
-            Choose a company kit
+            Choose a company sheet
           </div>
           <button type="button" className="ckm-close" onClick={onClose} aria-label="Close">
             <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">

@@ -170,7 +170,7 @@ export function DashboardPanel({
         <div className="dp-kits-head">
           <div className="dp-kits-head-text">
             <div className="dp-kits-eyebrow">Start here</div>
-            <h1 className="dp-kits-title">Popular company kits</h1>
+            <h1 className="dp-kits-title">Popular company sheets</h1>
           </div>
           <button type="button" className="dp-kits-viewall" onClick={() => setKitsModalOpen(true)}>
             <span>View all companies</span>
@@ -195,7 +195,7 @@ export function DashboardPanel({
               </div>
               <div className="dp-kit-name">{c.name}</div>
               <div className="dp-kit-cta">
-                Open kit
+                Open 
                 <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="10" height="10">
                   <path d="M2 6h8M6 2l4 4-4 4" />
                 </svg>

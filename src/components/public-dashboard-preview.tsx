@@ -72,7 +72,7 @@ export function PublicDashboardPreview({
           <div className="dp-kits-head">
             <div className="dp-kits-head-text">
               <div className="dp-kits-eyebrow">Start here</div>
-              <h1 className="dp-kits-title">Popular company kits</h1>
+              <h1 className="dp-kits-title">Popular company sheets</h1>
             </div>
             <button type="button" className="dp-kits-viewall" onClick={onBuyPremium}>
               <span>View all companies</span>
