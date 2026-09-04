@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search, SlidersVertical, X } from "lucide-react";
+import { Search } from "lucide-react";
 
 import adobeLogo from "@/assets/adobe.png";
 import airbnbLogo from "@/assets/airbnb.png";
@@ -42,8 +42,7 @@ import type {
 } from "@/types/maangco";
 
 import { CompanyLogo } from "./ui/company-logo";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import { Skeleton } from "./ui/shimmer";
 
 interface SystemDesignPanelProps {
@@ -148,18 +147,11 @@ export function SystemDesignPanel({
   const [search, setSearch] = useState("");
   const [companySearch, setCompanySearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const pageSize = 50;
 
   const deferredSearch = useDeferredValue(search);
   const deferredCompanySearch = useDeferredValue(companySearch);
-
-  const clearAllFilters = () => {
-    setFreqFilter("All");
-    setSelectedCat(ALL_CAT);
-    setLevelFilter("All");
-  };
 
   // Sync company + category to URL
   useEffect(() => {
@@ -223,6 +215,19 @@ export function SystemDesignPanel({
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
   const paginated = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const rangeStart = filtered.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, filtered.length);
+
+  const sdPageNumbers = useMemo((): (number | "…")[] => {
+    const pages = new Set<number>([1, totalPages, safePage - 1, safePage, safePage + 1]);
+    const sorted = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+    const result: (number | "…")[] = [];
+    sorted.forEach((p, i) => {
+      if (i > 0 && p - sorted[i - 1] > 1) result.push("…");
+      result.push(p);
+    });
+    return result;
+  }, [safePage, totalPages]);
 
   // Frequency breakdown
   const freqCounts = useMemo(() => {
@@ -241,12 +246,6 @@ export function SystemDesignPanel({
   const visibleDoneCount = filtered.filter((q) => completedIds.includes(q.id)).length;
   const visibleTotal = filtered.length;
   const visiblePct = visibleTotal > 0 ? Math.round((visibleDoneCount / visibleTotal) * 100) : 0;
-
-  const activeFilterCount = [
-    freqFilter !== "All",
-    selectedCat !== ALL_CAT,
-    levelFilter !== "All",
-  ].filter(Boolean).length;
 
   // Mini arc ring
   const sdArcR = 22;
@@ -376,22 +375,19 @@ export function SystemDesignPanel({
       {/* ── LEFT: header + table ── */}
       <div className="sd-content">
 
-        {/* Header */}
-        <div className="dsa-progress-header">
-          <div className="dsa-header-identity">
-            <div className="dsa-header-icon">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="3" width="20" height="14" rx="2" />
-                <path d="M8 21h8M12 17v4" />
-              </svg>
+        {/* Header card */}
+        <div className="dsa-header-card">
+          <div className="dsa-header-left">
+            <div className="dsa-header-meta">
+              <span className="dsa-header-badge">Core Track</span>
+              <span className="dsa-header-meta-dot">•</span>
+              <span className="dsa-header-meta-text">Updated today</span>
             </div>
-            <div className="dsa-header-title-group">
-              <h2 className="dsa-header-title">System Design</h2>
-              <span className="dsa-header-sub">150 questions sourced from Glassdoor, Blind &amp; Exponent (2021–2026)</span>
-            </div>
+            <h2 className="dsa-header-title">System Design</h2>
+            <span className="dsa-header-sub">150 questions sourced from Glassdoor, Blind &amp; Exponent (2021–2026)</span>
           </div>
 
-          <div className="dsa-progress-card">
+          <div className="dsa-header-right">
             <div className="dsa-mini-ring">
               <svg viewBox="0 0 56 56" className="dsa-mini-ring-svg">
                 <circle cx="28" cy="28" r={sdArcR} fill="none" stroke="var(--border2)" strokeWidth="3"
@@ -408,119 +404,106 @@ export function SystemDesignPanel({
               <span className="dsa-progress-count">
                 {visibleDoneCount}<span className="dsa-progress-total">/{visibleTotal}</span>
               </span>
-              <span className="dsa-progress-label">✓ Studied</span>
+              <span className="dsa-progress-label">✓ Studied Total</span>
             </div>
             <div className="dsa-progress-sep" />
             <div className="dsa-diff-stats">
-              <div className="dsa-diff-stat">
-                <span className="dsa-diff-stat-label" style={{ color: "var(--easy)" }}>High</span>
+              <div className="dsa-diff-stat dsa-diff-stat--easy">
+                <div className="dsa-diff-stat-head">
+                  <span className="dsa-diff-stat-label">High</span>
+                  <span className="dsa-diff-stat-dot" />
+                </div>
                 <span className="dsa-diff-stat-val">{freqCounts.highDone}/{freqCounts.high}</span>
+                <div className="dsa-diff-stat-bar">
+                  <div className="dsa-diff-stat-bar-fill" style={{ width: `${freqCounts.high ? (freqCounts.highDone / freqCounts.high) * 100 : 0}%` }} />
+                </div>
               </div>
-              <div className="dsa-diff-stat">
-                <span className="dsa-diff-stat-label" style={{ color: "var(--med)" }}>Med.</span>
+              <div className="dsa-diff-stat dsa-diff-stat--medium">
+                <div className="dsa-diff-stat-head">
+                  <span className="dsa-diff-stat-label">Med.</span>
+                  <span className="dsa-diff-stat-dot" />
+                </div>
                 <span className="dsa-diff-stat-val">{freqCounts.medDone}/{freqCounts.med}</span>
+                <div className="dsa-diff-stat-bar">
+                  <div className="dsa-diff-stat-bar-fill" style={{ width: `${freqCounts.med ? (freqCounts.medDone / freqCounts.med) * 100 : 0}%` }} />
+                </div>
               </div>
-              <div className="dsa-diff-stat">
-                <span className="dsa-diff-stat-label" style={{ color: "var(--muted)" }}>Low</span>
+              <div className="dsa-diff-stat dsa-diff-stat--hard">
+                <div className="dsa-diff-stat-head">
+                  <span className="dsa-diff-stat-label">Low</span>
+                  <span className="dsa-diff-stat-dot" />
+                </div>
                 <span className="dsa-diff-stat-val">{freqCounts.lowDone}/{freqCounts.low}</span>
+                <div className="dsa-diff-stat-bar">
+                  <div className="dsa-diff-stat-bar-fill" style={{ width: `${freqCounts.low ? (freqCounts.lowDone / freqCounts.low) * 100 : 0}%` }} />
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="dsa-header-bottom">
-            <div className="dsa-search-wrap">
-              <Search className="dsa-search-icon" size={14} strokeWidth={1.8} />
-              <input
-                className="dsa-search-input"
-                type="text"
-                placeholder="Search questions or companies..."
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-              />
-            </div>
-
-            <DropdownMenu open={filtersOpen} onOpenChange={setFiltersOpen} modal={false}>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className={`dsa-filter-btn${activeFilterCount > 0 ? " has-active" : ""}`}
-                >
-                  <SlidersVertical size={14} strokeWidth={1.8} />
-                  <span className="filter-btn-label">Filters</span>
-                  {activeFilterCount > 0 && <span className="dsa-filter-badge">{activeFilterCount}</span>}
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="dsa-filter-panel">
-                <div className="dsa-filter-panel-head">
-                  <span className="dsa-filter-panel-title">Filters</span>
-                  <button type="button" className="dsa-filter-panel-close" onClick={() => setFiltersOpen(false)} aria-label="Close">
-                    <X size={14} />
-                  </button>
-                </div>
-
-                <div className="dsa-filter-field">
-                  <div className="dsa-filter-field-head">
-                    <span className="dsa-filter-label">Frequency</span>
-                    {freqFilter !== "All" && (
-                      <button type="button" className="dsa-filter-reset" onClick={() => setFreqFilter("All")}>Reset</button>
-                    )}
-                  </div>
-                  <Select value={freqFilter} onValueChange={(v) => { startTransition(() => { setFreqFilter(v as "All" | SystemDesignFrequency); setCurrentPage(1); }); }}>
-                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="All">All</SelectItem>
-                      <SelectItem value="High">High</SelectItem>
-                      <SelectItem value="Medium">Medium</SelectItem>
-                      <SelectItem value="Low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="dsa-filter-field">
-                  <div className="dsa-filter-field-head">
-                    <span className="dsa-filter-label">Category</span>
-                    {selectedCat !== ALL_CAT && (
-                      <button type="button" className="dsa-filter-reset" onClick={() => setSelectedCat(ALL_CAT)}>Reset</button>
-                    )}
-                  </div>
-                  <Select value={selectedCat} onValueChange={(v) => { startTransition(() => { setSelectedCat(v as typeof ALL_CAT | SystemDesignCategory); setCurrentPage(1); }); }}>
-                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {CATEGORIES.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="dsa-filter-field">
-                  <div className="dsa-filter-field-head">
-                    <span className="dsa-filter-label">Level</span>
-                    {levelFilter !== "All" && (
-                      <button type="button" className="dsa-filter-reset" onClick={() => setLevelFilter("All")}>Reset</button>
-                    )}
-                  </div>
-                  <Select value={levelFilter} onValueChange={(v) => { startTransition(() => { setLevelFilter(v as "All" | "HLD" | "LLD" | "Both"); setCurrentPage(1); }); }}>
-                    <SelectTrigger className="dsa-select-trigger"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="All">All levels</SelectItem>
-                      <SelectItem value="HLD">HLD only</SelectItem>
-                      <SelectItem value="LLD">LLD only</SelectItem>
-                      <SelectItem value="Both">Both (HLD + LLD)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="dsa-filter-panel-foot">
-                  <button type="button" className="dsa-filter-clear-all" onClick={clearAllFilters}>Clear all</button>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {/* Search + filters card */}
+        <div className="dsa-header-bottom">
+          <div className="dsa-search-wrap">
+            <Search className="dsa-search-icon" size={14} strokeWidth={1.8} />
+            <input
+              className="dsa-search-input"
+              type="text"
+              placeholder="Search questions or companies..."
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+            />
           </div>
+
+          <Select value={freqFilter} onValueChange={(v) => { startTransition(() => { setFreqFilter(v as "All" | SystemDesignFrequency); setCurrentPage(1); }); }}>
+            <SelectTrigger className="dsa-pill-trigger">
+              <span className="dsa-pill-label">Frequency: <strong>{freqFilter}</strong></span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All</SelectItem>
+              <SelectItem value="High">High</SelectItem>
+              <SelectItem value="Medium">Medium</SelectItem>
+              <SelectItem value="Low">Low</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedCat} onValueChange={(v) => { startTransition(() => { setSelectedCat(v as typeof ALL_CAT | SystemDesignCategory); setCurrentPage(1); }); }}>
+            <SelectTrigger className="dsa-pill-trigger">
+              <span className="dsa-pill-label">Category: <strong>{selectedCat}</strong></span>
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select value={levelFilter} onValueChange={(v) => { startTransition(() => { setLevelFilter(v as "All" | "HLD" | "LLD" | "Both"); setCurrentPage(1); }); }}>
+            <SelectTrigger className="dsa-pill-trigger">
+              <span className="dsa-pill-label">Level: <strong>{levelFilter}</strong></span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All levels</SelectItem>
+              <SelectItem value="HLD">HLD only</SelectItem>
+              <SelectItem value="LLD">LLD only</SelectItem>
+              <SelectItem value="Both">Both (HLD + LLD)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Table */}
         <div className="sd-main">
           <div className="table-wrap">
-            <table className="q-table">
+          <div className="q-table-card">
+            <table className="q-table q-table--sd">
+              <colgroup>
+                <col style={{ width: "4%" }} />
+                <col style={{ width: "5%" }} />
+                <col style={{ width: "26%" }} />
+                <col style={{ width: "11%" }} />
+                <col style={{ width: "11%" }} />
+                <col style={{ width: "15%" }} />
+                <col style={{ width: "13%" }} />
+                <col style={{ width: "15%" }} />
+              </colgroup>
               <thead>
                 <tr>
                   <th style={{ width: 36 }} />
@@ -603,18 +586,37 @@ export function SystemDesignPanel({
                 )}
               </tbody>
             </table>
-          </div>
 
-          {totalPages > 1 && (
-            <div className="pagination">
-              <button type="button" className="page-btn" disabled={safePage <= 1} onClick={() => goPage(safePage - 1)}>← Prev</button>
-              <div className="page-info">
-                Page {safePage} of {totalPages}
-                <span className="page-count">· {filtered.length} questions</span>
+            {/* Pagination — inside the same card as the table */}
+            {filtered.length > 0 && (
+              <div className="q-pagination">
+                <div className="q-page-info">
+                  Showing <strong>{rangeStart}-{rangeEnd}</strong> of <strong>{filtered.length}</strong> items
+                </div>
+                {totalPages > 1 && (
+                  <div className="q-page-nums">
+                    <button type="button" className="q-page-btn" disabled={safePage <= 1} onClick={() => goPage(safePage - 1)}>Prev</button>
+                    {sdPageNumbers.map((p, i) =>
+                      p === "…" ? (
+                        <span key={`ellipsis-${i}`} className="q-page-ellipsis">…</span>
+                      ) : (
+                        <button
+                          key={p}
+                          type="button"
+                          className={`q-page-num${p === safePage ? " active" : ""}`}
+                          onClick={() => goPage(p)}
+                        >
+                          {p}
+                        </button>
+                      ),
+                    )}
+                    <button type="button" className="q-page-btn" disabled={safePage >= totalPages} onClick={() => goPage(safePage + 1)}>Next</button>
+                  </div>
+                )}
               </div>
-              <button type="button" className="page-btn" disabled={safePage >= totalPages} onClick={() => goPage(safePage + 1)}>Next →</button>
-            </div>
-          )}
+            )}
+          </div>
+          </div>
         </div>
       </div>
       {/* end .sd-content */}

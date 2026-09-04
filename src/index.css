@@ -2460,12 +2460,14 @@ body {
 /* DSA panel's table only — fixed column widths (via <colgroup>) so columns
    stay evenly distributed regardless of variable tag/title content, instead
    of the browser's default auto-layout reflowing per row. */
-.q-table--dsa {
+.q-table--dsa,
+.q-table--sd {
   table-layout: fixed;
 }
 
 .q-table--dsa .q-title,
-.q-table--dsa .q-title a {
+.q-table--dsa .q-title a,
+.q-table--sd .q-title {
   white-space: normal;
   word-break: break-word;
 }
@@ -4789,9 +4791,11 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 14px;
   overflow: hidden;
   min-width: 0;
   min-height: 0;
+  padding-top: 16px;
 }
 
 .sd-main {
@@ -4801,6 +4805,7 @@ body {
   overflow-y: auto;
   min-width: 0;
   min-height: 0;
+  padding-bottom: 16px;
 }
 
 /* ── SD Company Sidebar ── */
