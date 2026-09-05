@@ -3,7 +3,7 @@ import { Boxes, Database } from "lucide-react";
 import type { DsaCompany } from "@/types/maangco";
 import { CompanyKitsModal } from "./company-kits-modal";
 import { CompanyLogo } from "./ui/company-logo";
-import { Skeleton } from "./ui/shimmer";
+import { DashboardPanelSkeleton } from "./dashboard-panel-skeleton";
 
 const FEATURED_COMPANY_NAMES = ["Google", "Amazon", "Meta", "Microsoft", "Uber"];
 
@@ -59,60 +59,7 @@ export function DashboardPanel({
   const [kitsModalOpen, setKitsModalOpen] = useState(false);
 
   if (isLoading) {
-    return (
-      <div className="dp-root">
-        <div className="dp-kits">
-          <div className="dp-kits-head">
-            <div className="dp-kits-head-text">
-              <Skeleton w={70} h={11} style={{ marginBottom: 10 }} />
-              <Skeleton w={220} h={24} />
-            </div>
-            <Skeleton w={130} h={13} />
-          </div>
-          <div className="dp-kits-row">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <div key={i} className="dp-kit-card" style={{ pointerEvents: "none" }}>
-                <Skeleton w={44} h={44} radius={10} />
-                <Skeleton w="70%" h={16} />
-                <Skeleton w={60} h={12} />
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="dp-modules">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="dp-module-card" style={{ pointerEvents: "none", gap: 14 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <Skeleton w={32} h={32} radius={8} />
-                <Skeleton w={70} h={14} />
-              </div>
-              <Skeleton w="60%" h={18} />
-              <Skeleton w="100%" h={12} />
-              <Skeleton w="100%" h={6} radius={3} />
-              <div style={{ display: "flex", gap: 16, marginTop: 4 }}>
-                <Skeleton w={50} h={30} />
-                <Skeleton w={50} h={30} />
-                <Skeleton w={50} h={30} />
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="dp-section-head">
-          <Skeleton w={120} h={14} />
-        </div>
-        <div className="dp-tips">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="dp-tip">
-              <Skeleton w={36} h={36} radius={8} />
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
-                <Skeleton w="50%" h={13} />
-                <Skeleton w="85%" h={11} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    return <DashboardPanelSkeleton />;
   }
   const featuredCompanies = FEATURED_COMPANY_NAMES
     .map((name) => companies.find((c) => c.name === name))

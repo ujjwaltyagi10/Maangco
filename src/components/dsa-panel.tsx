@@ -13,7 +13,7 @@ import type { DsaAllQuestion, DsaCompany, DsaFrequencyWindow, DsaQuestion, Quest
 import { CompanyLogo } from "./ui/company-logo";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Skeleton } from "./ui/shimmer";
+import { DsaPanelSkeleton } from "./dsa-panel-skeleton";
 
 const ALL_ID = "all";
 
@@ -320,121 +320,7 @@ export function DsaPanel({
   const miniArcFill = miniArcLen * (visibleSolvedCount / Math.max(1, visibleTotal));
 
   if (isLoading) {
-    return (
-      <div className="dsa-panel">
-        {/* ── LEFT: main content skeleton ── */}
-        <div className="dsa-main">
-          {/* Header — same grid as real header */}
-          <div className="dsa-progress-header">
-            {!lockedCompanyId && (
-              <div className="dsa-header-identity">
-                <Skeleton w={36} h={36} radius={8} style={{ flexShrink: 0 }} />
-                <div className="dsa-header-title-group">
-                  <Skeleton w={130} h={17} style={{ marginBottom: 6 }} />
-                  <Skeleton w={220} h={12} />
-                </div>
-              </div>
-            )}
-            {!lockedCompanyId && (
-              <div className="dsa-progress-card">
-                <Skeleton w={56} h={56} radius={999} style={{ flexShrink: 0 }} />
-                <div className="dsa-progress-info">
-                  <Skeleton w={52} h={18} style={{ marginBottom: 5 }} />
-                  <Skeleton w={44} h={11} />
-                </div>
-                <div className="dsa-progress-sep" />
-                <div className="dsa-diff-stats">
-                  {["Easy","Med.","Hard"].map((l) => (
-                    <div key={l} className="dsa-diff-stat">
-                      <Skeleton w={28} h={11} style={{ marginBottom: 4 }} />
-                      <Skeleton w={32} h={14} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            <div className="dsa-header-bottom">
-              <Skeleton w="100%" h={36} radius={7} style={{ flex: 1 }} />
-              <Skeleton w={90} h={36} radius={7} />
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className="table-wrap">
-            <table className="q-table">
-              <thead>
-                <tr>
-                  <th style={{ width: 36 }} />
-                  <th><Skeleton w={16} h={11} /></th>
-                  <th><Skeleton w={36} h={11} /></th>
-                  <th><Skeleton w={54} h={11} /></th>
-                  <th><Skeleton w={60} h={11} /></th>
-                  <th><Skeleton w={30} h={11} /></th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {Array.from({ length: 14 }).map((_, i) => (
-                  <tr key={i} className="q-row">
-                    <td><Skeleton w={16} h={16} radius={4} /></td>
-                    <td className="q-num"><Skeleton w={28} h={12} /></td>
-                    <td className="q-title"><Skeleton w={`${42 + (i % 5) * 9}%`} h={13} /></td>
-                    <td><Skeleton w={52} h={22} radius={20} /></td>
-                    <td>
-                      <div className="freq-bar">
-                        <div className="freq-dots" style={{ display: "flex", gap: 3 }}>
-                          {[1,2,3,4,5].map((d) => <Skeleton key={d} w={8} h={8} radius={999} />)}
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="tag-list">
-                        <Skeleton w={48} h={20} radius={20} />
-                        {i % 3 !== 0 && <Skeleton w={52} h={20} radius={20} />}
-                      </div>
-                    </td>
-                    <td />
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* ── RIGHT: company sidebar skeleton — hidden on the locked kit page ── */}
-        {!lockedCompanyId && (
-        <aside className="dsa-sidebar">
-          <div className="dsa-sidebar-head">
-            <div className="dsa-sidebar-head-row">
-              <div>
-                <Skeleton w={80} h={14} style={{ marginBottom: 5 }} />
-                <Skeleton w={70} h={11} />
-              </div>
-              <Skeleton w={28} h={28} radius={6} />
-            </div>
-            <Skeleton w="100%" h={32} radius={6} style={{ marginTop: 8 }} />
-          </div>
-          <div className="dsa-sidebar-companies">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="co-item co-item--sidebar" style={{ pointerEvents: "none" }}>
-                <div className="co-logo"><Skeleton w={28} h={28} radius={999} /></div>
-                <div className="co-info"><Skeleton w={`${50 + (i % 4) * 12}%`} h={13} /></div>
-                <div className="co-prog"><Skeleton w={30} h={13} /></div>
-              </div>
-            ))}
-          </div>
-          <div className="dsa-sidebar-footer">
-            <Skeleton w={80} h={11} style={{ marginBottom: 6 }} />
-            <Skeleton w="100%" h={4} radius={2} style={{ marginBottom: 6 }} />
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Skeleton w={55} h={11} />
-              <Skeleton w={55} h={11} />
-            </div>
-          </div>
-        </aside>
-        )}
-      </div>
-    );
+    return <DsaPanelSkeleton lockedCompanyId={lockedCompanyId} />;
   }
 
   return (
