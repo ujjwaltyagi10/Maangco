@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "re
 
 import { AuthScreen } from "@/components/auth-screen";
 import { CancellationPolicyPage } from "@/components/cancellation-policy-page";
+import { CareerPage } from "@/components/career-page";
 import { ContactPage } from "@/components/contact-page";
 import { FinancialAidPage } from "@/components/financial-aid-page";
 import { LandingPage } from "@/components/landing-page";
@@ -255,6 +256,7 @@ export function PublicRoutes({
       "/cancellation-policy": "Cancellation & Refund Policy – MAANGco",
       "/financial-aid": "Financial Aid – MAANGco",
       "/contact": "Contact Us – MAANGco",
+      "/career": "Career Portal – MAANGco",
       "/login": "Sign In – MAANGco",
       "/signup": "Get Started Free – MAANGco",
       "/forgot-password": "Reset Password – MAANGco",
@@ -265,7 +267,7 @@ export function PublicRoutes({
   const isAuthenticated = Boolean(authSession?.token);
 
   // Redirect logged-in users away from auth screens only (not the landing page)
-  const isPublicLegalRoute = location.pathname === ROUTES.termsConditions || location.pathname === ROUTES.privacyPolicy || location.pathname === ROUTES.cancellationPolicy || location.pathname === ROUTES.financialAid || location.pathname === ROUTES.contact;
+  const isPublicLegalRoute = location.pathname === ROUTES.termsConditions || location.pathname === ROUTES.privacyPolicy || location.pathname === ROUTES.cancellationPolicy || location.pathname === ROUTES.financialAid || location.pathname === ROUTES.contact || location.pathname === ROUTES.career;
 
   if (isAuthenticated && location.pathname !== ROUTES.landing && !isPublicLegalRoute) {
     return <Navigate to={ROUTES.dashboard} replace />;
@@ -297,6 +299,7 @@ export function PublicRoutes({
       <Route path={ROUTES.cancellationPolicy} element={<CancellationPolicyPage theme={theme} onThemeChange={onThemeChange} />} />
       <Route path={ROUTES.financialAid} element={<FinancialAidPage theme={theme} onThemeChange={onThemeChange} />} />
       <Route path={ROUTES.contact} element={<ContactPage theme={theme} onThemeChange={onThemeChange} />} />
+      <Route path={ROUTES.career} element={<CareerPage theme={theme} onThemeChange={onThemeChange} />} />
       <Route
         path={ROUTES.login}
         element={

@@ -4,52 +4,42 @@ import { ROUTES } from "@/routes/route-paths";
 import instagramSvg from "@/assets/svg/instagram.svg";
 import linkedinSvg from "@/assets/svg/linkedin.svg";
 
-interface FinancialAidPageProps {
+interface CareerPageProps {
   theme: "light" | "dark";
   onThemeChange: () => void;
 }
 
-const QUESTIONS = [
+const careerRoles = [
   {
-    num: "01",
-    q: "Full name & email",
-    hint: "Your full name and the email address linked to your account (or the one you'll register with).",
+    id: "bda",
+    title: "Business Development Associate",
+    type: "Full Time",
+    exp: "2-5 yrs experience",
+    location: "Remote, India",
+    desc: "Own the full sales cycle for MAANGco — from prospecting and outreach to closing partnerships with colleges, coaching platforms, and corporate L&D teams. You'll work closely with the founding team to identify new growth channels, build relationships with key stakeholders, and turn conversations into signed deals. We're looking for 2-5 years of experience in B2B sales, business development, or partnerships, along with strong communication and negotiation skills.",
   },
   {
-    num: "02",
-    q: "Current status",
-    hint: "Student / Fresher / Unemployed / Employed (low income) / Career switcher",
+    id: "marketing-intern",
+    title: "Marketing Intern",
+    type: "Internship",
+    exp: "",
+    location: "Remote, India",
+    desc: "Support MAANGco's content, social media, and campaign execution across channels — from drafting posts and newsletters to tracking campaign performance and assisting with launches. This is a hands-on role for someone early in their marketing career who wants real ownership over what they ship, working directly with the founding team instead of inside a large, siloed marketing org.",
   },
   {
-    num: "03",
-    q: "Country & city of residence",
-    hint: "Helps us understand cost-of-living context without asking for income directly.",
-  },
-  {
-    num: "04",
-    q: "Why can't you afford the full subscription?",
-    hint: "2–3 sentences max. This is your core self-declaration.",
-  },
-  {
-    num: "05",
-    q: "What is your target goal?",
-    hint: "MAANG placement / Tier-1 startup / Any SWE job / Upskilling / Other",
-  },
-  {
-    num: "06",
-    q: "Hours per week you can commit to studying",
-    hint: "Less than 5 / 5–10 / 10–20 / 20+",
-  },
-  {
-    num: "07",
-    q: "What discount would make this accessible?",
-    hint: "25% off / 50% off / 75% off / I can't pay anything right now",
+    id: "sales-intern",
+    title: "Sales Intern",
+    type: "Internship",
+    exp: "",
+    location: "Remote, India",
+    desc: "Support the sales team with outreach, lead qualification, and pipeline management — helping identify prospective students and institutions, following up on leads, and keeping our CRM organized. A great opportunity to learn the fundamentals of B2B and B2C sales in a fast-moving startup, with direct mentorship from the team closing deals.",
   },
 ];
 
-export function FinancialAidPage({ theme, onThemeChange }: FinancialAidPageProps) {
+export function CareerPage({ theme, onThemeChange }: CareerPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
+  const [openRoleId, setOpenRoleId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -116,33 +106,77 @@ export function FinancialAidPage({ theme, onThemeChange }: FinancialAidPageProps
         </div>
       </nav>
 
-      {/* ── HERO ── */}
-      <section className="ltc-hero">
-        <div className="landing-container">
-          <p className="ltc-eyebrow">Support</p>
-          <h1 className="ltc-h1">Financial Aid</h1>
-          <p className="ltc-sub">
-            We believe cost should never be a barrier to learning. Send us an email with the details below we review every application personally and respond within 3–5 business days.
-          </p>
-          <p className="lfa-hero-email">
-            <a href="mailto:support@maangco.com" className="lfa-email-link">support@maangco.com</a>
-          </p>
-        </div>
-      </section>
+      {/* ── CAREER PORTAL ── */}
+      <section className="lcareer-section">
+        <div className="lcareer-inner">
+          <div className="lcareer-left">
+            <p className="lcareer-eyebrow">Careers</p>
+            <h1 className="lcareer-heading">Career Portal</h1>
+            <p className="lcareer-sub">
+              We're a small, fast-moving team building the sharpest interview-prep
+              platform out there. Come build it with us.
+            </p>
+            <div className="lcareer-contact">
+              <span className="lcareer-contact-label">Or contact us with</span>
+              <a href="mailto:careers@maangco.com" className="lcareer-contact-link">careers@maangco.com</a>
+            </div>
+          </div>
 
-      {/* ── QUESTIONS ── */}
-      <section className="lfa-section">
-        <div className="landing-container">
-          <div className="lfa-grid">
-            {QUESTIONS.map(({ num, q, hint }) => (
-              <div key={num} className="lfa-item">
-                <span className="lfa-item-num">{num}</span>
-                <div className="lfa-item-body">
-                  <p className="lfa-item-q">{q}</p>
-                  <p className="lfa-item-hint">{hint}</p>
+          <div className="lcareer-right">
+            {careerRoles.map((role) => {
+              const isOpen = openRoleId === role.id;
+              return (
+                <div key={role.id} className={`lcareer-role${isOpen ? " open" : ""}`}>
+                  <div className="lcareer-role-main">
+                    <div className="lcareer-role-head">
+                      <p className="lcareer-role-eyebrow">Open Role</p>
+                      <h3 className="lcareer-role-title">{role.title}</h3>
+                      <div className="lcareer-role-meta">
+                        <span>{role.type}</span>
+                        {role.exp && (
+                          <>
+                            <span className="lcareer-meta-dot" />
+                            <span>{role.exp}</span>
+                          </>
+                        )}
+                        <span className="lcareer-meta-dot" />
+                        <span>{role.location}</span>
+                      </div>
+                    </div>
+                    <div className="lcareer-role-actions">
+                      <button
+                        type="button"
+                        className="lcareer-role-toggle"
+                        onClick={() => setOpenRoleId(isOpen ? null : role.id)}
+                        aria-label={isOpen ? "Collapse details" : "Expand details"}
+                        aria-expanded={isOpen}
+                      >
+                        <svg
+                          viewBox="0 0 12 12"
+                          width="11"
+                          height="11"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}
+                        >
+                          <path d="M2 4l4 4 4-4" />
+                        </svg>
+                      </button>
+                      <Link to={ROUTES.contact} className="lbtn-primary lcareer-apply-btn">
+                        Apply Now
+                        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11">
+                          <path d="M2 6h8M6 2l4 4-4 4" />
+                        </svg>
+                      </Link>
+                    </div>
+                  </div>
+                  {isOpen && <p className="lcareer-role-desc">{role.desc}</p>}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

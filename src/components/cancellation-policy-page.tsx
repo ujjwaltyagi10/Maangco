@@ -300,6 +300,7 @@ export function CancellationPolicyPage({ theme, onThemeChange }: CancellationPol
               <Link to={ROUTES.financialAid} className="lfooter-link" style={{ textDecoration: "none" }}>Financial Aid</Link>
               <Link to={ROUTES.privacyPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Privacy Policy</Link>
               <Link to={ROUTES.cancellationPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Cancellation and Refund Policy</Link>
+              <Link to={ROUTES.career} className="lfooter-link" style={{ textDecoration: "none" }}>Career</Link>
             </div>
             <div className="lfooter-social-row">
               <a href="https://x.com/MAANGcode" target="_blank" rel="noreferrer" className="lfooter-social-link" aria-label="X">

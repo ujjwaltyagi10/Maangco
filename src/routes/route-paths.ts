@@ -20,6 +20,7 @@ export const ROUTES = {
   cancellationPolicy: "/cancellation-policy",
   financialAid: "/financial-aid",
   contact: "/contact",
+  career: "/career",
   dashboard: "/dashboard",
   dsa: "/dsa",
   companyKit: "/company",
