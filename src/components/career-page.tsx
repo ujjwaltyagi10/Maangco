@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes/route-paths";
-import { fetchCareerRoles, type CareerRole } from "@/lib/careers-api";
+import { fetchCareerRoles, getCachedCareerRoles, type CareerRole } from "@/lib/careers-api";
 import { CareerApplyModal } from "@/components/career-apply-modal";
 import instagramSvg from "@/assets/svg/instagram.svg";
 import linkedinSvg from "@/assets/svg/linkedin.svg";
@@ -16,8 +16,9 @@ export function CareerPage({ theme, onThemeChange }: CareerPageProps) {
   const [navScrolled, setNavScrolled] = useState(false);
   const [openRoleId, setOpenRoleId] = useState<string | null>(null);
   const [applyRoleId, setApplyRoleId] = useState<string | null>(null);
-  const [roles, setRoles] = useState<CareerRole[]>([]);
-  const [rolesLoading, setRolesLoading] = useState(true);
+  const cachedRoles = getCachedCareerRoles();
+  const [roles, setRoles] = useState<CareerRole[]>(cachedRoles ?? []);
+  const [rolesLoading, setRolesLoading] = useState(cachedRoles === null);
   const [rolesError, setRolesError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 

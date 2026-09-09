@@ -9,12 +9,35 @@ export interface CareerRole {
   description: string;
 }
 
+const CACHE_KEY = "careerRolesCache";
+let memoryCache: CareerRole[] | null = null;
+
+export function getCachedCareerRoles(): CareerRole[] | null {
+  if (memoryCache) return memoryCache;
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (raw) {
+      memoryCache = JSON.parse(raw) as CareerRole[];
+      return memoryCache;
+    }
+  } catch {
+    // sessionStorage unavailable — fall through to a normal fetch
+  }
+  return null;
+}
+
 export async function fetchCareerRoles(): Promise<CareerRole[]> {
   const res = await fetch(`${AUTH_API_BASE_URL}/api/careers`, {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) throw new Error("Failed to load open roles");
   const data = (await res.json()) as { success: boolean; data: CareerRole[] };
+  memoryCache = data.data;
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify(data.data));
+  } catch {
+    // sessionStorage unavailable — cached in memory only, still fine for this tab
+  }
   return data.data;
 }
 
