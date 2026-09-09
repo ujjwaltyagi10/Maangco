@@ -125,9 +125,9 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
               <Link to={ROUTES.termsConditions} className="lfooter-link" style={{ textDecoration: "none" }}>Terms and Conditions</Link>
               <Link to={ROUTES.contact} className="lfooter-link" style={{ textDecoration: "none" }}>Contact us</Link>
               <Link to={ROUTES.financialAid} className="lfooter-link" style={{ textDecoration: "none" }}>Financial Aid</Link>
+              <Link to={ROUTES.career} className="lfooter-link" style={{ textDecoration: "none" }}>Career</Link>
               <Link to={ROUTES.privacyPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Privacy Policy</Link>
               <Link to={ROUTES.cancellationPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Cancellation and Refund Policy</Link>
-              <Link to={ROUTES.career} className="lfooter-link" style={{ textDecoration: "none" }}>Career</Link>
             </div>
             <div className="lfooter-social-row">
               <a href="https://x.com/MAANGcode" target="_blank" rel="noreferrer" className="lfooter-social-link" aria-label="X">

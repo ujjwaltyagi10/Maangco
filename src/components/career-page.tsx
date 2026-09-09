@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes/route-paths";
+import { fetchCareerRoles, type CareerRole } from "@/lib/careers-api";
 import instagramSvg from "@/assets/svg/instagram.svg";
 import linkedinSvg from "@/assets/svg/linkedin.svg";
 
@@ -9,37 +10,13 @@ interface CareerPageProps {
   onThemeChange: () => void;
 }
 
-const careerRoles = [
-  {
-    id: "bda",
-    title: "Business Development Associate",
-    type: "Full Time",
-    exp: "2-5 yrs experience",
-    location: "Remote, India",
-    desc: "Own the full sales cycle for MAANGco — from prospecting and outreach to closing partnerships with colleges, coaching platforms, and corporate L&D teams. You'll work closely with the founding team to identify new growth channels, build relationships with key stakeholders, and turn conversations into signed deals. We're looking for 2-5 years of experience in B2B sales, business development, or partnerships, along with strong communication and negotiation skills.",
-  },
-  {
-    id: "marketing-intern",
-    title: "Marketing Intern",
-    type: "Internship",
-    exp: "",
-    location: "Remote, India",
-    desc: "Support MAANGco's content, social media, and campaign execution across channels — from drafting posts and newsletters to tracking campaign performance and assisting with launches. This is a hands-on role for someone early in their marketing career who wants real ownership over what they ship, working directly with the founding team instead of inside a large, siloed marketing org.",
-  },
-  {
-    id: "sales-intern",
-    title: "Sales Intern",
-    type: "Internship",
-    exp: "",
-    location: "Remote, India",
-    desc: "Support the sales team with outreach, lead qualification, and pipeline management — helping identify prospective students and institutions, following up on leads, and keeping our CRM organized. A great opportunity to learn the fundamentals of B2B and B2C sales in a fast-moving startup, with direct mentorship from the team closing deals.",
-  },
-];
-
 export function CareerPage({ theme, onThemeChange }: CareerPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const [openRoleId, setOpenRoleId] = useState<string | null>(null);
+  const [roles, setRoles] = useState<CareerRole[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
+  const [rolesError, setRolesError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,6 +25,13 @@ export function CareerPage({ theme, onThemeChange }: CareerPageProps) {
     const onScroll = () => setNavScrolled(el.scrollTop > 20);
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    fetchCareerRoles()
+      .then(setRoles)
+      .catch(() => setRolesError(true))
+      .finally(() => setRolesLoading(false));
   }, []);
 
   return (
@@ -123,60 +107,74 @@ export function CareerPage({ theme, onThemeChange }: CareerPageProps) {
           </div>
 
           <div className="lcareer-right">
-            {careerRoles.map((role) => {
-              const isOpen = openRoleId === role.id;
-              return (
-                <div key={role.id} className={`lcareer-role${isOpen ? " open" : ""}`}>
-                  <div className="lcareer-role-main">
-                    <div className="lcareer-role-head">
-                      <p className="lcareer-role-eyebrow">Open Role</p>
-                      <h3 className="lcareer-role-title">{role.title}</h3>
-                      <div className="lcareer-role-meta">
-                        <span>{role.type}</span>
-                        {role.exp && (
-                          <>
-                            <span className="lcareer-meta-dot" />
-                            <span>{role.exp}</span>
-                          </>
-                        )}
-                        <span className="lcareer-meta-dot" />
-                        <span>{role.location}</span>
+            {rolesLoading ? (
+              <p className="lcareer-role-desc">Loading open roles…</p>
+            ) : rolesError ? (
+              <p className="lcareer-role-desc">
+                Couldn't load open roles right now — reach out at{" "}
+                <a href="mailto:careers@maangco.com" className="lcareer-contact-link">careers@maangco.com</a> instead.
+              </p>
+            ) : roles.length === 0 ? (
+              <p className="lcareer-role-desc">
+                No open roles right now — but we're always happy to hear from good people. Email us at{" "}
+                <a href="mailto:careers@maangco.com" className="lcareer-contact-link">careers@maangco.com</a>.
+              </p>
+            ) : (
+              roles.map((role) => {
+                const isOpen = openRoleId === role.id;
+                return (
+                  <div key={role.id} className={`lcareer-role${isOpen ? " open" : ""}`}>
+                    <div className="lcareer-role-main">
+                      <div className="lcareer-role-head">
+                        <p className="lcareer-role-eyebrow">Open Role</p>
+                        <h3 className="lcareer-role-title">{role.title}</h3>
+                        <div className="lcareer-role-meta">
+                          <span>{role.type}</span>
+                          {role.experience && (
+                            <>
+                              <span className="lcareer-meta-dot" />
+                              <span>{role.experience}</span>
+                            </>
+                          )}
+                          <span className="lcareer-meta-dot" />
+                          <span>{role.location}</span>
+                        </div>
+                      </div>
+                      <div className="lcareer-role-actions">
+                        <button
+                          type="button"
+                          className="lcareer-role-toggle"
+                          onClick={() => setOpenRoleId(isOpen ? null : role.id)}
+                          aria-label={isOpen ? "Collapse details" : "Expand details"}
+                          aria-expanded={isOpen}
+                        >
+                          <svg
+                            viewBox="0 0 12 12"
+                            width="11"
+                            height="11"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}
+                          >
+                            <path d="M2 4l4 4 4-4" />
+                          </svg>
+                        </button>
+                        <Link to={ROUTES.contact} className="lbtn-primary lcareer-apply-btn">
+                          Apply Now
+                          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11">
+                            <path d="M2 6h8M6 2l4 4-4 4" />
+                          </svg>
+                        </Link>
                       </div>
                     </div>
-                    <div className="lcareer-role-actions">
-                      <button
-                        type="button"
-                        className="lcareer-role-toggle"
-                        onClick={() => setOpenRoleId(isOpen ? null : role.id)}
-                        aria-label={isOpen ? "Collapse details" : "Expand details"}
-                        aria-expanded={isOpen}
-                      >
-                        <svg
-                          viewBox="0 0 12 12"
-                          width="11"
-                          height="11"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}
-                        >
-                          <path d="M2 4l4 4 4-4" />
-                        </svg>
-                      </button>
-                      <Link to={ROUTES.contact} className="lbtn-primary lcareer-apply-btn">
-                        Apply Now
-                        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11">
-                          <path d="M2 6h8M6 2l4 4-4 4" />
-                        </svg>
-                      </Link>
-                    </div>
+                    {isOpen && <p className="lcareer-role-desc">{role.description}</p>}
                   </div>
-                  {isOpen && <p className="lcareer-role-desc">{role.desc}</p>}
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       </section>
@@ -194,9 +192,9 @@ export function CareerPage({ theme, onThemeChange }: CareerPageProps) {
               <Link to={ROUTES.termsConditions} className="lfooter-link" style={{ textDecoration: "none" }}>Terms and Conditions</Link>
               <Link to={ROUTES.contact} className="lfooter-link" style={{ textDecoration: "none" }}>Contact us</Link>
               <Link to={ROUTES.financialAid} className="lfooter-link" style={{ textDecoration: "none" }}>Financial Aid</Link>
+              <Link to={ROUTES.career} className="lfooter-link" style={{ textDecoration: "none" }}>Career</Link>
               <Link to={ROUTES.privacyPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Privacy Policy</Link>
               <Link to={ROUTES.cancellationPolicy} className="lfooter-link" style={{ textDecoration: "none" }}>Cancellation and Refund Policy</Link>
-              <Link to={ROUTES.career} className="lfooter-link" style={{ textDecoration: "none" }}>Career</Link>
             </div>
             <div className="lfooter-social-row">
               <a href="https://x.com/MAANGcode" target="_blank" rel="noreferrer" className="lfooter-social-link" aria-label="X">
