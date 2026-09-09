@@ -23,6 +23,8 @@ import snowflakeSvg from "@/assets/svg/snowflake.svg";
 import uberDarkSvg from "@/assets/svg/uber-dark.svg";
 import visaSvg from "@/assets/svg/visa.svg";
 import { ROUTES } from "@/routes/route-paths";
+import { fetchActiveCampaign, computeDiscountedPrice, type ActiveCampaign } from "@/lib/discounts-api";
+import { SaleBanner } from "./sale-banner";
 
 const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url)
   .href;
@@ -45,6 +47,14 @@ interface LandingPageProps {
   onOpenChangePassword?: () => void;
   onBuyPremium?: (plan?: "monthly" | "yearly") => void;
   isPremium?: boolean;
+}
+
+// Must match the base prices in the backend's config/plans.js
+const MONTHLY_BASE_PRICE = 299;
+const YEARLY_BASE_PRICE = 1999;
+
+function campaignAppliesToPlan(campaign: ActiveCampaign | null, plan: "monthly" | "yearly"): boolean {
+  return !!campaign && (campaign.appliesTo === "both" || campaign.appliesTo === plan);
 }
 
 const PLAN_FEATURES = [
@@ -198,6 +208,20 @@ export function LandingPage({
   const [activeSection, setActiveSection] = useState<string>("");
   const avatarMenuRef = useRef<HTMLDivElement>(null);
   const landingRef = useRef<HTMLDivElement>(null);
+  const [activeCampaign, setActiveCampaign] = useState<ActiveCampaign | null>(null);
+  const [bannerNow, setBannerNow] = useState(() => Date.now());
+  // In-memory only — dismissing hides the banner for this page view, but a
+  // refresh should bring it back, so this is intentionally not persisted.
+  const [bannerDismissedKey, setBannerDismissedKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchActiveCampaign().then(setActiveCampaign).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setBannerNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     const el = landingRef.current;
@@ -252,10 +276,39 @@ export function LandingPage({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [avatarMenuOpen]);
 
+  const bannerKey = activeCampaign ? `${activeCampaign.name}|${activeCampaign.endsAt}` : null;
+  const bannerRemaining = activeCampaign ? new Date(activeCampaign.endsAt).getTime() - bannerNow : 0;
+  const showSaleBanner = !!activeCampaign && bannerRemaining > 0 && bannerDismissedKey !== bannerKey;
+
+  function handleDismissSaleBanner() {
+    if (!bannerKey) return;
+    setBannerDismissedKey(bannerKey);
+  }
+
+  const monthlySale = campaignAppliesToPlan(activeCampaign, "monthly") && activeCampaign
+    ? {
+        originalPrice: MONTHLY_BASE_PRICE,
+        salePrice: computeDiscountedPrice(MONTHLY_BASE_PRICE, activeCampaign.discountType, activeCampaign.discountValue),
+        label: activeCampaign.name,
+      }
+    : null;
+  const yearlySale = campaignAppliesToPlan(activeCampaign, "yearly") && activeCampaign
+    ? {
+        originalPrice: YEARLY_BASE_PRICE,
+        salePrice: computeDiscountedPrice(YEARLY_BASE_PRICE, activeCampaign.discountType, activeCampaign.discountValue),
+        label: activeCampaign.name,
+      }
+    : null;
+
   return (
     <div className="landing w-full min-w-0" ref={landingRef}>
+      {/* ── SALE BANNER ── */}
+      {showSaleBanner && activeCampaign && (
+        <SaleBanner campaign={activeCampaign} remainingMs={bannerRemaining} onDismiss={handleDismissSaleBanner} />
+      )}
+
       {/* ── NAVBAR ── */}
-      <nav className={`landing-nav${navScrolled ? " scrolled" : ""}${mobileMenuOpen ? " mobile-open" : ""}`}>
+      <nav className={`landing-nav${navScrolled ? " scrolled" : ""}${mobileMenuOpen ? " mobile-open" : ""}${showSaleBanner ? " landing-nav--with-banner" : ""}`}>
         <div className="landing-container">
           <div className="landing-nav-row">
             <div className="landing-nav-left">
@@ -965,15 +1018,17 @@ export function LandingPage({
                 <div className="lprice-card">
                   <div className="lprice-plan-name">Monthly</div>
                   <div className="lprice-original-row">
-                    <span className="lprice-original">₹349</span>
-                    <span className="lprice-discount-badge">14% off</span>
+                    <span className="lprice-original">₹{monthlySale ? monthlySale.originalPrice : 349}</span>
+                    <span className={`lprice-discount-badge${monthlySale ? " lprice-discount-badge--sale" : ""}`}>
+                      {monthlySale ? `${monthlySale.label} 🎉` : "14% off"}
+                    </span>
                   </div>
                   <div className="lprice-amount">
                     <span className="lprice-currency">₹</span>
-                    <span className="lprice-num">299</span>
+                    <span className="lprice-num">{monthlySale ? monthlySale.salePrice.toLocaleString("en-IN") : 299}</span>
                     <span className="lprice-period">/month</span>
                   </div>
-                  <p className="lprice-tagline">Great to start. Cancel anytime.</p>
+                  <p className="lprice-tagline">{monthlySale ? "Limited-time sale price" : "Great to start. Cancel anytime."}</p>
                   <ul className="lprice-features">
                     {PLAN_FEATURES.map((f) => (
                       <li key={f} className="lprice-feature">
@@ -1001,16 +1056,18 @@ export function LandingPage({
                   </div>
                   <div className="lprice-plan-name">Yearly</div>
                   <div className="lprice-original-row">
-                    <span className="lprice-original">₹2,999</span>
-                    <span className="lprice-discount-badge">33% off</span>
+                    <span className="lprice-original">₹{(yearlySale ? yearlySale.originalPrice : 2999).toLocaleString("en-IN")}</span>
+                    <span className={`lprice-discount-badge${yearlySale ? " lprice-discount-badge--sale" : ""}`}>
+                      {yearlySale ? `${yearlySale.label} 🎉` : "33% off"}
+                    </span>
                   </div>
                   <div className="lprice-amount">
                     <span className="lprice-currency">₹</span>
-                    <span className="lprice-num">1,999</span>
+                    <span className="lprice-num">{(yearlySale ? yearlySale.salePrice : 1999).toLocaleString("en-IN")}</span>
                     <span className="lprice-period">/year</span>
                   </div>
                   <p className="lprice-tagline">
-                    ₹167/month · Save ₹1,589 vs monthly
+                    {yearlySale ? "Limited-time sale price" : "₹167/month · Save ₹1,589 vs monthly"}
                   </p>
                   <ul className="lprice-features">
                     {PLAN_FEATURES.map((f) => (
