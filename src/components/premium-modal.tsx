@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { createSubscription, verifySubscription, SubscriptionAuthError, type PlanType } from "../lib/subscription-api";
 import { fetchPlans, type Plan } from "../lib/plans-api";
 import { validateCoupon, fetchActiveCampaign, computeDiscountedPrice, CouponInvalidError, type CouponPreview, type ActiveCampaign } from "../lib/discounts-api";
@@ -79,6 +79,16 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
     : couponValidForPlan
       ? { discountType: couponValidForPlan.discountType, discountValue: couponValidForPlan.discountValue, label: couponValidForPlan.code }
       : null;
+
+  function getCardDiscount(planId: string): { discountType: "percent" | "flat"; discountValue: number } | null {
+    if (activeCampaign && (activeCampaign.appliesTo === "both" || activeCampaign.appliesTo === planId)) {
+      return { discountType: activeCampaign.discountType, discountValue: activeCampaign.discountValue };
+    }
+    if (planId === selectedPlan && couponValidForPlan) {
+      return { discountType: couponValidForPlan.discountType, discountValue: couponValidForPlan.discountValue };
+    }
+    return null;
+  }
 
   const handleApplyCoupon = async () => {
     if (!couponInput.trim() || !authToken) return;
@@ -268,34 +278,47 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
 
           {/* Plan cards */}
           <div className="pm-plans">
-            {plans.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                className={`pm-plan-card${p.isPopular ? " pm-plan-card--featured" : ""}${selectedPlan === p.id ? " pm-plan-card--active" : ""}`}
-                onClick={() => setSelectedPlan(p.id as PlanType)}
-              >
-                <div className="pm-plan-row">
-                  <div className="pm-plan-info">
-                    <div className="pm-plan-name">{p.label}</div>
-                    <div className="pm-plan-billing">{p.billing}</div>
+            {plans.map((p) => {
+              const cardDiscount = getCardDiscount(p.id);
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`pm-plan-card${p.isPopular ? " pm-plan-card--featured" : ""}${selectedPlan === p.id ? " pm-plan-card--active" : ""}`}
+                  onClick={() => setSelectedPlan(p.id as PlanType)}
+                >
+                  <div className="pm-plan-row">
+                    <div className="pm-plan-info">
+                      <div className="pm-plan-name">{p.label}</div>
+                      <div className="pm-plan-billing">{p.billing}</div>
+                    </div>
+                    <div className="pm-plan-price-wrap">
+                      {cardDiscount ? (
+                        <>
+                          <span className="pm-plan-price-strike">{p.priceDisplay}</span>
+                          <span className="pm-plan-price">
+                            ₹{computeDiscountedPrice(p.price, cardDiscount.discountType, cardDiscount.discountValue).toLocaleString("en-IN")}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="pm-plan-price">{p.priceDisplay}</span>
+                      )}
+                      <span className="pm-plan-period">{p.period}</span>
+                    </div>
+                    <div className={`pm-plan-radio${selectedPlan === p.id ? " pm-plan-radio--on" : ""}`}>
+                      {selectedPlan === p.id && CHECK_ICON}
+                    </div>
                   </div>
-                  <div className="pm-plan-price-wrap">
-                    <span className="pm-plan-price">{p.priceDisplay}</span>
-                    <span className="pm-plan-period">{p.period}</span>
-                  </div>
-                  <div className={`pm-plan-radio${selectedPlan === p.id ? " pm-plan-radio--on" : ""}`}>
-                    {selectedPlan === p.id && CHECK_ICON}
-                  </div>
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
 
           {/* Coupon / active sale */}
           {campaignApplies && activeCampaign ? (
             <div className="pm-campaign-banner">
-              🎉 {activeCampaign.name} — {activeCampaign.discountType === "percent" ? `${activeCampaign.discountValue}% off` : `₹${activeCampaign.discountValue} off`} applied automatically
+              <Sparkles size={13} strokeWidth={2.25} className="pm-campaign-banner-icon" />
+              {activeCampaign.name} — {activeCampaign.discountType === "percent" ? `${activeCampaign.discountValue}% off` : `₹${activeCampaign.discountValue} off`} applied automatically
             </div>
           ) : (
             <div className="pm-coupon">

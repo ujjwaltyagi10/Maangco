@@ -957,6 +957,125 @@ a.lbtn-lg {
   background: rgba(245, 243, 238, 0.99);
   border-color: rgba(0, 0, 0, 0.1);
 }
+.landing-nav--with-banner {
+  top: 52px;
+}
+
+.sale-banner {
+  position: relative;
+  z-index: 210;
+  width: 100%;
+  background: linear-gradient(90deg, #a85e30, #c87c4a 55%, #cd8b5c);
+  color: #fff;
+}
+.sale-banner-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px clamp(16px, 4vw, 40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.sale-banner-icon {
+  color: #fff;
+  flex-shrink: 0;
+}
+.sale-banner-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
+}
+.sale-banner-text strong {
+  font-weight: 800;
+  color: #fff;
+}
+.sale-banner-sep {
+  margin: 0 6px;
+  opacity: 0.5;
+}
+.sale-banner-countdown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sale-banner-timebox {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: 13px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  padding: 2px 6px;
+  min-width: 30px;
+  justify-content: center;
+}
+.sale-banner-timebox em {
+  font-style: normal;
+  font-size: 9px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+.sale-banner-colon {
+  font-weight: 800;
+  opacity: 0.6;
+}
+.sale-banner-cta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #fff;
+  color: #a85e30;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.sale-banner-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+.sale-banner-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.sale-banner-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+@media (max-width: 720px) {
+  .sale-banner-inner {
+    gap: 8px;
+    padding: 8px 16px;
+  }
+  .sale-banner-text {
+    font-size: 11.5px;
+    white-space: normal;
+  }
+  .sale-banner-sep {
+    display: none;
+  }
+  .sale-banner-cta span {
+    display: none;
+  }
+}
 [data-theme="dark"] .landing-nav.mobile-open {
   background: rgba(14, 14, 14, 0.99);
   border-color: rgba(255,255,255,0.08);
@@ -2863,6 +2982,11 @@ a.lbtn-lg {
   border: 1px solid rgba(200, 124, 74, 0.25);
   border-radius: 6px;
   padding: 2px 7px;
+}
+.lprice-discount-badge--sale {
+  color: #fff;
+  background: linear-gradient(135deg, #a85e30, #c87c4a);
+  border-color: transparent;
 }
 .lprice-amount {
   display: flex;

@@ -4458,7 +4458,7 @@ body {
 .pm-plan-price-wrap {
   display: flex;
   align-items: baseline;
-  gap: 2px;
+  gap: 6px;
   flex-shrink: 0;
 }
 .pm-plan-price {
@@ -4467,6 +4467,12 @@ body {
   font-weight: 600;
   letter-spacing: -0.04em;
   color: var(--text1);
+}
+.pm-plan-price-strike {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  text-decoration: line-through;
 }
 .pm-plan-period {
   font-size: 12px;
@@ -4628,6 +4634,9 @@ body {
 }
 
 .pm-campaign-banner {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   padding: 0.65rem 0.85rem;
   border-radius: 12px;
   border: 1px solid rgba(200, 124, 74, 0.35);
@@ -4635,6 +4644,11 @@ body {
   color: var(--accent);
   font-size: 12.5px;
   font-weight: 600;
+}
+
+.pm-campaign-banner-icon {
+  flex-shrink: 0;
+  color: var(--accent);
 }
 
 .premium-modal-cta {
@@ -4837,6 +4851,7 @@ body {
 
 [data-theme="light"] .pm-plan-billing,
 [data-theme="light"] .pm-plan-period,
+[data-theme="light"] .pm-plan-price-strike,
 [data-theme="light"] .pm-summary-row,
 [data-theme="light"] .premium-modal-trust,
 [data-theme="light"] .premium-modal-dismiss {
