@@ -1020,7 +1020,7 @@ export function LandingPage({
                   <div className="lprice-original-row">
                     <span className="lprice-original">₹{monthlySale ? monthlySale.originalPrice : 349}</span>
                     <span className={`lprice-discount-badge${monthlySale ? " lprice-discount-badge--sale" : ""}`}>
-                      {monthlySale ? monthlySale.label : "14% off"}
+                      {monthlySale ? `${monthlySale.label} 🎉` : "14% off"}
                     </span>
                   </div>
                   <div className="lprice-amount">
@@ -1058,7 +1058,7 @@ export function LandingPage({
                   <div className="lprice-original-row">
                     <span className="lprice-original">₹{(yearlySale ? yearlySale.originalPrice : 2999).toLocaleString("en-IN")}</span>
                     <span className={`lprice-discount-badge${yearlySale ? " lprice-discount-badge--sale" : ""}`}>
-                      {yearlySale ? yearlySale.label : "33% off"}
+                      {yearlySale ? `${yearlySale.label} 🎉` : "33% off"}
                     </span>
                   </div>
                   <div className="lprice-amount">
