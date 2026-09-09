@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { createSubscription, verifySubscription, SubscriptionAuthError, type PlanType } from "../lib/subscription-api";
 import { fetchPlans, type Plan } from "../lib/plans-api";
+import { validateCoupon, fetchActiveCampaign, computeDiscountedPrice, CouponInvalidError, type CouponPreview, type ActiveCampaign } from "../lib/discounts-api";
 import { COMPANY_LOGOS } from "../lib/company-logos";
 
 interface PremiumModalProps {
@@ -40,6 +42,12 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponPreview, setCouponPreview] = useState<CouponPreview | null>(null);
+  const [couponPreviewPlan, setCouponPreviewPlan] = useState<PlanType | null>(null);
+  const [couponChecking, setCouponChecking] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [activeCampaign, setActiveCampaign] = useState<ActiveCampaign | null>(null);
 
   useEffect(() => {
     fetchPlans().then(setPlans).catch(() => {});
@@ -48,12 +56,46 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
   useEffect(() => {
     if (open) {
       setSelectedPlan(defaultPlan === "monthly" || defaultPlan === "yearly" ? defaultPlan : "monthly");
+      fetchActiveCampaign().then(setActiveCampaign).catch(() => setActiveCampaign(null));
     } else {
       setIsProcessing(false);
       setError(null);
       setSessionExpired(false);
+      setActiveCampaign(null);
+      setCouponInput("");
+      setCouponPreview(null);
+      setCouponError(null);
     }
   }, [open, defaultPlan]);
+
+  // A coupon's validity is plan-specific — a preview only counts for the plan it was checked against.
+  const couponValidForPlan = couponPreview && couponPreviewPlan === selectedPlan ? couponPreview : null;
+
+  const campaignApplies = !!activeCampaign
+    && (activeCampaign.appliesTo === "both" || activeCampaign.appliesTo === selectedPlan);
+
+  const effectiveDiscount = campaignApplies
+    ? { discountType: activeCampaign!.discountType, discountValue: activeCampaign!.discountValue, label: activeCampaign!.name }
+    : couponValidForPlan
+      ? { discountType: couponValidForPlan.discountType, discountValue: couponValidForPlan.discountValue, label: couponValidForPlan.code }
+      : null;
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim() || !authToken) return;
+    setCouponChecking(true);
+    setCouponError(null);
+    try {
+      const preview = await validateCoupon(authToken, couponInput.trim(), selectedPlan);
+      setCouponPreview(preview);
+      setCouponPreviewPlan(selectedPlan);
+    } catch (err) {
+      setCouponPreview(null);
+      setCouponPreviewPlan(null);
+      setCouponError(err instanceof CouponInvalidError ? err.message : "Something went wrong — try again.");
+    } finally {
+      setCouponChecking(false);
+    }
+  };
 
   const handlePurchase = async () => {
     if (isProcessing) return;
@@ -73,7 +115,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
     setSessionExpired(false);
 
     try {
-      const data = await createSubscription(authToken, selectedPlan);
+      const data = await createSubscription(authToken, selectedPlan, couponValidForPlan?.code);
 
       const rzp = new window.Razorpay({
         key: data.keyId,
@@ -250,6 +292,51 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
             ))}
           </div>
 
+          {/* Coupon / active sale */}
+          {campaignApplies && activeCampaign ? (
+            <div className="pm-campaign-banner">
+              🎉 {activeCampaign.name} — {activeCampaign.discountType === "percent" ? `${activeCampaign.discountValue}% off` : `₹${activeCampaign.discountValue} off`} applied automatically
+            </div>
+          ) : (
+            <div className="pm-coupon">
+              <div className={`pm-coupon-field${couponInput.trim() ? " pm-coupon-field--active" : ""}`}>
+                <input
+                  type="text"
+                  className="pm-coupon-input"
+                  placeholder="Have a coupon code?"
+                  value={couponInput}
+                  onChange={(e) => {
+                    setCouponInput(e.target.value.toUpperCase());
+                    setCouponPreview(null);
+                    setCouponError(null);
+                  }}
+                  disabled={couponChecking}
+                />
+                <button
+                  type="button"
+                  className={`pm-coupon-apply${couponInput.trim() ? " pm-coupon-apply--active" : ""}`}
+                  onClick={handleApplyCoupon}
+                  disabled={couponChecking || !couponInput.trim()}
+                  aria-label={couponValidForPlan ? "Coupon applied" : "Apply coupon"}
+                >
+                  {couponChecking ? (
+                    <span className="pm-coupon-spinner" />
+                  ) : couponValidForPlan ? (
+                    CHECK_ICON
+                  ) : (
+                    <ArrowRight size={16} strokeWidth={2.25} />
+                  )}
+                </button>
+              </div>
+              {couponError && <div className="pm-coupon-error">{couponError}</div>}
+              {couponValidForPlan && (
+                <div className="pm-coupon-success">
+                  "{couponValidForPlan.code}" applied — {couponValidForPlan.discountType === "percent" ? `${couponValidForPlan.discountValue}% off` : `₹${couponValidForPlan.discountValue} off`}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Order summary */}
           <div className="pm-summary">
             <div className="pm-summary-label">Order summary</div>
@@ -259,8 +346,24 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
             </div>
             <div className="pm-summary-row">
               <span>Amount</span>
-              <strong>{plan.priceDisplay}<span className="pm-summary-period">{plan.period}</span></strong>
+              <strong>
+                {effectiveDiscount ? (
+                  <>
+                    <span className="pm-summary-strike">{plan.priceDisplay}</span>{" "}
+                    ₹{computeDiscountedPrice(plan.price, effectiveDiscount.discountType, effectiveDiscount.discountValue).toLocaleString("en-IN")}
+                  </>
+                ) : (
+                  plan.priceDisplay
+                )}
+                <span className="pm-summary-period">{plan.period}</span>
+              </strong>
             </div>
+            {effectiveDiscount && (
+              <div className="pm-summary-row">
+                <span>Discount</span>
+                <strong className="pm-summary-discount">{effectiveDiscount.label}</strong>
+              </div>
+            )}
             <div className="pm-summary-row">
               <span>Billing</span>
               <strong>{plan.billing}</strong>

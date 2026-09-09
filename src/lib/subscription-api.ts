@@ -9,6 +9,13 @@ export class SubscriptionAuthError extends Error {
 
 export type PlanType = "monthly" | "yearly";
 
+export interface SubscriptionDiscount {
+  source: "grant" | "coupon" | "campaign";
+  discountType: "percent" | "flat";
+  discountValue: number;
+  couponCode?: string;
+}
+
 export interface SubscriptionData {
   subscriptionId: string;
   keyId: string;
@@ -17,11 +24,13 @@ export interface SubscriptionData {
     email: string;
     contact: string;
   };
+  discount?: SubscriptionDiscount | null;
 }
 
 export async function createSubscription(
   token: string,
   plan: PlanType,
+  couponCode?: string,
 ): Promise<SubscriptionData> {
   const response = await fetch(
     new URL("/subscription/create", AUTH_API_BASE_URL).toString(),
@@ -33,7 +42,7 @@ export async function createSubscription(
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ plan, billing: plan }),
+      body: JSON.stringify({ plan, billing: plan, couponCode: couponCode || undefined }),
     },
   );
 
