@@ -278,7 +278,7 @@ export function LandingPage({
 
   const bannerKey = activeCampaign ? `${activeCampaign.name}|${activeCampaign.endsAt}` : null;
   const bannerRemaining = activeCampaign ? new Date(activeCampaign.endsAt).getTime() - bannerNow : 0;
-  const showSaleBanner = !!activeCampaign && bannerRemaining > 0 && bannerDismissedKey !== bannerKey;
+  const showSaleBanner = !isPremium && !!activeCampaign && bannerRemaining > 0 && bannerDismissedKey !== bannerKey;
 
   function handleDismissSaleBanner() {
     if (!bannerKey) return;
