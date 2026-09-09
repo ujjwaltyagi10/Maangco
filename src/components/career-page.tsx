@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes/route-paths";
 import { fetchCareerRoles, type CareerRole } from "@/lib/careers-api";
+import { CareerApplyModal } from "@/components/career-apply-modal";
 import instagramSvg from "@/assets/svg/instagram.svg";
 import linkedinSvg from "@/assets/svg/linkedin.svg";
 
@@ -14,6 +15,7 @@ export function CareerPage({ theme, onThemeChange }: CareerPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const [openRoleId, setOpenRoleId] = useState<string | null>(null);
+  const [applyRoleId, setApplyRoleId] = useState<string | null>(null);
   const [roles, setRoles] = useState<CareerRole[]>([]);
   const [rolesLoading, setRolesLoading] = useState(true);
   const [rolesError, setRolesError] = useState(false);
@@ -162,12 +164,16 @@ export function CareerPage({ theme, onThemeChange }: CareerPageProps) {
                             <path d="M2 4l4 4 4-4" />
                           </svg>
                         </button>
-                        <Link to={ROUTES.contact} className="lbtn-primary lcareer-apply-btn">
+                        <button
+                          type="button"
+                          className="lbtn-primary lcareer-apply-btn"
+                          onClick={() => setApplyRoleId(role.id)}
+                        >
                           Apply Now
                           <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11">
                             <path d="M2 6h8M6 2l4 4-4 4" />
                           </svg>
-                        </Link>
+                        </button>
                       </div>
                     </div>
                     {isOpen && <p className="lcareer-role-desc">{role.description}</p>}
@@ -217,6 +223,13 @@ export function CareerPage({ theme, onThemeChange }: CareerPageProps) {
           </div>
         </div>
       </footer>
+
+      <CareerApplyModal
+        open={!!applyRoleId}
+        roleId={applyRoleId ?? ""}
+        roleTitle={roles.find((r) => r.id === applyRoleId)?.title ?? ""}
+        onClose={() => setApplyRoleId(null)}
+      />
 
     </div>
   );
