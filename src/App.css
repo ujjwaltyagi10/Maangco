@@ -5476,8 +5476,6 @@ a.lbtn-lg {
 }
 
 .dp-tip-icon {
-  font-size: 16px;
-  line-height: 1;
   flex-shrink: 0;
   width: 32px;
   height: 32px;
@@ -5487,6 +5485,7 @@ a.lbtn-lg {
   background: var(--surface3);
   border-radius: 8px;
   border: 1px solid var(--border);
+  color: var(--accent);
 }
 
 .dp-tip-body {

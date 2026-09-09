@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Boxes, Database } from "lucide-react";
+import { Boxes, Database, Repeat, Flame, Mic } from "lucide-react";
 import type { DsaCompany } from "@/types/maangco";
 import { CompanyKitsModal } from "./company-kits-modal";
 import { CompanyLogo } from "./ui/company-logo";
@@ -31,11 +31,11 @@ interface DashboardPanelProps {
 }
 
 const tips = [
-  { icon: "🔁", title: "Consistency beats intensity", copy: "1 hour daily beats 8 hours on weekends. Use the 45-day roadmap." },
+  { icon: Repeat, title: "Consistency beats intensity", copy: "1 hour daily beats 8 hours on weekends. Use the 45-day roadmap." },
   // { icon: "⚡", title: "JS fundamentals first", copy: "Closures, event loop, and prototypes appear in 90% of frontend rounds." },
   // { icon: "🏗️", title: "Build, don't just read", copy: "Implement debounce, throttle, and LRU cache from scratch — they ask this." },
-  { icon: "🔥", title: "High-freq DSA first", copy: "Sliding window & two pointers cover ~40% of rounds. Start there." },
-  { icon: "🎤", title: "Explain as you code", copy: "Interviewers value communication. Think out loud even when stuck." },
+  { icon: Flame, title: "High-freq DSA first", copy: "Sliding window & two pointers cover ~40% of rounds. Start there." },
+  { icon: Mic, title: "Explain as you code", copy: "Interviewers value communication. Think out loud even when stuck." },
   // { icon: "📐", title: "System design matters", copy: "Autocomplete and infinite scroll are the most common frontend SD questions." },
 ];
 
@@ -230,7 +230,7 @@ export function DashboardPanel({
       <div className="dp-tips">
         {tips.map((t) => (
           <div key={t.title} className="dp-tip">
-            <div className="dp-tip-icon">{t.icon}</div>
+            <div className="dp-tip-icon"><t.icon size={16} strokeWidth={1.8} /></div>
             <div className="dp-tip-body">
               <div className="dp-tip-title">{t.title}</div>
               <div className="dp-tip-copy">{t.copy}</div>
