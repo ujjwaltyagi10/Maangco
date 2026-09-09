@@ -1,17 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes/route-paths";
+import { fetchCareerRoles, getCachedCareerRoles, type CareerRole } from "@/lib/careers-api";
+import { CareerApplyModal } from "@/components/career-apply-modal";
 import instagramSvg from "@/assets/svg/instagram.svg";
 import linkedinSvg from "@/assets/svg/linkedin.svg";
 
-interface ContactPageProps {
+interface CareerPageProps {
   theme: "light" | "dark";
   onThemeChange: () => void;
 }
 
-export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
+export function CareerPage({ theme, onThemeChange }: CareerPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
+  const [openRoleId, setOpenRoleId] = useState<string | null>(null);
+  const [applyRoleId, setApplyRoleId] = useState<string | null>(null);
+  const cachedRoles = getCachedCareerRoles();
+  const [roles, setRoles] = useState<CareerRole[]>(cachedRoles ?? []);
+  const [rolesLoading, setRolesLoading] = useState(cachedRoles === null);
+  const [rolesError, setRolesError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -20,6 +28,13 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
     const onScroll = () => setNavScrolled(el.scrollTop > 20);
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    fetchCareerRoles()
+      .then(setRoles)
+      .catch(() => setRolesError(true))
+      .finally(() => setRolesLoading(false));
   }, []);
 
   return (
@@ -39,7 +54,6 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
                 <span className="landing-logo-text">MAANG<em>co</em></span>
               </Link>
             </div>
-
             <div className="hidden lg:flex items-center gap-2">
               <button type="button" className="lnav-theme-btn" onClick={onThemeChange} aria-label="Toggle theme">
                 {theme === "light" ? (
@@ -54,7 +68,6 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
                 )}
               </button>
             </div>
-
             <div className="landing-nav-mobile">
               <button type="button" className="lnav-theme-btn" onClick={onThemeChange} aria-label="Toggle theme">
                 {theme === "light" ? (
@@ -77,38 +90,99 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
               </button>
             </div>
           </div>
-
         </div>
       </nav>
 
-      {/* ── CONTACT CONTENT ── */}
-      <section className="lcontact-section">
-        <div className="lcontact-card">
-          {/* Phone icon */}
-          <div className="lcontact-icon-wrap">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#c87c4a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
-            </svg>
+      {/* ── CAREER PORTAL ── */}
+      <section className="lcareer-section">
+        <div className="lcareer-inner">
+          <div className="lcareer-left">
+            <p className="lcareer-eyebrow">Careers</p>
+            <h1 className="lcareer-heading">Career Portal</h1>
+            <p className="lcareer-sub">
+              We're a small, fast-moving team building the sharpest interview-prep
+              platform out there. Come build it with us.
+            </p>
+            <div className="lcareer-contact">
+              <span className="lcareer-contact-label">Or contact us with</span>
+              <a href="mailto:careers@maangco.com" className="lcareer-contact-link">careers@maangco.com</a>
+            </div>
           </div>
 
-          <h1 className="lcontact-title">Contact</h1>
-
-          <p className="lcontact-body">
-            You can reach us at{" "}
-            <a href="mailto:support@maangco.com" className="lcontact-link">
-              support@maangco.com
-            </a>{" "}
-            by dropping an email. We usually get back within 48–72 hours.
-          </p>
-
-          {/* <p className="lcontact-phone">
-            Phone Number: <span>+91 98765 43210</span>
-          </p> */}
-
-          {/* <p className="lcontact-address">
-            Address: 4th floor, 123, Koramangala 5th Block, 80 Feet Road,<br />
-            Bengaluru – 560 095.
-          </p> */}
+          <div className="lcareer-right">
+            {rolesLoading ? (
+              <p className="lcareer-role-desc">Loading open roles…</p>
+            ) : rolesError ? (
+              <p className="lcareer-role-desc">
+                Couldn't load open roles right now — reach out at{" "}
+                <a href="mailto:careers@maangco.com" className="lcareer-contact-link">careers@maangco.com</a> instead.
+              </p>
+            ) : roles.length === 0 ? (
+              <p className="lcareer-role-desc">
+                No open roles right now — but we're always happy to hear from good people. Email us at{" "}
+                <a href="mailto:careers@maangco.com" className="lcareer-contact-link">careers@maangco.com</a>.
+              </p>
+            ) : (
+              roles.map((role) => {
+                const isOpen = openRoleId === role.id;
+                return (
+                  <div key={role.id} className={`lcareer-role${isOpen ? " open" : ""}`}>
+                    <div className="lcareer-role-main">
+                      <div className="lcareer-role-head">
+                        <p className="lcareer-role-eyebrow">Open Role</p>
+                        <h3 className="lcareer-role-title">{role.title}</h3>
+                        <div className="lcareer-role-meta">
+                          <span>{role.type}</span>
+                          {role.experience && (
+                            <>
+                              <span className="lcareer-meta-dot" />
+                              <span>{role.experience}</span>
+                            </>
+                          )}
+                          <span className="lcareer-meta-dot" />
+                          <span>{role.location}</span>
+                        </div>
+                      </div>
+                      <div className="lcareer-role-actions">
+                        <button
+                          type="button"
+                          className="lcareer-role-toggle"
+                          onClick={() => setOpenRoleId(isOpen ? null : role.id)}
+                          aria-label={isOpen ? "Collapse details" : "Expand details"}
+                          aria-expanded={isOpen}
+                        >
+                          <svg
+                            viewBox="0 0 12 12"
+                            width="11"
+                            height="11"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}
+                          >
+                            <path d="M2 4l4 4 4-4" />
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          className="lbtn-primary lcareer-apply-btn"
+                          onClick={() => setApplyRoleId(role.id)}
+                        >
+                          Apply Now
+                          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11">
+                            <path d="M2 6h8M6 2l4 4-4 4" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                    {isOpen && <p className="lcareer-role-desc">{role.description}</p>}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       </section>
 
@@ -150,6 +224,13 @@ export function ContactPage({ theme, onThemeChange }: ContactPageProps) {
           </div>
         </div>
       </footer>
+
+      <CareerApplyModal
+        open={!!applyRoleId}
+        roleId={applyRoleId ?? ""}
+        roleTitle={roles.find((r) => r.id === applyRoleId)?.title ?? ""}
+        onClose={() => setApplyRoleId(null)}
+      />
 
     </div>
   );
