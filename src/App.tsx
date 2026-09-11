@@ -8,6 +8,7 @@ import { fetchProgress, toggleProgress, emptyProgress, type ProgressState } from
 import { fetchDsaGrouped, fetchDsaAll, fetchSystemDesignQuestions, fetchFrontendQuestions, fetchRoadmap } from "./lib/questions-api";
 import { useLocalStorage } from "./hooks/use-local-storage";
 import { useGoogleOneTap } from "./hooks/useGoogleOneTap";
+import { identify, track } from "./lib/mixpanel";
 import type { DsaAllQuestion, DsaCompany, FrontendQuestion, FrontendQuestionId, QuestionId, RoadmapWeek, SystemDesignQuestion, SystemDesignQuestionId } from "./types/maangco";
 import { ROUTES, type AuthSubmitResult } from "./routes/route-paths";
 import "./App.css";
@@ -113,6 +114,16 @@ function App() {
     "maangco.auth-session",
     null,
   );
+
+  useEffect(() => {
+    const userId = authSession?.user?.id;
+    if (!userId) return;
+    identify(String(userId), {
+      $email: authSession?.user?.email,
+      $first_name: authSession?.user?.first_name,
+      $last_name: authSession?.user?.last_name,
+    });
+  }, [authSession?.user?.id, authSession?.user?.email, authSession?.user?.first_name, authSession?.user?.last_name]);
   const [authStatus, setAuthStatus] = useState<"loading" | "ready">("loading");
   const [authError, setAuthError] = useState<string | null>(null);
   const [authInfo, setAuthInfo] = useState<string | null>(null);
@@ -402,6 +413,7 @@ function App() {
     const safePlan = plan === "monthly" || plan === "yearly" ? plan : "monthly";
     setPremiumModalDefaultPlan(safePlan);
     setShowPremiumModal(true);
+    track("Buy Premium Clicked", { plan: safePlan });
   };
 
   const handlePaymentSuccess = async () => {

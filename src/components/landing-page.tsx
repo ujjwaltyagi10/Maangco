@@ -24,6 +24,7 @@ import uberDarkSvg from "@/assets/svg/uber-dark.svg";
 import visaSvg from "@/assets/svg/visa.svg";
 import { ROUTES } from "@/routes/route-paths";
 import { fetchActiveCampaign, computeDiscountedPrice, type ActiveCampaign } from "@/lib/discounts-api";
+import { track } from "@/lib/mixpanel";
 import { SaleBanner } from "./sale-banner";
 
 const DSALightVid = new URL("../assets/Video/DSALight.webm", import.meta.url)
@@ -216,6 +217,10 @@ export function LandingPage({
 
   useEffect(() => {
     fetchActiveCampaign().then(setActiveCampaign).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    track("Landing Page Viewed");
   }, []);
 
   useEffect(() => {

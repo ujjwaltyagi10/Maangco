@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
 import * as Sentry from '@sentry/react'
+import { initMixpanel } from './lib/mixpanel'
 import './index.css'
 import App from './App.tsx'
 
@@ -13,6 +14,8 @@ if (import.meta.env.VITE_SENTRY_DSN) {
     replaysOnErrorSampleRate: 1.0,
   })
 }
+
+initMixpanel()
 
 registerSW({ immediate: true })
 

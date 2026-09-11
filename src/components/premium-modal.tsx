@@ -4,6 +4,7 @@ import { createSubscription, verifySubscription, SubscriptionAuthError, type Pla
 import { fetchPlans, type Plan } from "../lib/plans-api";
 import { validateCoupon, fetchActiveCampaign, computeDiscountedPrice, CouponInvalidError, type CouponPreview, type ActiveCampaign } from "../lib/discounts-api";
 import { COMPANY_LOGOS } from "../lib/company-logos";
+import { track } from "../lib/mixpanel";
 
 interface PremiumModalProps {
   open: boolean;
@@ -98,6 +99,7 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
       const preview = await validateCoupon(authToken, couponInput.trim(), selectedPlan);
       setCouponPreview(preview);
       setCouponPreviewPlan(selectedPlan);
+      track("Coupon Applied", { code: preview.code, plan: selectedPlan, discountType: preview.discountType, discountValue: preview.discountValue });
     } catch (err) {
       setCouponPreview(null);
       setCouponPreviewPlan(null);
@@ -166,6 +168,11 @@ export function PremiumModal({ open, onClose, authToken, userEmail, onPaymentSuc
         },
       });
 
+      track("Checkout Started", {
+        plan: selectedPlan,
+        discountApplied: !!couponValidForPlan || campaignApplies,
+        couponCode: couponValidForPlan?.code,
+      });
       rzp.open();
     } catch (err) {
       if (err instanceof SubscriptionAuthError) {
