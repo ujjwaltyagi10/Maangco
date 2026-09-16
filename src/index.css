@@ -3494,9 +3494,14 @@ body {
     grid-template-columns: 1fr;
   }
 
-  /* ── Bottom clearance: shrink content-area so fixed nav never overlaps ── */
+  /* ── Bottom clearance: shrink content-area so the fixed nav never overlaps ──
+     content-area is the flex parent for every panel (.dashboard, .dp-root,
+     .dsa-panel, .sd-content, .frontend-panel, ...); padding here shrinks the
+     box all of them flex to fill, so this single rule covers every panel.
+     Don't also add padding-bottom on the panels themselves — that double
+     -counts the clearance and leaves a large empty gap under short content. */
   .content-area {
-    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(62px + 32px + env(safe-area-inset-bottom, 0px));
   }
 
   /* ── DSA panel: stack vertically ── */
