@@ -972,11 +972,34 @@ a.lbtn-lg {
   max-width: 1200px;
   margin: 0 auto;
   padding: 10px clamp(16px, 4vw, 40px);
+  /* Equal 1fr side columns keep the center group truly centered no matter
+     its width, while the close button pins to the right edge independently
+     instead of being dragged into the centered cluster. */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.sale-banner-spacer {
+  min-width: 0;
+}
+.sale-banner-center {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
+  gap: 24px;
+  min-width: 0;
+}
+.sale-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.sale-banner-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
 }
 .sale-banner-icon {
   color: #fff;
@@ -1061,18 +1084,54 @@ a.lbtn-lg {
   background: rgba(255, 255, 255, 0.3);
 }
 @media (max-width: 720px) {
+  /* Mobile: one flat flex row — the grouping that centers things on desktop
+     isn't needed on a narrow screen, so collapse all wrappers back to
+     `contents` and let icon/text/countdown/cta/close sit as direct flex
+     items, tightened up with the discount text dropped and the CTA
+     collapsed to its arrow icon. */
   .sale-banner-inner {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
     gap: 8px;
-    padding: 8px 16px;
+    padding: 9px 14px;
   }
-  .sale-banner-text {
-    font-size: 11.5px;
-    white-space: normal;
-  }
-  .sale-banner-sep {
+  .sale-banner-spacer {
     display: none;
   }
+  .sale-banner-center,
+  .sale-banner-left {
+    display: contents;
+  }
+  .sale-banner-icon {
+    flex-shrink: 0;
+  }
+  .sale-banner-text {
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .sale-banner-discount {
+    display: none;
+  }
+  .sale-banner-countdown {
+    flex-shrink: 0;
+  }
+  .sale-banner-cta {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 999px;
+    justify-content: center;
+  }
   .sale-banner-cta span {
+    display: none;
+  }
+  .sale-banner-right {
     display: none;
   }
 }
