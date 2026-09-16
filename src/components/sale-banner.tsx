@@ -38,35 +38,45 @@ export function SaleBanner({ campaign, remainingMs, onDismiss }: SaleBannerProps
   return (
     <div className="sale-banner">
       <div className="sale-banner-inner">
-        <Sparkles size={15} strokeWidth={2.25} className="sale-banner-icon" aria-hidden="true" />
-        <span className="sale-banner-text">
-          <strong>{campaign.name}</strong>
-          <span className="sale-banner-sep" aria-hidden="true">·</span>
-          {discountLabel(campaign)} on Premium
-        </span>
+        <div className="sale-banner-spacer" aria-hidden="true" />
 
-        <div className="sale-banner-countdown" aria-label={`Offer ends in ${t.days} days ${t.hours} hours ${t.minutes} minutes ${t.seconds} seconds`}>
-          {t.days > 0 && (
-            <>
-              <span className="sale-banner-timebox">{pad(t.days)}<em>d</em></span>
-              <span className="sale-banner-colon">:</span>
-            </>
-          )}
-          <span className="sale-banner-timebox">{pad(t.hours)}<em>h</em></span>
-          <span className="sale-banner-colon">:</span>
-          <span className="sale-banner-timebox">{pad(t.minutes)}<em>m</em></span>
-          <span className="sale-banner-colon">:</span>
-          <span className="sale-banner-timebox">{pad(t.seconds)}<em>s</em></span>
+        <div className="sale-banner-center">
+          <div className="sale-banner-left">
+            <Sparkles size={15} strokeWidth={2.25} className="sale-banner-icon" aria-hidden="true" />
+            <span className="sale-banner-text">
+              <strong>{campaign.name}</strong>
+              <span className="sale-banner-discount">
+                <span className="sale-banner-sep" aria-hidden="true">·</span>
+                {discountLabel(campaign)} on Premium
+              </span>
+            </span>
+          </div>
+
+          <div className="sale-banner-countdown" aria-label={`Offer ends in ${t.days} days ${t.hours} hours ${t.minutes} minutes ${t.seconds} seconds`}>
+            {t.days > 0 && (
+              <>
+                <span className="sale-banner-timebox sale-banner-timebox--days">{pad(t.days)}<em>d</em></span>
+                <span className="sale-banner-colon sale-banner-colon--days">:</span>
+              </>
+            )}
+            <span className="sale-banner-timebox sale-banner-timebox--hours">{pad(t.hours)}<em>h</em></span>
+            <span className="sale-banner-colon sale-banner-colon--hours">:</span>
+            <span className="sale-banner-timebox sale-banner-timebox--minutes">{pad(t.minutes)}<em>m</em></span>
+            <span className="sale-banner-colon sale-banner-colon--minutes">:</span>
+            <span className="sale-banner-timebox sale-banner-timebox--seconds">{pad(t.seconds)}<em>s</em></span>
+          </div>
+
+          <a href="#pricing" className="sale-banner-cta" aria-label="Claim offer">
+            <span>Claim offer</span>
+            <ArrowRight size={13} strokeWidth={2.25} />
+          </a>
         </div>
 
-        <a href="#pricing" className="sale-banner-cta">
-          <span>Claim offer</span>
-          <ArrowRight size={13} strokeWidth={2.25} />
-        </a>
-
-        <button type="button" className="sale-banner-close" onClick={onDismiss} aria-label="Dismiss">
-          <X size={14} strokeWidth={2} />
-        </button>
+        <div className="sale-banner-right">
+          <button type="button" className="sale-banner-close" onClick={onDismiss} aria-label="Dismiss">
+            <X size={14} strokeWidth={2} />
+          </button>
+        </div>
       </div>
     </div>
   );
