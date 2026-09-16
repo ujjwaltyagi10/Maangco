@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, SlidersVertical, X } from "lucide-react";
 
 import type {
   SystemDesignCategory,
@@ -19,6 +19,7 @@ import type {
 
 import { COMPANY_LOGOS } from "@/lib/company-logos";
 import { CompanyLogo } from "./ui/company-logo";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import { SystemDesignPanelSkeleton } from "./system-design-panel-skeleton";
 
@@ -99,6 +100,7 @@ export function SystemDesignPanel({
   const [companySearch, setCompanySearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const pageSize = 50;
 
   const deferredSearch = useDeferredValue(search);
@@ -223,6 +225,15 @@ export function SystemDesignPanel({
     setCurrentPage(Math.max(1, Math.min(totalPages, n)));
   }
 
+  function clearAllFilters() {
+    setFreqFilter("All");
+    setSelectedCat(ALL_CAT);
+    setLevelFilter("All");
+    setCurrentPage(1);
+  }
+
+  const hasActiveFilters = freqFilter !== "All" || selectedCat !== ALL_CAT || levelFilter !== "All";
+
   const totalDone = completedIds.length;
 
   if (isLoading) {
@@ -310,38 +321,78 @@ export function SystemDesignPanel({
             />
           </div>
 
-          <Select value={freqFilter} onValueChange={(v) => { startTransition(() => { setFreqFilter(v as "All" | SystemDesignFrequency); setCurrentPage(1); }); }}>
-            <SelectTrigger className="dsa-pill-trigger">
-              <span className="dsa-pill-label">Frequency: <strong>{freqFilter}</strong></span>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All</SelectItem>
-              <SelectItem value="High">High</SelectItem>
-              <SelectItem value="Medium">Medium</SelectItem>
-              <SelectItem value="Low">Low</SelectItem>
-            </SelectContent>
-          </Select>
+          {/* Single combined Filters button holding Frequency/Category/Level */}
+          <DropdownMenu open={filtersOpen} onOpenChange={setFiltersOpen} modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button type="button" className={`dsa-filter-btn${hasActiveFilters ? " has-active" : ""}`}>
+                <SlidersVertical size={14} strokeWidth={1.8} />
+                <span className="filter-btn-label">Filters</span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="dsa-filter-panel">
+              <div className="dsa-filter-panel-head">
+                <span className="dsa-filter-panel-title">Filters</span>
+                <button type="button" className="dsa-filter-panel-close" onClick={() => setFiltersOpen(false)} aria-label="Close">
+                  <X size={14} />
+                </button>
+              </div>
 
-          <Select value={selectedCat} onValueChange={(v) => { startTransition(() => { setSelectedCat(v as typeof ALL_CAT | SystemDesignCategory); setCurrentPage(1); }); }}>
-            <SelectTrigger className="dsa-pill-trigger">
-              <span className="dsa-pill-label">Category: <strong>{selectedCat}</strong></span>
-            </SelectTrigger>
-            <SelectContent>
-              {CATEGORIES.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
-            </SelectContent>
-          </Select>
+              <div className="dsa-filter-field">
+                <div className="dsa-filter-field-head">
+                  <span className="dsa-filter-label">Frequency</span>
+                  {freqFilter !== "All" && (
+                    <button type="button" className="dsa-filter-reset" onClick={() => setFreqFilter("All")}>Reset</button>
+                  )}
+                </div>
+                <Select value={freqFilter} onValueChange={(v) => { startTransition(() => { setFreqFilter(v as "All" | SystemDesignFrequency); setCurrentPage(1); }); }}>
+                  <SelectTrigger className="dsa-select-trigger"><span>{freqFilter}</span></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All</SelectItem>
+                    <SelectItem value="High">High</SelectItem>
+                    <SelectItem value="Medium">Medium</SelectItem>
+                    <SelectItem value="Low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <Select value={levelFilter} onValueChange={(v) => { startTransition(() => { setLevelFilter(v as "All" | "HLD" | "LLD" | "Both"); setCurrentPage(1); }); }}>
-            <SelectTrigger className="dsa-pill-trigger">
-              <span className="dsa-pill-label">Level: <strong>{levelFilter}</strong></span>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All levels</SelectItem>
-              <SelectItem value="HLD">HLD only</SelectItem>
-              <SelectItem value="LLD">LLD only</SelectItem>
-              <SelectItem value="Both">Both (HLD + LLD)</SelectItem>
-            </SelectContent>
-          </Select>
+              <div className="dsa-filter-field">
+                <div className="dsa-filter-field-head">
+                  <span className="dsa-filter-label">Category</span>
+                  {selectedCat !== ALL_CAT && (
+                    <button type="button" className="dsa-filter-reset" onClick={() => setSelectedCat(ALL_CAT)}>Reset</button>
+                  )}
+                </div>
+                <Select value={selectedCat} onValueChange={(v) => { startTransition(() => { setSelectedCat(v as typeof ALL_CAT | SystemDesignCategory); setCurrentPage(1); }); }}>
+                  <SelectTrigger className="dsa-select-trigger"><span>{selectedCat}</span></SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="dsa-filter-field">
+                <div className="dsa-filter-field-head">
+                  <span className="dsa-filter-label">Level</span>
+                  {levelFilter !== "All" && (
+                    <button type="button" className="dsa-filter-reset" onClick={() => setLevelFilter("All")}>Reset</button>
+                  )}
+                </div>
+                <Select value={levelFilter} onValueChange={(v) => { startTransition(() => { setLevelFilter(v as "All" | "HLD" | "LLD" | "Both"); setCurrentPage(1); }); }}>
+                  <SelectTrigger className="dsa-select-trigger"><span>{levelFilter}</span></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All levels</SelectItem>
+                    <SelectItem value="HLD">HLD only</SelectItem>
+                    <SelectItem value="LLD">LLD only</SelectItem>
+                    <SelectItem value="Both">Both (HLD + LLD)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="dsa-filter-panel-foot">
+                <button type="button" className="dsa-filter-clear-all" onClick={clearAllFilters}>Clear all</button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Table */}
@@ -349,14 +400,14 @@ export function SystemDesignPanel({
           <div className="q-table-card">
             <table className="q-table q-table--sd">
               <colgroup>
-                <col style={{ width: "4%" }} />
-                <col style={{ width: "5%" }} />
-                <col style={{ width: "26%" }} />
-                <col style={{ width: "11%" }} />
-                <col style={{ width: "11%" }} />
-                <col style={{ width: "15%" }} />
-                <col style={{ width: "13%" }} />
-                <col style={{ width: "15%" }} />
+                <col className="sd-col-check" />
+                <col className="sd-col-num" />
+                <col className="sd-col-title" />
+                <col className="sd-col-freq" />
+                <col className="sd-col-level" />
+                <col className="sd-col-cat" />
+                <col className="sd-col-time" />
+                <col className="sd-col-resource" />
               </colgroup>
               <thead>
                 <tr>
@@ -450,6 +501,7 @@ export function SystemDesignPanel({
                 {totalPages > 1 && (
                   <div className="q-page-nums">
                     <button type="button" className="q-page-btn" disabled={safePage <= 1} onClick={() => goPage(safePage - 1)}>Prev</button>
+                    <span className="q-page-indicator">Page {safePage} of {totalPages}</span>
                     {sdPageNumbers.map((p, i) =>
                       p === "…" ? (
                         <span key={`ellipsis-${i}`} className="q-page-ellipsis">…</span>

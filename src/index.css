@@ -2281,6 +2281,13 @@ body {
   color: var(--muted);
 }
 
+/* Wrapper around DSA's Difficulty/Status/Tags controls so they can be hidden
+   as a group on mobile in favor of the single combined Filters button —
+   `contents` keeps them acting as direct flex children on desktop. */
+.dsa-desktop-only-filter {
+  display: contents;
+}
+
 .dsa-filter-btn {
   display: flex;
   align-items: center;
@@ -2418,6 +2425,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.dsa-filter-panel::-webkit-scrollbar {
+  display: none;
 }
 
 .dsa-filter-panel-head {
@@ -2485,6 +2498,13 @@ body {
 
 .dsa-filter-reset:hover {
   text-decoration: underline;
+}
+
+/* Difficulty/Status/Tags fields duplicated inside the combined Filters
+   panel for mobile — hidden by default since desktop shows them as
+   standalone pills next to the search bar instead. */
+.dsa-filter-mobile-only {
+  display: none;
 }
 
 .dsa-filter-panel-foot {
@@ -2558,7 +2578,9 @@ body {
   background: var(--row-card-bg, #fff);
   border: 1px solid var(--border);
   border-radius: 14px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .q-table {
@@ -2573,6 +2595,35 @@ body {
 .q-table--sd {
   table-layout: fixed;
 }
+
+.q-table--dsa {
+  min-width: 900px;
+}
+
+.q-table--sd {
+  min-width: 1040px;
+}
+
+/* DSA table column widths (desktop) — kept as classes, not inline <col> styles,
+   so mobile media queries below can actually override them; table-layout:fixed
+   ignores hidden cells and keeps their <colgroup> width reserved otherwise. */
+.dsa-col-check { width: 4%; }
+.dsa-col-num { width: 6%; }
+.dsa-col-title { width: 27%; }
+.dsa-col-diff { width: 11%; }
+.dsa-col-freq { width: 14%; }
+.dsa-col-tags { width: 32%; }
+.dsa-col-save { width: 6%; }
+
+/* System Design table column widths (desktop) */
+.sd-col-check { width: 4%; }
+.sd-col-num { width: 5%; }
+.sd-col-title { width: 26%; }
+.sd-col-freq { width: 11%; }
+.sd-col-level { width: 11%; }
+.sd-col-cat { width: 15%; }
+.sd-col-time { width: 13%; }
+.sd-col-resource { width: 15%; }
 
 .q-table--dsa .q-title,
 .q-table--dsa .q-title a,
@@ -2676,6 +2727,12 @@ body {
   font-family: "DM Mono", monospace;
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* DSA difficulty badge: full word by default, single-letter on narrow
+   screens where the card only has room for E/M/H. */
+.diff-badge-short {
+  display: none;
 }
 
 .diff-badge.Easy {
@@ -3583,12 +3640,155 @@ body {
     gap: 8px;
   }
 
-  /* ── DSA table: hide Frequency + Tags on mobile ── */
-  .q-table th:nth-child(5),
-  .q-table td:nth-child(5),
-  .q-table th:nth-child(6),
-  .q-table td:nth-child(6) {
+  /* ── DSA table: on mobile, each row becomes a compact grid card. ── */
+  .q-table--dsa {
+    display: block;
+    table-layout: auto;
+    width: 100%;
+    min-width: 0;
+  }
+  .q-table--dsa colgroup {
     display: none;
+  }
+  .q-table--dsa thead {
+    display: none;
+  }
+  .q-table--dsa tbody {
+    display: block;
+    width: 100%;
+  }
+  .q-table--dsa tr.q-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 8px 12px;
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+  }
+  .q-table--dsa tr.q-row + tr.q-row {
+    border-top: 1px solid var(--border);
+  }
+  .q-table--dsa tr.q-row td {
+    display: block;
+    padding: 0;
+    border-top: none !important;
+    min-width: 0;
+  }
+  /* Hidden on mobile: # (2), Topic Tags (6), Save (7) — the card only has
+     room for the checkbox, title, frequency dots and difficulty badge, all
+     on one line. These selectors must match (or beat) the specificity of
+     the `tr.q-row td` display:block rule above, or the display:none here
+     loses the cascade. */
+  .q-table--dsa tr.q-row td:nth-child(2),
+  .q-table--dsa tr.q-row td:nth-child(6),
+  .q-table--dsa tr.q-row td:nth-child(7) {
+    display: none;
+  }
+  .q-table--dsa tr.q-row td:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .q-table--dsa tr.q-row td:nth-child(3) {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .q-table--dsa tr.q-row td:nth-child(5) {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .q-table--dsa tr.q-row td:nth-child(4) {
+    grid-column: 4;
+    grid-row: 1;
+    margin-left: 4px;
+  }
+
+  /* Difficulty badge: collapse to a single letter (E/M/H) to save space. */
+  .diff-badge-full {
+    display: none;
+  }
+  .diff-badge-short {
+    display: inline;
+  }
+
+  /* ── System Design table: same grid-card treatment (check + title + frequency) ── */
+  .q-table--sd {
+    display: block;
+    table-layout: auto;
+    width: 100%;
+    min-width: 0;
+  }
+  .q-table--sd colgroup {
+    display: none;
+  }
+  .q-table--sd thead {
+    display: none;
+  }
+  .q-table--sd tbody {
+    display: block;
+    width: 100%;
+  }
+  .q-table--sd tr.q-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+  }
+  .q-table--sd tr.q-row + tr.q-row {
+    border-top: 1px solid var(--border);
+  }
+  .q-table--sd tr.q-row td {
+    display: block;
+    padding: 0;
+    border-top: none !important;
+    min-width: 0;
+  }
+  /* Hidden on mobile: # (2), Design Level (5), Category (6), Timeframe (7),
+     Resource (8) — only the checkbox, title and frequency badge fit on a
+     card. These selectors must match (or beat) the specificity of the
+     `tr.q-row td` display:block rule above, or display:none here loses
+     the cascade. */
+  .q-table--sd tr.q-row td:nth-child(2),
+  .q-table--sd tr.q-row td:nth-child(5),
+  .q-table--sd tr.q-row td:nth-child(6),
+  .q-table--sd tr.q-row td:nth-child(7),
+  .q-table--sd tr.q-row td:nth-child(8) {
+    display: none;
+  }
+  .q-table--sd tr.q-row td:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .q-table--sd tr.q-row td:nth-child(3) {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .q-table--sd tr.q-row td:nth-child(4) {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .q-table--sd .q-title {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  /* DSA title now shares its row with the frequency dots and difficulty
+     badge, so it truncates with an ellipsis instead of wrapping. */
+  .q-table--dsa .q-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .q-table--dsa .q-title a {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* ── Frontend Prep panel: stack vertically ── */
@@ -3650,6 +3850,16 @@ body {
     height: 42px;
     padding: 0;
     justify-content: center;
+  }
+
+  /* Collapse DSA's Difficulty/Status/Tags into the single combined Filters
+     button — they'd otherwise overflow the search row on narrow screens. */
+  .dsa-desktop-only-filter {
+    display: none;
+  }
+
+  .dsa-filter-mobile-only {
+    display: flex;
   }
 
   /* Mobile hamburger menu button: same size */
@@ -3730,12 +3940,6 @@ body {
 
   .q-table th {
     padding: 0.5rem 0.5rem;
-  }
-
-  /* Also hide bookmark on very small screens */
-  .q-table th:nth-child(7),
-  .q-table td:nth-child(7) {
-    display: none;
   }
 }
 
@@ -4136,6 +4340,61 @@ body {
   color: var(--text3);
   font-size: 13px;
   padding: 0 2px;
+}
+
+/* Compact "Page X of Y" indicator — swaps in for the full page-number list
+   on narrow screens, where a row of number buttons doesn't fit. */
+.q-page-indicator {
+  display: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .q-pagination {
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 16px 16px;
+  }
+
+  .q-page-info {
+    width: 100%;
+    font-size: 12px;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .q-page-nums {
+    width: 100%;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* Number buttons + ellipsis don't fit a narrow card — replaced by the
+     compact "Page X of Y" indicator between Prev/Next. */
+  .q-page-num,
+  .q-page-ellipsis {
+    display: none;
+  }
+
+  .q-page-indicator {
+    display: inline-block;
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .q-page-btn {
+    flex: 0 0 auto;
+    height: 40px;
+    min-width: 68px;
+    padding: 0 13px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1;
+  }
 }
 
 /* ─────────────────────────────────────────
